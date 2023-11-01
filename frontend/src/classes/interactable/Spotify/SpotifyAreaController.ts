@@ -110,6 +110,10 @@ export default class SpotifyAreaController extends InteractableAreaController<
     throw new Error('Method not implemented.');
   }
 
+  //Need a method for passing song data to frontend/makeing stream connection. Waiting on API tool
+
+  //Need method for handling sign in credentials. Waiting on API Tool
+
   /**
    * Emits a queueChanged event if anything about the queue has changed (likes, dislikes comments, order)
    * @param newModel The new model which is to be checked for changes with the current model
@@ -121,4 +125,5 @@ export default class SpotifyAreaController extends InteractableAreaController<
   public isActive(): boolean {
     throw new Error('Method not implemented.');
   }
+
 }
