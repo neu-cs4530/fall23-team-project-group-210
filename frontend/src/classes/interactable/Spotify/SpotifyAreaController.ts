@@ -16,7 +16,7 @@ export type Song = {
 
 /**
  * Events to be emitted. I believe this tells the fronted to rerender. Right now
- * only adding a queueChanged event, but may need more types of events like new comments, likes, 
+ * only adding a queueChanged event, but may need more types of events like new comments, likes,
  * song change, playback change, etc. Look at ViewingAreaController for examples.
  */
 export type SpotifyAreaEvents = BaseInteractableEventMap & {
@@ -76,7 +76,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param playerId playerId who saved the song
    */
   saveSong(song: Song, playerId: number): void {
-    throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.' + song + playerId);
   }
 
   /**
@@ -84,7 +84,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param playerId the Id of the player whose saved songs we're fetching
    */
   getSavedSongs(playerId: number): Song[] {
-    throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.' + playerId);
   }
 
   /**
@@ -92,7 +92,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param songName the name of the song provided by the frontend from the user
    */
   searchSong(songName: string): Song[] {
-    throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.' + songName);
   }
 
   toInteractableAreaModel(): SpotifyAreaModel {
@@ -107,7 +107,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param comments comments for song
    */
   updateSong(song: string, likes: number, dislikes: number, comments: string[]): void {
-    throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.' + song + likes + dislikes + comments);
   }
 
   //Need a method for passing song data to frontend/makeing stream connection. Waiting on API tool
@@ -119,11 +119,10 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param newModel The new model which is to be checked for changes with the current model
    */
   protected _updateFrom(newModel: SpotifyAreaModel): void {
-    throw new Error('Method not implemented.');
+    throw new Error('Method not implemented.' + newModel);
   }
 
   public isActive(): boolean {
     throw new Error('Method not implemented.');
   }
-
 }

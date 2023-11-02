@@ -1,17 +1,16 @@
-import { nanoid } from 'nanoid';
 import { SongQueue } from './Queue';
-import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
+//import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
 import { Song } from './SpotifyAreaController';
 describe('SpotifyAreaController and SongQueue Tests', () => {
   beforeEach(() => {
-    const model: SpotifyAreaModel = {
-      queue: new SongQueue(),
-      //NEED TO UPDATE interactableTypeForObjectType and create a type for spotifyArea
-      type: 'ViewingArea',
-      id: '',
-      occupants: []
-    }
-    const controller: SpotifyAreaController = new SpotifyAreaController(nanoid(), model);
+    // const model: SpotifyAreaModel = {
+    //   queue: new SongQueue(),
+    //   //NEED TO UPDATE interactableTypeForObjectType and create a type for spotifyArea
+    //   type: 'ViewingArea',
+    //   id: '',
+    //   occupants: [],
+    // };
+    //const controller: SpotifyAreaController = new SpotifyAreaController(nanoid(), model);
   });
   describe('SongQueue', () => {
     it('SongQueue adds and removes songs in the right order', () => {
