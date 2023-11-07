@@ -196,16 +196,6 @@ export default function TownSelection(): JSX.Element {
         ? new URLSearchParams(window.location.hash.substring(1)).get('access_token')
         : null,
     );
-
-    const items = await api.search('The Beatles', ['artist']);
-
-    console.table(
-      items.artists.items.map(item => ({
-        name: item.name,
-        followers: item.followers.total,
-        popularity: item.popularity,
-      })),
-    );
     return;
   };
 
