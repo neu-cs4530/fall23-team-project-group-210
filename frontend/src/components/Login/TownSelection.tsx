@@ -22,12 +22,11 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
-import { SpotifyApi } from '@spotify/web-api-ts-sdk';
+import { UserProfile, SpotifyApi } from '@spotify/web-api-ts-sdk';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
-import { set } from 'lodash';
-import { use } from 'matter';
+import { useSpotify } from '../../hooks/useSpotify';
 
 export default function TownSelection(): JSX.Element {
   const clientID = 'ddf7330eed894b0f81b580cba2d1b570';
@@ -37,37 +36,64 @@ export default function TownSelection(): JSX.Element {
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
   const [currentPublicTowns, setCurrentPublicTowns] = useState<Town[]>();
   const [isJoining, setIsJoining] = useState<boolean>(false);
-  const [spotifyUID, setSpotifyUID] = useState<string>('');
-  const [spotifyToken, setSpotifyToken] = useState<string | null>(
+  const [isSpotifyAttempt, setIsSpotifyAttempt] = useState<boolean>(false);
+  const [spotifyUser, setSpotifyUser] = useState<UserProfile>({} as UserProfile);
+  // const [spotifyToken, setSpotifyToken] = useState<string | null>(
+  //   window.location.hash !== ''
+  //     ? new URLSearchParams(window.location.hash.substring(1)).get('access_token')
+  //     : null,
+  // );
+  const spotifyToken =
     window.location.hash !== ''
       ? new URLSearchParams(window.location.hash.substring(1)).get('access_token')
-      : null,
+      : null;
+
+  const spotifyAPI = useSpotify(
+    isSpotifyAttempt,
+    clientID, // Figure out env variables
+    `${window.location.protocol}//${window.location.host}`,
+    [
+      'user-read-playback-state',
+      'user-read-currently-playing',
+      'user-read-private',
+      'playlist-read-private',
+      'playlist-read-collaborative',
+      'user-library-read',
+    ],
   );
-  const [spotifyAPI, setSpotifyAPI] = useState<SpotifyApi>(
-    SpotifyApi.withUserAuthorization(
-      clientID, // Figure out env variables
-      `${window.location.protocol}//${window.location.host}`,
-      [
-        'user-read-playback-state',
-        'user-read-currently-playing',
-        'user-read-private',
-        'playlist-read-private',
-        'playlist-read-collaborative',
-        'user-library-read',
-      ],
-    ),
-  );
+
   const loginController = useLoginController();
   const { setTownController, townsService } = loginController;
   const { connect: videoConnect } = useVideoContext();
   const toast = useToast();
 
-  const getSpotifyUsername = useCallback(async () => {
-    if (spotifyToken) {
-      const result = await spotifyAPI.currentUser.profile();
-      setSpotifyUID(result.id);
-    }
-  }, [spotifyToken, spotifyAPI]);
+  useEffect(() => {
+    const logAPISearch = async () => {
+      console.log('Searching Spotify for The Beatles...'); // adding a quick check for now
+      try {
+        const items = await spotifyAPI?.search('The Beatles', ['artist']);
+
+        console.table(
+          items?.artists.items.map(item => ({
+            name: item.name,
+            followers: item.followers.total,
+            popularity: item.popularity,
+          })),
+        );
+      } catch (err) {
+        console.log(err);
+      }
+      return;
+    };
+
+    (async () => {
+      const user = await spotifyAPI?.currentUser.profile();
+      if (user) {
+        setSpotifyUser(user);
+        await logAPISearch();
+      }
+    })();
+  }, [spotifyAPI]);
 
   const updateTownListings = useCallback(() => {
     townsService.listTowns().then(towns => {
@@ -76,12 +102,11 @@ export default function TownSelection(): JSX.Element {
   }, [townsService]);
   useEffect(() => {
     updateTownListings();
-    getSpotifyUsername();
     const timer = setInterval(updateTownListings, 2000);
     return () => {
       clearInterval(timer);
     };
-  }, [updateTownListings, getSpotifyUsername]);
+  }, [updateTownListings]);
 
   const handleJoin = useCallback(
     async (coveyRoomID: string) => {
@@ -167,37 +192,6 @@ export default function TownSelection(): JSX.Element {
     },
     [setTownController, userName, toast, videoConnect, loginController],
   );
-
-  const handleSpotifyAuth = async () => {
-    // if (!NEXT_SPOTIFY_CLIENT_ID || !NEXT_SPOTIFY_CLIENT_SECRET) {
-    //   console.log(process.env.NEXT_SPOTIFY_CLIENT_ID as string);
-    //   toast({
-    //     title: 'Unable to connect with Spotify',
-    //     description: 'Unconfigured Spotify Client ID or Client Secret',
-    //     status: 'error',
-    //   });
-    //   return;
-    // }
-    console.log('Searching Spotify for The Beatles...');
-
-    const api = await SpotifyApi.withUserAuthorization(
-      clientID, // Figure out env variables
-      `${window.location.protocol}//${window.location.host}`,
-      [
-        'user-read-playback-state',
-        'user-read-currently-playing',
-        'user-read-private',
-        'user-library-read',
-      ],
-    );
-    setSpotifyAPI(api);
-    setSpotifyToken(
-      window.location.hash !== ''
-        ? new URLSearchParams(window.location.hash.substring(1)).get('access_token')
-        : null,
-    );
-    return;
-  };
 
   const handleCreate = async () => {
     if (!userName || userName.length === 0) {
@@ -302,15 +296,18 @@ export default function TownSelection(): JSX.Element {
       <form>
         <Stack>
           <Box p='4' borderWidth='1px' borderRadius='lg'>
-            <Heading as='h2' size='lg'>
-              Connect to your Spotify Account!
-            </Heading>
-            {spotifyToken ? (
+            {spotifyAPI ? (
               <Heading as='h2' size='lg'>
-                User {spotifyUID} is logged in!
+                Spotify account for {spotifyUser.display_name} is connected.
               </Heading>
             ) : (
-              <Button onClick={handleSpotifyAuth}>Login to Spotify Account</Button>
+              <Button
+                onClick={async () => {
+                  // await handleSpotifyAuth();
+                  setIsSpotifyAttempt(true);
+                }}>
+                Login to Spotify Account
+              </Button>
             )}
           </Box>
           <Box p='4' borderWidth='1px' borderRadius='lg'>
