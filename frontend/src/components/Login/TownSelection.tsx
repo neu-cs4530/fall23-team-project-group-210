@@ -21,7 +21,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
-import { Artist, ItemTypes, PartialSearchResult, UserProfile } from '@spotify/web-api-ts-sdk';
+import { Artist, ItemTypes, SpotifyApi, UserProfile } from '@spotify/web-api-ts-sdk';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
@@ -63,31 +63,31 @@ export default function TownSelection(): JSX.Element {
   const toast = useToast();
 
   useEffect(() => {
-    const logAPISearch = async () => {
-      console.log('Searching Spotify for The Beatles...'); // adding a quick check for now
-      try {
-        const items = await spotifyAPI?.search('The Beatles' as string, ['artist'] as ItemTypes[]);
+    // const logAPISearch = async () => {
+    //   console.log('Searching Spotify for The Beatles...'); // Let's see if the API search is working
+    //   try {
+    //     const items = await spotifyAPI?.search('The Beatles', ['artist']);
 
-        if (items?.artists) {
-          console.table(
-            items.artists.items.map((item: Artist) => ({
-              name: item.name,
-              followers: item.followers.total,
-              popularity: item.popularity,
-            })),
-          );
-        }
-      } catch (err) {
-        console.log(err);
-      }
-      return;
-    };
+    //     if (items?.artists) {
+    //       console.table(
+    //         items.artists.items.map((item: Artist) => ({
+    //           name: item.name,
+    //           followers: item.followers.total,
+    //           popularity: item.popularity,
+    //         })),
+    //       );
+    //     }
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    //   return;
+    // };
 
     (async () => {
       const user = await spotifyAPI?.currentUser.profile();
       if (user) {
         setSpotifyUser(user);
-        await logAPISearch();
+        // await logAPISearch();
       }
     })();
   }, [spotifyAPI]);
