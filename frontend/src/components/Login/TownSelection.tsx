@@ -9,7 +9,6 @@ import {
   FormLabel,
   Heading,
   Input,
-  Link,
   Stack,
   Table,
   TableCaption,
@@ -22,7 +21,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
-import { UserProfile, SpotifyApi } from '@spotify/web-api-ts-sdk';
+import { Artist, ItemTypes, PartialSearchResult, UserProfile } from '@spotify/web-api-ts-sdk';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
@@ -43,10 +42,6 @@ export default function TownSelection(): JSX.Element {
   //     ? new URLSearchParams(window.location.hash.substring(1)).get('access_token')
   //     : null,
   // );
-  const spotifyToken =
-    window.location.hash !== ''
-      ? new URLSearchParams(window.location.hash.substring(1)).get('access_token')
-      : null;
 
   const spotifyAPI = useSpotify(
     isSpotifyAttempt,
@@ -71,15 +66,17 @@ export default function TownSelection(): JSX.Element {
     const logAPISearch = async () => {
       console.log('Searching Spotify for The Beatles...'); // adding a quick check for now
       try {
-        const items = await spotifyAPI?.search('The Beatles', ['artist']);
+        const items = await spotifyAPI?.search('The Beatles' as string, ['artist'] as ItemTypes[]);
 
-        console.table(
-          items?.artists.items.map(item => ({
-            name: item.name,
-            followers: item.followers.total,
-            popularity: item.popularity,
-          })),
-        );
+        if (items?.artists) {
+          console.table(
+            items.artists.items.map((item: Artist) => ({
+              name: item.name,
+              followers: item.followers.total,
+              popularity: item.popularity,
+            })),
+          );
+        }
       } catch (err) {
         console.log(err);
       }
