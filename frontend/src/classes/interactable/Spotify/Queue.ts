@@ -21,4 +21,8 @@ export class SongQueue {
   size(): number {
     return this._storage.length;
   }
+
+  removeByName(name: string): Song {
+    this._storage.filter(song => song.name === name);
+  }
 }

@@ -23,6 +23,10 @@ export type SpotifyAreaEvents = BaseInteractableEventMap & {
   queueChange: (newQueue: SongQueue) => void;
 };
 
+// type PlayerCredentials = {
+//   userIdToCredentials
+// }
+
 /**
  * Responsible for managing the queue, likes, comments,
  * changing the queue based on the voting, and the sign in credentials
@@ -30,6 +34,7 @@ export type SpotifyAreaEvents = BaseInteractableEventMap & {
 //NEED TO UPDATE interactableTypeForObjectType and create a type for spotifyAreaModel
 export interface SpotifyAreaModel extends Interactable {
   queue: SongQueue;
+  playerCredentials: 
 }
 
 export default class SpotifyAreaController extends InteractableAreaController<
@@ -107,6 +112,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param comments comments for song
    */
   updateSong(song: string, likes: number, dislikes: number, comments: string[]): void {
+    
     throw new Error('Method not implemented.' + song + likes + dislikes + comments);
   }
 
