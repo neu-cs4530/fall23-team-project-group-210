@@ -14,6 +14,9 @@ export default class Player {
   /** The player's username, which is not guaranteed to be unique within the town * */
   private readonly _userName: string;
 
+  /** The player's Spotify username * */
+  private readonly _spotifyUserName: string;
+
   /** The secret token that allows this client to access our Covey.Town service for this town * */
   private readonly _sessionToken: string;
 
@@ -31,6 +34,7 @@ export default class Player {
       rotation: 'front',
     };
     this._userName = userName;
+    this._spotifyUserName = '';
     this._id = nanoid();
     this._sessionToken = nanoid();
     this.townEmitter = townEmitter;
