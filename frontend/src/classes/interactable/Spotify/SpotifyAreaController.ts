@@ -8,7 +8,6 @@ import { SongQueue } from './Queue';
  * Class to contain song data. Using a string for name until we decide on data implementation
  */
 export type Song = {
-  id: string;
   name: string;
   likes: number;
   dislikes: number;
