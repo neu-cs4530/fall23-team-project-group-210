@@ -8,6 +8,7 @@ import { SongQueue } from './Queue';
  * Class to contain song data. Using a string for name until we decide on data implementation
  */
 export type Song = {
+  id: string;
   name: string;
   likes: number;
   dislikes: number;
@@ -15,7 +16,7 @@ export type Song = {
 };
 
 /**
- * Events to be emitted. I believe this tells the fronted to rerender. Right now
+ * Events to be emitted. I believe this tells the frontend to rerender. Right now
  * only adding a queueChanged event, but may need more types of events like new comments, likes,
  * song change, playback change, etc. Look at ViewingAreaController for examples.
  */
