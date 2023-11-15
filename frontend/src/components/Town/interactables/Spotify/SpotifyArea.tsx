@@ -41,7 +41,7 @@ export default function SpotifyArea({ interactableID }: { interactableID: Intera
       </Heading>
       <List aria-label="list of songs in the queue">
         {queue.queue().map((song) => (
-          <Flex key={song.id} align="center">
+          <Flex key={song.name} align="center">
             {/* <Image src={song.albumArt} alt="album art" boxSize="50px" /> To be implemented */}
             <Text>{song.name}</Text>
           </Flex>
