@@ -21,22 +21,76 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
+import { Artist, ItemTypes, SpotifyApi, UserProfile } from '@spotify/web-api-ts-sdk';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
+import { useSpotify } from '../../hooks/useSpotify';
 
 export default function TownSelection(): JSX.Element {
+  const clientID = 'ddf7330eed894b0f81b580cba2d1b570';
   const [userName, setUserName] = useState<string>('');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
   const [currentPublicTowns, setCurrentPublicTowns] = useState<Town[]>();
   const [isJoining, setIsJoining] = useState<boolean>(false);
+  const [isSpotifyAttempt, setIsSpotifyAttempt] = useState<boolean>(false);
+  const [spotifyUser, setSpotifyUser] = useState<UserProfile>({} as UserProfile);
+  // const [spotifyToken, setSpotifyToken] = useState<string | null>(
+  //   window.location.hash !== ''
+  //     ? new URLSearchParams(window.location.hash.substring(1)).get('access_token')
+  //     : null,
+  // );
+
+  const spotifyAPI = useSpotify(
+    isSpotifyAttempt,
+    clientID, // Figure out env variables
+    `${window.location.protocol}//${window.location.host}`,
+    [
+      'user-read-playback-state',
+      'user-read-currently-playing',
+      'user-read-private',
+      'playlist-read-private',
+      'playlist-read-collaborative',
+      'user-library-read',
+    ],
+  );
+
   const loginController = useLoginController();
   const { setTownController, townsService } = loginController;
   const { connect: videoConnect } = useVideoContext();
-
   const toast = useToast();
+
+  useEffect(() => {
+    // const logAPISearch = async () => {
+    //   console.log('Searching Spotify for The Beatles...'); // Let's see if the API search is working
+    //   try {
+    //     const items = await spotifyAPI?.search('The Beatles', ['artist']);
+
+    //     if (items?.artists) {
+    //       console.table(
+    //         items.artists.items.map((item: Artist) => ({
+    //           name: item.name,
+    //           followers: item.followers.total,
+    //           popularity: item.popularity,
+    //         })),
+    //       );
+    //     }
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    //   return;
+    // };
+
+    (async () => {
+      const user = await spotifyAPI?.currentUser.profile();
+      if (user) {
+        setSpotifyUser(user);
+        // await logAPISearch();
+      }
+    })();
+  }, [spotifyAPI]);
 
   const updateTownListings = useCallback(() => {
     townsService.listTowns().then(towns => {
@@ -238,6 +292,21 @@ export default function TownSelection(): JSX.Element {
     <>
       <form>
         <Stack>
+          <Box p='4' borderWidth='1px' borderRadius='lg'>
+            {spotifyAPI ? (
+              <Heading as='h2' size='lg'>
+                Spotify account for {spotifyUser.display_name} is connected.
+              </Heading>
+            ) : (
+              <Button
+                onClick={async () => {
+                  // await handleSpotifyAuth();
+                  setIsSpotifyAttempt(true);
+                }}>
+                Login to Spotify Account
+              </Button>
+            )}
+          </Box>
           <Box p='4' borderWidth='1px' borderRadius='lg'>
             <Heading as='h2' size='lg'>
               Select a username

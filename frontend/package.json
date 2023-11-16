@@ -8,6 +8,7 @@
     "@emotion/styled": "^11.9.3",
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
+    "@spotify/web-api-ts-sdk": "^1.1.2",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react-hooks": "^8.0.1",
     "@twilio-labs/plugin-rtc": "^0.8.4",
@@ -29,6 +30,7 @@
     "concurrently": "^7.2.2",
     "cross-env": "^7.0.3",
     "d3-timer": "^3.0.1",
+    "dotenv": "^16.3.1",
     "enzyme": "^3.11.0",
     "framer-motion": "^6.5.0",
     "fscreen": "^1.2.0",
@@ -50,7 +52,8 @@
     "twilio": "^3.84.1",
     "twilio-video": "^2.27.0",
     "typed-emitter": "^2.1.0",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "uuid": "^9.0.1"
   },
   "engines": {
     "node": "18.x.x",
@@ -93,6 +96,7 @@
     "@testing-library/react": "^12.1.0",
     "@testing-library/user-event": "^14.2.1",
     "@types/linkify-it": "^3.0.2",
+    "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",

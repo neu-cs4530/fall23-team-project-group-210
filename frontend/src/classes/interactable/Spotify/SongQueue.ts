@@ -6,6 +6,10 @@ import { Song } from './SpotifyAreaController';
 export class SongQueue {
   private _storage: Song[] = [];
 
+  public get songs(): Song[] {
+    return this._storage;
+  }
+
   enqueue(song: Song): void {
     this._storage.push(song);
   }
@@ -14,7 +18,7 @@ export class SongQueue {
     return this._storage.shift();
   }
 
-  orderByLikes(): void {
+  sortByLikes(): void {
     this._storage.sort((a: Song, b: Song) => b.likes - a.likes);
   }
 
@@ -22,7 +26,18 @@ export class SongQueue {
     return this._storage.length;
   }
 
-  removeByName(name: string): Song {
-    this._storage.filter(song => song.name === name);
+  updateFieldsByID(songId: string, likes?: number, dislikes?: number, comments?: string[]): void {
+    const song: Song | undefined = this._storage.find(s => s.id === songId);
+    if (song) {
+      if (likes) {
+        song.likes = likes;
+      }
+      if (dislikes) {
+        song.dislikes = dislikes;
+      }
+      if (comments) {
+        song.comments = comments;
+      }
+    }
   }
 }
