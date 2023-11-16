@@ -1,14 +1,14 @@
-import { any, mock } from 'jest-mock-extended';
+import { mock } from 'jest-mock-extended';
 import type {
   Track,
   SimplifiedAlbum,
   ExternalIds,
   ExternalUrls,
-  ItemTypes,
-  Market,
+  // ItemTypes,
+  // Market,
 } from '../../../../node_modules/@spotify/web-api-ts-sdk/dist/mjs/types';
 //import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
-import SpotifyAreaController, { Song } from './SpotifyAreaController';
+import SpotifyAreaController from './SpotifyAreaController';
 import { SpotifyApi, PartialSearchResult } from '@spotify/web-api-ts-sdk';
 import TownController from '../../TownController';
 describe('SpotifyAreaController Tests', () => {
@@ -85,9 +85,9 @@ describe('SpotifyAreaController Tests', () => {
     previous: null,
     total: 5,
   };
-  mockSpotifyApi.search.mockImplementation(
-    async (s: string, t: readonly ItemTypes[], d?: Market, w?: number) => out,
-  );
+  // mockSpotifyApi.search.mockImplementation(
+  //   async (s: string, t: readonly ItemTypes[], d?: Market, w?: number) => out,
+  // );
   const mockTownController = mock<TownController>();
   const controller: SpotifyAreaController = new SpotifyAreaController(
     '1',

@@ -1,17 +1,8 @@
-import { GameArea, GameState, Interactable } from '../../../types/CoveyTownSocket';
+import { GameArea, GameState } from '../../../types/CoveyTownSocket';
 import TownController from '../../TownController';
 import GameAreaController, { GameEventTypes } from '../GameAreaController';
-import InteractableAreaController, {
-  BaseInteractableEventMap,
-} from '../InteractableAreaController';
 import { SongQueue } from './SongQueue';
-import {
-  SpotifyApi,
-  SimplifiedArtist,
-  SdkOptions,
-  AuthorizationCodeWithPKCEStrategy,
-  ItemTypes,
-} from '@spotify/web-api-ts-sdk';
+import { SpotifyApi, SimplifiedArtist } from '@spotify/web-api-ts-sdk';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
