@@ -49,8 +49,8 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
 }
 
 /**
- * A wrapper component for the TicTacToeArea component.
- * Determines if the player is currently in a tic tac toe area on the map, and if so,
+ * A wrapper component for the SpotiftHubArea component.
+ * Determines if the player is currently in a Spotify hub area on the map, and if so,
  * renders the TicTacToeArea component in a modal.
  */
 export default function SpotifyAreaWrapper(): JSX.Element {

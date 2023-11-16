@@ -59,7 +59,6 @@ export default class SpotifyAreaController extends GameAreaController<
   }
   //private _spotifyAreaModel: SpotifyAreaModel;
 
-<<<<<<< HEAD
   //NEED TO GET THESE TWO VALUES SOMEHOW
   private _spotifyAPI: SpotifyApi;
 
@@ -75,19 +74,6 @@ export default class SpotifyAreaController extends GameAreaController<
     super(id, gameArea, townController);
     this._spotifyAPI = spotifyAPI;
     this._deviceID = deviceID;
-=======
-  private _townController: TownController;
-
-  /**
-   * Create a new SpotifyAreaController
-   * @param id
-   * @param topic
-   */
-  constructor(id: string, model: SpotifyAreaModel, townController: TownController) {
-    super(id);
-    this._spotifyAreaModel = model;
-    this._townController = townController;
->>>>>>> main
   }
 
   get queue(): SongQueue | undefined {
