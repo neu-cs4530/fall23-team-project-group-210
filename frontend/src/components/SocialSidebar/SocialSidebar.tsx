@@ -16,7 +16,7 @@ export default function SocialSidebar(): JSX.Element {
       divider={<StackDivider borderColor='gray.200' />}
       borderRadius='4px'>
       <Heading fontSize='xl' as='h1'>
-        Players In This Town!
+        Players In This Town
       </Heading>
       <PlayersList />
       <ConversationAreasList />
