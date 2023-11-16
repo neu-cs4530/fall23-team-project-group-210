@@ -10,8 +10,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
-import SpotifyAreaController from '../../../../classes/interactable/Spotify/SpotifyAreaController';
-import { useInteractable, useInteractableAreaController, useSpotifyAreaController } from '../../../../classes/TownController';
+import { useInteractable, useSpotifyAreaController } from '../../../../classes/TownController';
 
 import useTownController from '../../../../hooks/useTownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';

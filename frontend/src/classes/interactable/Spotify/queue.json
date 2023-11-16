@@ -1,0 +1,30 @@
+
+[
+  {
+    "name": "Song 1",
+    "likes": 10,
+    "dislikes": 2,
+    "comments": [
+      "Great song!",
+      "I love this one"
+    ]
+  },
+  {
+    "name": "Song 2",
+    "likes": 5,
+    "dislikes": 1,
+    "comments": [
+      "Not my favorite",
+      "Could be better"
+    ]
+  },
+  {
+    "name": "Song 3",
+    "likes": 20,
+    "dislikes": 0,
+    "comments": [
+      "This is amazing!",
+      "Best song ever"
+    ]
+  }
+]

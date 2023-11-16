@@ -1,5 +1,4 @@
 import SpotifyAreaController, {
-  SpotifyAreaModel,
 } from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 import { nanoid } from 'nanoid';
 import { SongQueue } from '../../../../classes/interactable/Spotify/SongQueue';
@@ -34,7 +33,7 @@ const MOCK_QUEUE = [
 ];
 class MockSpotifyAreaController extends SpotifyAreaController {
   public constructor() {
-    super(nanoid(), mock<SpotifyAreaModel>(), mock<TownController>());
+    super(nanoid(), mock<SpotifyArea>(), mock<TownController>());
   }
 
   // mock the functions that are called in the constructor
