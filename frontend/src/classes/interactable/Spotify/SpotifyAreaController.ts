@@ -3,6 +3,26 @@ import InteractableAreaController, {
   BaseInteractableEventMap,
 } from '../InteractableAreaController';
 import { SongQueue } from './Queue';
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getDatabase, onValue, ref, set } from "firebase/database"; 
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAIE5wWApYIghDcv-GQJCtN3_CCJHzlGmg",
+  authDomain: "spotify-819f9.firebaseapp.com",
+  databaseURL: "https://spotify-819f9-default-rtdb.firebaseio.com",
+  projectId: "spotify-819f9",
+  storageBucket: "spotify-819f9.appspot.com",
+  messagingSenderId: "643647635154",
+  appId: "1:643647635154:web:c8b7f2a749b6d44054b70b",
+  measurementId: "G-GXPWKR312B"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 /**
  * Class to contain song data. Using a string for name until we decide on data implementation
@@ -76,7 +96,14 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param playerId playerId who saved the song
    */
   saveSong(song: Song, playerId: number): void {
-    throw new Error('Method not implemented.' + song + playerId);
+    const db = getDatabase(); 
+    const reference = ref(db, "player/" + playerId); 
+
+    set(reference, {
+        username: playerId, 
+        song: song, 
+    }); 
+
   }
 
   /**
@@ -84,7 +111,16 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param playerId the Id of the player whose saved songs we're fetching
    */
   getSavedSongs(playerId: number): Song[] {
-    throw new Error('Method not implemented.' + playerId);
+    const db = getDatabase(); 
+    const songRef = ref(db, 'player/' + playerId + '/saved songs'); 
+    onValue(songRef, (snapshot) => {
+      snapshot.forEach(childSnapshot) => {
+        const childKey = childSnapshot.key; 
+        const childData = childSnapshot.val(); 
+      }
+   }), {
+    onlyOnce: true 
+   }
   }
 
   /**

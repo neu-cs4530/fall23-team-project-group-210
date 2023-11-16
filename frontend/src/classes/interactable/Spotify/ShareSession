@@ -1,0 +1,63 @@
+import { SongQueue } from './Queue';
+import { Player } from '../../../types/CoveyTownSocket';
+import { Song } from './SpotifyAreaController';
+
+
+/**
+ * Shared listening session for multiple players. 
+ */
+export class ShareSession {
+  private players: Player[] = [];
+  private sharedQueue: Queue[]
+
+  /** 
+   * Adds a player to the list of players in the shared session.  
+   * @param player The player to be added. 
+   */
+  addPlayer(p: Player): void {
+    const inPlayerGame = this.players.includes(p);
+    if (inPlayerGame) {
+      throw new Error("PLAYER_ALREADY_IN_SESSION_MESSAGE");
+    } else if (p === undefined) {
+        throw new Error("PLAYER_UNDEFINED")
+    } 
+    this.players.push(p);
+  }
+
+   /** 
+   * Removes a player from the list of players in the shared session.  
+   * @param player The player to be added. 
+   */
+  removePlayer(player: Player): void {
+    const inPlayerGame = this.players.includes(player);
+    if (!inPlayerGame) {
+      throw new Error("PLAYER_NOT_IN_SESSION_MESSAGE");
+    }
+    this.players = this.players.filter(p => p.id !== player.id);
+  }
+
+  /** 
+   * Adds a song to the shared queue in the shared session.  
+   * @param song The song to be added. 
+   */
+  addToQueue(song: Song): void {
+    this.players.forEach(function (getPlayerQueue)) {
+        this.sharedQueue.enqueue(song); 
+    }
+  }
+
+  /** 
+   * Returns true if player queued a song. 
+   * @param player The player in the shared session
+   */
+  getPlayerQueue(player: Player): boolean {
+
+  }
+  
+  /** 
+   * Returns the shared queue of from all users. 
+   */
+  getSharedQueue(): SongQueue {
+    return this.sharedQueue;
+  }
+}

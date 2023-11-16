@@ -21,4 +21,6 @@ export class SongQueue {
   size(): number {
     return this._storage.length;
   }
+
+  
 }
