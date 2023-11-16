@@ -32,6 +32,7 @@ import GameAreaController, { GameEventTypes } from './interactable/GameAreaContr
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from './interactable/InteractableAreaController';
+import SpotifyAreaController from './interactable/Spotify/SpotifyAreaController';
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
@@ -665,6 +666,21 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       return existingController as GameAreaController<GameType, EventsType>;
     } else {
       throw new Error('Game area controller not created');
+    }
+  }
+
+  /**
+   * Retrieves the spotify area controller corresponding to a spotify area by ID, or
+   * throws an error if the spotify area controller does not exist
+   */
+  public getSpotifyAreaController(spotifyArea: SpotifyArea): SpotifyAreaController {
+    const existingController = this._interactableControllers.find(
+      eachExistingArea => eachExistingArea.id === spotifyArea.name,
+    );
+    if (existingController instanceof SpotifyAreaController) {
+      return existingController;
+    } else {
+      throw new Error('Spotify area controller not created');
     }
   }
 

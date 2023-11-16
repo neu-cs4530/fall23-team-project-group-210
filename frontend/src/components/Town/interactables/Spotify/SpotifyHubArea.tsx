@@ -1,24 +1,13 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  Heading,
-  Image,
-  Link,
-  List,
-  Text,
-} from "@chakra-ui/react";
-
-import React, { useEffect, useState } from "react";
+import { Container, Flex, Heading, List, Text } from "@chakra-ui/react";
+import React, { useCallback, useEffect, useState } from "react";
 import SpotifyAreaController from "../../../../classes/interactable/Spotify/SpotifyAreaController";
-import { useInteractableAreaController } from "../../../../classes/TownController";
+import { useInteractable, useInteractableAreaController } from "../../../../classes/TownController";
 
-import { useSpotify } from "../../../../hooks/useSpotify";
 import useTownController from "../../../../hooks/useTownController";
 import { InteractableID } from "../../../../types/CoveyTownSocket";
+import Interactable from "../../Interactable";
 
-export default function SpotifyArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
+function SpotifyArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const spotifyAreaController = useInteractableAreaController<SpotifyAreaController>(interactableID);
   const townController = useTownController();
 
@@ -49,4 +38,18 @@ export default function SpotifyArea({ interactableID }: { interactableID: Intera
       </List>
     </Container>
   );
+}
+
+export default function SpotifyAreaWrapper(): JSX.Element {
+  const townController = useTownController();
+  const spotifyArea = useInteractable<Interactable>('spotifyArea');
+
+  const closeModal = useCallback(() => {
+    if (spotifyArea) {
+      townController.interactEnd(spotifyArea);
+      const controller = townController.getSpotifyAreaController(spotifyArea);
+    }
+  }, [townController, spotifyArea]);
+
+  return <></>;
 }
