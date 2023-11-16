@@ -18,8 +18,11 @@ import { v4 as uuidv4 } from 'uuid';
  * Class to contain song data. Using a string for name until we decide on data implementation
  */
 export type Song = {
+<<<<<<< HEAD
   id: string;
   uri: string;
+=======
+>>>>>>> 286a3f1 (reverted change in controller)
   name: string;
   artists: SimplifiedArtist[];
   likes: number;
