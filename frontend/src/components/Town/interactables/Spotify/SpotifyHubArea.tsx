@@ -1,15 +1,14 @@
-import { Container, Flex, Heading, List, Text } from "@chakra-ui/react";
+import { Container, Flex, Heading, List, Modal, ModalHeader, ModalOverlay, Text } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useState } from "react";
 import SpotifyAreaController from "../../../../classes/interactable/Spotify/SpotifyAreaController";
 import { useInteractable, useInteractableAreaController } from "../../../../classes/TownController";
 
 import useTownController from "../../../../hooks/useTownController";
 import { InteractableID } from "../../../../types/CoveyTownSocket";
-import Interactable from "../../Interactable";
+import SpotifyArea from "./SpotifyArea";
 
-function SpotifyArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
+function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const spotifyAreaController = useInteractableAreaController<SpotifyAreaController>(interactableID);
-  const townController = useTownController();
 
   const [queue, setQueue] = useState(spotifyAreaController.queue);
 
@@ -30,8 +29,7 @@ function SpotifyArea({ interactableID }: { interactableID: InteractableID }): JS
       </Heading>
       <List aria-label="list of songs in the queue">
         {queue.queue().map((song) => (
-          <Flex key={song.name} align="center">
-            {/* <Image src={song.albumArt} alt="album art" boxSize="50px" /> To be implemented */}
+          <Flex data-testid="song" key={song.name} align="center">
             <Text>{song.name}</Text>
           </Flex>
         ))}
@@ -40,9 +38,14 @@ function SpotifyArea({ interactableID }: { interactableID: InteractableID }): JS
   );
 }
 
+/**
+ * A wrapper component for the TicTacToeArea component.
+ * Determines if the player is currently in a tic tac toe area on the map, and if so,
+ * renders the TicTacToeArea component in a modal.
+ */
 export default function SpotifyAreaWrapper(): JSX.Element {
   const townController = useTownController();
-  const spotifyArea = useInteractable<Interactable>('spotifyArea');
+  const spotifyArea = useInteractable<SpotifyArea>('spotifyArea');
 
   const closeModal = useCallback(() => {
     if (spotifyArea) {
@@ -51,5 +54,14 @@ export default function SpotifyAreaWrapper(): JSX.Element {
     }
   }, [townController, spotifyArea]);
 
+  if (spotifyArea && spotifyArea.getData('type') === 'Spotify') {
+    return (
+      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
+        <ModalOverlay />
+        <ModalHeader>{spotifyArea.name}</ModalHeader>
+        <SpotifyHubArea interactableID={spotifyArea.name} />
+      </Modal>
+    );
+  }
   return <></>;
 }

@@ -1,4 +1,5 @@
 import { Interactable } from '../../../types/CoveyTownSocket';
+import TownController from '../../TownController';
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from '../InteractableAreaController';
@@ -39,14 +40,17 @@ export default class SpotifyAreaController extends InteractableAreaController<
   private _spotifyAreaModel: SpotifyAreaModel;
   //private _spotifyInterface: APITool;
 
+  private _townController: TownController;
+
   /**
    * Create a new SpotifyAreaController
    * @param id
    * @param topic
    */
-  constructor(id: string, model: SpotifyAreaModel) {
+  constructor(id: string, model: SpotifyAreaModel, townController: TownController) {
     super(id);
     this._spotifyAreaModel = model;
+    this._townController = townController;
   }
 
   get queue(): SongQueue {
