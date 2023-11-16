@@ -1,7 +1,4 @@
-import {
-  GameArea,
-  GameState,
-} from '../../../types/CoveyTownSocket';
+import { GameArea, GameState } from '../../../types/CoveyTownSocket';
 import GameAreaController, { GameEventTypes } from '../GameAreaController';
 import TownController from '../../TownController';
 import { SongQueue } from './SongQueue';
