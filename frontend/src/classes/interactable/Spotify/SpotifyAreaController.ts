@@ -1,16 +1,16 @@
-import { GameArea, GameState, Interactable } from '../../../types/CoveyTownSocket';
-import TownController from '../../TownController';
+import {
+  GameArea,
+  GameState,
+} from '../../../types/CoveyTownSocket';
 import GameAreaController, { GameEventTypes } from '../GameAreaController';
-import InteractableAreaController, {
-  BaseInteractableEventMap,
-} from '../InteractableAreaController';
+import TownController from '../../TownController';
 import { SongQueue } from './SongQueue';
 import {
   SpotifyApi,
   SimplifiedArtist,
-  SdkOptions,
-  AuthorizationCodeWithPKCEStrategy,
-  ItemTypes,
+  // SdkOptions,
+  // AuthorizationCodeWithPKCEStrategy,
+  // ItemTypes,
 } from '@spotify/web-api-ts-sdk';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -28,7 +28,7 @@ export type Song = {
 };
 
 /**
- * Events to be emitted. I believe this tells the fronted to rerender. Right now
+ * Events to be emitted. I believe this tells the frontend to rerender. Right now
  * only adding a queueChanged event, but may need more types of events like new comments, likes,
  * song change, playback change, etc. Look at ViewingAreaController for examples.
  */
@@ -59,6 +59,7 @@ export default class SpotifyAreaController extends GameAreaController<
   }
   //private _spotifyAreaModel: SpotifyAreaModel;
 
+<<<<<<< HEAD
   //NEED TO GET THESE TWO VALUES SOMEHOW
   private _spotifyAPI: SpotifyApi;
 
@@ -74,6 +75,19 @@ export default class SpotifyAreaController extends GameAreaController<
     super(id, gameArea, townController);
     this._spotifyAPI = spotifyAPI;
     this._deviceID = deviceID;
+=======
+  private _townController: TownController;
+
+  /**
+   * Create a new SpotifyAreaController
+   * @param id
+   * @param topic
+   */
+  constructor(id: string, model: SpotifyAreaModel, townController: TownController) {
+    super(id);
+    this._spotifyAreaModel = model;
+    this._townController = townController;
+>>>>>>> main
   }
 
   get queue(): SongQueue | undefined {

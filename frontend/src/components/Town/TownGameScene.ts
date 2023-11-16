@@ -7,6 +7,7 @@ import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
 import ConversationArea from './interactables/ConversationArea';
 import GameArea from './interactables/GameArea';
+import SpotifyArea from './interactables/Spotify/SpotifyArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
 
@@ -21,6 +22,8 @@ function interactableTypeForObjectType(type: string): any {
     return ViewingArea;
   } else if (type === 'GameArea') {
     return GameArea;
+  } else if (type === 'SpotifyArea') {
+    return SpotifyArea;
   } else {
     throw new Error(`Unknown object type: ${type}`);
   }
