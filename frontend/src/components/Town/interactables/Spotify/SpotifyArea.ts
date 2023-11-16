@@ -1,9 +1,8 @@
-import { SpotifyAreaModel } from "../../../../classes/interactable/Spotify/SpotifyAreaController";
-import Interactable, { KnownInteractableTypes } from "../../Interactable";
+import Interactable, { KnownInteractableTypes } from '../../Interactable';
 
 export default class SpotifyArea extends Interactable {
   private _labelText?: Phaser.GameObjects.Text;
-  
+
   private _isInteracting = false;
 
   addedToScene(): void {
@@ -25,7 +24,7 @@ export default class SpotifyArea extends Interactable {
     );
     this._labelText.setVisible(false);
   }
-  
+
   overlap(): void {
     if (!this._labelText) {
       throw new Error('Should not be able to overlap with this interactable before added to scene');
@@ -35,7 +34,7 @@ export default class SpotifyArea extends Interactable {
     this._labelText.setY(location.y);
     this._labelText.setVisible(true);
   }
-  
+
   overlapExit(): void {
     this._labelText?.setVisible(false);
     if (this._isInteracting) {
