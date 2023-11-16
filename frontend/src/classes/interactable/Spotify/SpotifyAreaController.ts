@@ -38,6 +38,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
   private _spotifyAreaModel: SpotifyArea;
   //private _spotifyInterface: APITool;
 
+<<<<<<< HEAD
   private _townController: TownController;
 
   /**
@@ -49,6 +50,23 @@ export default class SpotifyAreaController extends InteractableAreaController<
     super(id);
     this._spotifyAreaModel = model;
     this._townController = townController;
+=======
+  //NEED TO GET THESE TWO VALUES SOMEHOW
+  private _spotifyAPI: SpotifyApi;
+
+  private _deviceID: string;
+
+  constructor(
+    id: string,
+    gameArea: GameArea<SpotifyAreaModel>,
+    townController: TownController,
+    spotifyAPI: SpotifyApi,
+    deviceID: string,
+  ) {
+    super(id, gameArea, townController);
+    this._spotifyAPI = spotifyAPI;
+    this._deviceID = deviceID;
+>>>>>>> 3ad20b2 (solved merge conflict)
   }
 
   get queue(): SongQueue {
