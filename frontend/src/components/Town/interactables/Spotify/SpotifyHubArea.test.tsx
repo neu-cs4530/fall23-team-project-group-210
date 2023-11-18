@@ -9,7 +9,8 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import TownControllerContext from '../../../../contexts/TownControllerContext';
-import { SpotifyArea } from '../../../../types/CoveyTownSocket';
+import { SpotifyArea as SpotifyAreaModel } from '../../../../types/CoveyTownSocket';
+import SpotifyArea from './SpotifyArea';
 
 const MOCK_QUEUE = [
   {
@@ -33,7 +34,7 @@ const MOCK_QUEUE = [
 ];
 class MockSpotifyAreaController extends SpotifyAreaController {
   public constructor() {
-    super(nanoid(), mock<SpotifyArea>(), mock<TownController>());
+    super(nanoid(), mock<SpotifyAreaModel>(), mock<TownController>());
   }
 
   // mock the functions that are called in the constructor
