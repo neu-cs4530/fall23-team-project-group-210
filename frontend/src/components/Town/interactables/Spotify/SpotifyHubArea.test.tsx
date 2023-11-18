@@ -3,13 +3,13 @@ import SpotifyAreaController, {
 import { nanoid } from 'nanoid';
 import { SongQueue } from '../../../../classes/interactable/Spotify/SongQueue';
 import { mock, mockReset } from 'jest-mock-extended';
-import SpotifyArea from './SpotifyArea';
 import TownController, * as TownControllerHooks from '../../../../classes/TownController';
 import SpotifyHubArea from './SpotifyHubArea';
 import React from 'react';
 import { render } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import TownControllerContext from '../../../../contexts/TownControllerContext';
+import { SpotifyArea } from '../../../../types/CoveyTownSocket';
 
 const MOCK_QUEUE = [
   {
