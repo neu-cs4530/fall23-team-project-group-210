@@ -9,7 +9,6 @@ import {
   FormLabel,
   Heading,
   Input,
-  Select,
   Stack,
   Table,
   TableCaption,
@@ -22,7 +21,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
-import { Artist, Device, ItemTypes, SpotifyApi, UserProfile } from '@spotify/web-api-ts-sdk';
+import { Device, UserProfile } from '@spotify/web-api-ts-sdk';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
