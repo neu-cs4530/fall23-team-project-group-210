@@ -1,8 +1,14 @@
 import { GameArea, GameState } from '../../../types/CoveyTownSocket';
-import TownController from '../../TownController';
 import GameAreaController, { GameEventTypes } from '../GameAreaController';
+import TownController from '../../TownController';
 import { SongQueue } from './SongQueue';
-import { SpotifyApi, SimplifiedArtist } from '@spotify/web-api-ts-sdk';
+import {
+  SpotifyApi,
+  SimplifiedArtist,
+  // SdkOptions,
+  // AuthorizationCodeWithPKCEStrategy,
+  // ItemTypes,
+} from '@spotify/web-api-ts-sdk';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -19,7 +25,7 @@ export type Song = {
 };
 
 /**
- * Events to be emitted. I believe this tells the fronted to rerender. Right now
+ * Events to be emitted. I believe this tells the frontend to rerender. Right now
  * only adding a queueChanged event, but may need more types of events like new comments, likes,
  * song change, playback change, etc. Look at ViewingAreaController for examples.
  */
