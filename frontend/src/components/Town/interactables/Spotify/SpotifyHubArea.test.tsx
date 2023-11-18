@@ -63,7 +63,7 @@ class MockSpotifyAreaController extends SpotifyAreaController {
 }
 
 const mockSpotifyArea = mock<SpotifyArea>();
-mockSpotifyArea.getData.mockReturnValue('Spotify');
+// mockSpotifyArea.getData.mockReturnValue('Spotify');
 
 jest.spyOn(TownControllerHooks, 'useInteractable').mockReturnValue(mockSpotifyArea);
 const useInteractableAreaControllerSpy = jest.spyOn(
@@ -98,26 +98,7 @@ describe('SpotifyHubArea', () => {
   beforeEach(() => {
     mockSpotifyArea.name = nanoid();
     mockReset(townController);
-    // spotifyAreaController.mockReset();
     useInteractableAreaControllerSpy.mockReturnValue(spotifyAreaController);
-
-    // ourPlayer = new PlayerController('player x', 'player x', randomLocation());
-    // mockGameArea.name = nanoid();
-    // mockReset(townController);
-    // gameAreaController.mockReset();
-    // useInteractableAreaControllerSpy.mockReturnValue(gameAreaController);
-    // leaderboardComponentSpy.mockClear();
-    // mockToast.mockClear();
-    // gameAreaController.joinGame.mockReset();
-    // gameAreaController.makeMove.mockReset();
-
-    // gameAreaController.joinGame.mockImplementation(
-    //   () =>
-    //     new Promise<void>((resolve, reject) => {
-    //       joinGameResolve = resolve;
-    //       joinGameReject = reject;
-    //     }),
-    // );
   });
 
   describe('Rendering', () => {
@@ -129,7 +110,6 @@ describe('SpotifyHubArea', () => {
 
   describe('Song Details', () => {
     it('should render the correct number of songs', () => {
-      // const { getAllByTestId } = render(<SpotifyHubArea />);
       const { getAllByTestId } = renderSpotifyHubArea();
       expect(getAllByTestId('song').length).toBe(3);
     });

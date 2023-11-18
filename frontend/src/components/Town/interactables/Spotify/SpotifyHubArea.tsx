@@ -10,15 +10,14 @@ import {
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import SpotifyAreaController from '../../../../classes/interactable/Spotify/SpotifyAreaController';
-import { useInteractable, useInteractableAreaController } from '../../../../classes/TownController';
+import { useInteractable, useInteractableAreaController, useSpotifyAreaController } from '../../../../classes/TownController';
 
 import useTownController from '../../../../hooks/useTownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
 
 function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
-  const spotifyAreaController =
-    useInteractableAreaController<SpotifyAreaController>(interactableID);
+  const spotifyAreaController = useSpotifyAreaController(interactableID);
 
   const [queue, setQueue] = useState(spotifyAreaController.queue);
 
@@ -49,9 +48,9 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
 }
 
 /**
- * A wrapper component for the TicTacToeArea component.
- * Determines if the player is currently in a tic tac toe area on the map, and if so,
- * renders the TicTacToeArea component in a modal.
+ * A wrapper component for the SpotifyArea component.
+ * Determines if the player is currently in a spotify area on the map, and if so,
+ * renders the SpotifyArea component in a modal.
  */
 export default function SpotifyAreaWrapper(): JSX.Element {
   const townController = useTownController();
@@ -64,7 +63,7 @@ export default function SpotifyAreaWrapper(): JSX.Element {
     }
   }, [townController, spotifyArea]);
 
-  if (spotifyArea && spotifyArea.getData('type') === 'Spotify') {
+  if (spotifyArea) {
     return (
       <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
         <ModalOverlay />

@@ -1,4 +1,4 @@
-import { Interactable } from '../../../types/CoveyTownSocket';
+import { Interactable, SpotifyArea } from '../../../types/CoveyTownSocket';
 import TownController from '../../TownController';
 import InteractableAreaController, {
   BaseInteractableEventMap,
@@ -29,15 +29,13 @@ export type SpotifyAreaEvents = BaseInteractableEventMap & {
  * changing the queue based on the voting, and the sign in credentials
  */
 //NEED TO UPDATE interactableTypeForObjectType and create a type for spotifyAreaModel
-export interface SpotifyAreaModel extends Interactable {
-  queue: SongQueue;
-}
 
+// should ideally be in another file, but this is ok for now.
 export default class SpotifyAreaController extends InteractableAreaController<
   SpotifyAreaEvents,
-  SpotifyAreaModel
+  SpotifyArea
 > {
-  private _spotifyAreaModel: SpotifyAreaModel;
+  private _spotifyAreaModel: SpotifyArea;
   //private _spotifyInterface: APITool;
 
   private _townController: TownController;
@@ -47,7 +45,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param id
    * @param topic
    */
-  constructor(id: string, model: SpotifyAreaModel, townController: TownController) {
+  constructor(id: string, model: SpotifyArea, townController: TownController) {
     super(id);
     this._spotifyAreaModel = model;
     this._townController = townController;
@@ -99,7 +97,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
     throw new Error('Method not implemented.' + songName);
   }
 
-  toInteractableAreaModel(): SpotifyAreaModel {
+  toInteractableAreaModel(): SpotifyArea {
     throw new Error('Method not implemented.');
   }
 
@@ -122,7 +120,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * Emits a queueChanged event if anything about the queue has changed (likes, dislikes comments, order)
    * @param newModel The new model which is to be checked for changes with the current model
    */
-  protected _updateFrom(newModel: SpotifyAreaModel): void {
+  protected _updateFrom(newModel: SpotifyArea): void {
     throw new Error('Method not implemented.' + newModel);
   }
 

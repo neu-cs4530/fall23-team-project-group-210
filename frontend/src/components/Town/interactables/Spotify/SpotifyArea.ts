@@ -19,7 +19,7 @@ export default class SpotifyArea extends Interactable {
     this._labelText = this.scene.add.text(
       this.x - this.displayWidth / 2,
       this.y - this.displayHeight / 2,
-      `Press space to join this Spotify station!\n Current song:}`,
+      `Press space to join this Spotify station!`,
       { color: '#FFFFFF', backgroundColor: '#000000' },
     );
     this._labelText.setVisible(false);

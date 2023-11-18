@@ -27,7 +27,7 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
-import { isConversationArea, isTicTacToeArea, isViewingArea } from '../types/TypeUtils';
+import { isConversationArea, isSpotifyArea, isTicTacToeArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './interactable/ConversationAreaController';
 import GameAreaController, { GameEventTypes } from './interactable/GameAreaController';
 import InteractableAreaController, {
@@ -332,6 +332,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return ret as GameAreaController<GameState, GameEventTypes>[];
   }
 
+  public get spotifyAreas() {
+    const ret = this._interactableControllers.filter(
+      eachInteractable => eachInteractable instanceof SpotifyAreaController,
+    );
+    return ret as SpotifyAreaController[];
+  }
+
   /**
    * Begin interacting with an interactable object. Emits an event to all listeners.
    * @param interactedObj
@@ -607,6 +614,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             this._interactableControllers.push(
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
             );
+          } else if (isSpotifyArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new SpotifyAreaController(eachInteractable.id, eachInteractable, this),
+            );
           }
         });
         this._userID = initialData.userID;
@@ -771,6 +782,17 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
     throw new Error(`Requested interactable area ${interactableAreaID} does not exist`);
   }
   return interactableAreaController as unknown as T;
+}
+
+export function useSpotifyAreaController(spotifyAreaID: string): SpotifyAreaController {
+  const townController = useTownController();
+  const spotifyAreaController = townController.spotifyAreas.find(
+    eachArea => eachArea.id == spotifyAreaID,
+  );
+  if (!spotifyAreaController) {
+    throw new Error(`Requested spotify area ${spotifyAreaID} does not exist`);
+  }
+  return spotifyAreaController;
 }
 
 /**

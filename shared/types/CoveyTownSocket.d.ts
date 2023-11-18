@@ -73,6 +73,10 @@ export interface ViewingArea extends Interactable {
   elapsedTimeSec: number;
 }
 
+export interface SpotifyArea extends Interactable {
+  queue: SongQueue;
+}
+
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER';
 /**
  * Base type for the state of a game
