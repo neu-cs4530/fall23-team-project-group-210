@@ -85,10 +85,17 @@
 //     previous: null,
 //     total: 5,
 //   };
-//   // mockSpotifyApi.search.mockImplementation(
-//   //   async (s: string, t: readonly ItemTypes[], d?: Market, w?: number) => out,
-//   // );
-//   // mockSpotifyApi.search.mockResolvedValue(out);
+//   mockSpotifyApi.search.mockImplementation(
+//     async (s: string, t: readonly ItemTypes[], d?: Market, w?: number) => {
+//       return out;
+//     },
+//   );
+//   // mockSpotifyApi.search.mockResolvedValue(() => {
+//   //   // Change the argument type or perform any custom logic
+//   //   // const modifiedId = id.toString();
+//   //   return out;
+//   // })
+//   mockSpotifyApi.search.mockResolvedValue(out);
 //   const mockTownController = mock<TownController>();
 //   const controller: SpotifyAreaController = new SpotifyAreaController(
 //     '1',
