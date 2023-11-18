@@ -9,6 +9,8 @@ import { SongQueue } from './SongQueue';
  * Class to contain song data. Using a string for name until we decide on data implementation
  */
 export type Song = {
+  id: string;
+  uri: string;
   name: string;
   likes: number;
   dislikes: number;
@@ -29,8 +31,6 @@ export type SpotifyAreaEvents = BaseInteractableEventMap & {
  * changing the queue based on the voting, and the sign in credentials
  */
 //NEED TO UPDATE interactableTypeForObjectType and create a type for spotifyAreaModel
-
-// should ideally be in another file, but this is ok for now.
 export default class SpotifyAreaController extends InteractableAreaController<
   SpotifyAreaEvents,
   SpotifyArea
@@ -38,7 +38,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
   private _spotifyAreaModel: SpotifyArea;
   //private _spotifyInterface: APITool;
 
-<<<<<<< HEAD
   private _townController: TownController;
 
   /**
@@ -50,23 +49,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
     super(id);
     this._spotifyAreaModel = model;
     this._townController = townController;
-=======
-  //NEED TO GET THESE TWO VALUES SOMEHOW
-  private _spotifyAPI: SpotifyApi;
-
-  private _deviceID: string;
-
-  constructor(
-    id: string,
-    gameArea: GameArea<SpotifyAreaModel>,
-    townController: TownController,
-    spotifyAPI: SpotifyApi,
-    deviceID: string,
-  ) {
-    super(id, gameArea, townController);
-    this._spotifyAPI = spotifyAPI;
-    this._deviceID = deviceID;
->>>>>>> 3ad20b2 (solved merge conflict)
   }
 
   get queue(): SongQueue {
