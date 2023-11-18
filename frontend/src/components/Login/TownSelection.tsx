@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import assert from 'assert';
 import {
   Box,
@@ -9,6 +9,7 @@ import {
   FormLabel,
   Heading,
   Input,
+  Select,
   Stack,
   Table,
   TableCaption,
@@ -21,7 +22,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
-import { Artist, ItemTypes, SpotifyApi, UserProfile } from '@spotify/web-api-ts-sdk';
+import { Artist, Device, ItemTypes, SpotifyApi, UserProfile } from '@spotify/web-api-ts-sdk';
 import useLoginController from '../../hooks/useLoginController';
 import TownController from '../../classes/TownController';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
@@ -37,17 +38,24 @@ export default function TownSelection(): JSX.Element {
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const [isSpotifyAttempt, setIsSpotifyAttempt] = useState<boolean>(false);
   const [spotifyUser, setSpotifyUser] = useState<UserProfile>({} as UserProfile);
-  // const [spotifyToken, setSpotifyToken] = useState<string | null>(
-  //   window.location.hash !== ''
-  //     ? new URLSearchParams(window.location.hash.substring(1)).get('access_token')
-  //     : null,
-  // );
+  const [spotifyDevice, setSpotifyDevice] = useState<Device | null>(null);
+  const [spotifyDevices, setSpotifyDevices] = useState<Device[]>([] as Device[]);
+  const spotifyToken = useMemo(
+    () =>
+      window.location.search !== ''
+        ? new URLSearchParams(
+            window.location.search.substring(window.location.search.indexOf('?code=') + 1),
+          )
+        : null,
+    [],
+  );
 
   const spotifyAPI = useSpotify(
     isSpotifyAttempt,
     clientID, // Figure out env variables
     `${window.location.protocol}//${window.location.host}`,
     [
+      'streaming',
       'user-read-playback-state',
       'user-read-currently-playing',
       'user-read-private',
@@ -63,34 +71,48 @@ export default function TownSelection(): JSX.Element {
   const toast = useToast();
 
   useEffect(() => {
-    // const logAPISearch = async () => {
-    //   console.log('Searching Spotify for The Beatles...'); // Let's see if the API search is working
-    //   try {
-    //     const items = await spotifyAPI?.search('The Beatles', ['artist']);
+    const logAPISearch = async () => {
+      // console.log('Searching Spotify for The Beatles...'); // Let's see if the API search is working
+      console.log('Searching Spotify for devices...'); // Let's see if the API search is working
 
-    //     if (items?.artists) {
-    //       console.table(
-    //         items.artists.items.map((item: Artist) => ({
-    //           name: item.name,
-    //           followers: item.followers.total,
-    //           popularity: item.popularity,
-    //         })),
-    //       );
-    //     }
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-    //   return;
-    // };
+      try {
+        // const items = await spotifyAPI?.search('The Beatles', ['artist']);
+        const devices = await spotifyAPI?.player.getAvailableDevices();
+        const items = devices?.devices;
+        if (items) {
+          setSpotifyDevices(items);
+        }
+        console.log(items);
+        if (items) {
+          console.table(
+            items.map((item: Device) => ({
+              name: item.name,
+              type: item.type,
+            })),
+          );
+        }
+      } catch (err) {
+        console.log(err);
+      }
+      return;
+    };
 
     (async () => {
       const user = await spotifyAPI?.currentUser.profile();
       if (user) {
         setSpotifyUser(user);
-        // await logAPISearch();
+        await logAPISearch();
       }
     })();
   }, [spotifyAPI]);
+
+  useEffect(() => {
+    (async () => {
+      if (spotifyToken) {
+        setIsSpotifyAttempt(true);
+      }
+    })();
+  }, [spotifyToken]);
 
   const updateTownListings = useCallback(() => {
     townsService.listTowns().then(towns => {
@@ -288,19 +310,63 @@ export default function TownSelection(): JSX.Element {
     }
   };
 
+  const DeviceOptions = () => {
+    const deviceList = spotifyDevices.map(device => (
+      <option key={device.id} value={device.name}>
+        {device.name}
+      </option>
+    ));
+    return <>{deviceList}</>;
+  };
+  const DeviceDropdown = () => {
+    return (
+      <div>
+        <select
+          onChange={option => {
+            const device = spotifyDevices?.find(
+              (item: Device) => item.name === option.target.value,
+            );
+            setSpotifyDevice(device as Device);
+          }}>
+          <DeviceOptions />
+        </select>
+        <Button
+          onClick={async () => {
+            const devices = await spotifyAPI?.player.getAvailableDevices();
+            if (devices?.devices) {
+              setSpotifyDevices(devices?.devices);
+            }
+          }}>
+          Refresh Device List
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <>
       <form>
         <Stack>
           <Box p='4' borderWidth='1px' borderRadius='lg'>
             {spotifyAPI ? (
-              <Heading as='h2' size='lg'>
-                Spotify account for {spotifyUser.display_name} is connected.
-              </Heading>
+              <>
+                <Heading as='h2' size='lg'>
+                  Spotify account for {spotifyUser.display_name} is connected.
+                </Heading>
+                <br />
+                <br />
+                {!spotifyDevice ? (
+                  <div>
+                    <text>Choose a device to play music on:</text>
+                    <DeviceDropdown />
+                  </div>
+                ) : null}
+              </>
             ) : (
               <Button
                 onClick={async () => {
                   // await handleSpotifyAuth();
+                  console.log(spotifyToken);
                   setIsSpotifyAttempt(true);
                 }}>
                 Login to Spotify Account
@@ -366,7 +432,6 @@ export default function TownSelection(): JSX.Element {
           <Heading p='4' as='h2' size='lg'>
             -or-
           </Heading>
-
           <Box borderWidth='1px' borderRadius='lg'>
             <Heading p='4' as='h2' size='lg'>
               Join an Existing Town
