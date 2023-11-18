@@ -2,7 +2,7 @@ import SpotifyAreaController, {
   SpotifyAreaModel,
 } from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 import { nanoid } from 'nanoid';
-import { SongQueue } from '../../../../classes/interactable/Spotify/Queue';
+import { SongQueue } from '../../../../classes/interactable/Spotify/SongQueue';
 import { mock, mockReset } from 'jest-mock-extended';
 import SpotifyArea from './SpotifyArea';
 import TownController, * as TownControllerHooks from '../../../../classes/TownController';

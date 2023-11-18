@@ -3,7 +3,7 @@ import TownController from '../../TownController';
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from '../InteractableAreaController';
-import { SongQueue } from './Queue';
+import { SongQueue } from './SongQueue';
 
 /**
  * Class to contain song data. Using a string for name until we decide on data implementation

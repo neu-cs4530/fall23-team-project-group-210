@@ -1,4 +1,4 @@
-import { SongQueue } from './Queue';
+import { SongQueue } from './SongQueue';
 //import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
 import { Song } from './SpotifyAreaController';
 describe('SpotifyAreaController and SongQueue Tests', () => {
