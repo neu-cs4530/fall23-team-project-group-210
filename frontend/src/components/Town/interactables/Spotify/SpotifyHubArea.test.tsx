@@ -11,21 +11,28 @@ import { ChakraProvider } from '@chakra-ui/react';
 import TownControllerContext from '../../../../contexts/TownControllerContext';
 import { SpotifyArea as SpotifyAreaModel } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
+import { Song } from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 
-const MOCK_QUEUE = [
+const MOCK_QUEUE: Song[] = [
   {
+    id: '1',
+    uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 1',
     likes: 10,
     dislikes: 2,
     comments: ['Great song!', 'I love this one'],
   },
   {
+    id: '2',
+    uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 2',
     likes: 5,
     dislikes: 1,
     comments: ['Not my favorite', 'Could be better'],
   },
   {
+    id: '3',
+    uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 3',
     likes: 20,
     dislikes: 0,
@@ -41,12 +48,7 @@ class MockSpotifyAreaController extends SpotifyAreaController {
   get queue(): SongQueue {
     const queue = new SongQueue();
     MOCK_QUEUE.forEach(song => {
-      queue.enqueue({
-        name: song.name,
-        likes: song.likes,
-        dislikes: song.dislikes,
-        comments: song.comments,
-      });
+      queue.enqueue(song);
     });
     return queue;
   }
