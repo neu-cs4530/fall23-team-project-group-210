@@ -697,7 +697,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     if (existingController instanceof SpotifyAreaController) {
       return existingController;
     } else {
-      throw new Error('Spotify area controller not created');
+      throw new Error(`No such spotify area controller ${existingController}`);
     }
   }
 
@@ -789,6 +789,16 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
   return interactableAreaController as unknown as T;
 }
 
+/**
+ * A react hook to retrieve a spotify area controller
+ * 
+ * This function will throw an error if the spotify area controller does not exist.
+ * 
+ * This hook relies on the TownControllerContext.
+ * 
+ * @param spotifyAreaID The ID of the spotify area to retrieve the controller for
+ * @returns Error if there is no spotify area controller matching the specified ID
+ */
 export function useSpotifyAreaController(spotifyAreaID: string): SpotifyAreaController {
   const townController = useTownController();
   const spotifyAreaController = townController.spotifyAreas.find(
