@@ -1,4 +1,4 @@
-import { Interactable, SpotifyArea } from '../../../types/CoveyTownSocket';
+import { SpotifyArea } from '../../../types/CoveyTownSocket';
 import TownController from '../../TownController';
 import InteractableAreaController, {
   BaseInteractableEventMap,

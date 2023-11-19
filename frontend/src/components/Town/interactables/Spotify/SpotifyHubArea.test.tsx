@@ -1,5 +1,4 @@
-import SpotifyAreaController, {
-} from '../../../../classes/interactable/Spotify/SpotifyAreaController';
+import SpotifyAreaController from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 import { nanoid } from 'nanoid';
 import { SongQueue } from '../../../../classes/interactable/Spotify/SongQueue';
 import { mock, mockReset } from 'jest-mock-extended';
@@ -65,25 +64,11 @@ class MockSpotifyAreaController extends SpotifyAreaController {
 }
 
 const mockSpotifyArea = mock<SpotifyArea>();
-// mockSpotifyArea.getData.mockReturnValue('Spotify');
 
 jest.spyOn(TownControllerHooks, 'useInteractable').mockReturnValue(mockSpotifyArea);
-const useInteractableAreaControllerSpy = jest.spyOn(
-  TownControllerHooks,
-  'useInteractableAreaController',
-);
+const useSpotifyAreaControllerSpy = jest.spyOn(TownControllerHooks, 'useSpotifyAreaController');
 
 describe('SpotifyHubArea', () => {
-  let mockSpotifyAreaController: MockSpotifyAreaController;
-
-  beforeAll(() => {
-    mockSpotifyAreaController = new MockSpotifyAreaController();
-  });
-
-  beforeEach(() => {
-    useInteractableAreaControllerSpy.mockReturnValue(mockSpotifyAreaController);
-  });
-
   const townController = mock<TownController>();
   const spotifyAreaController = new MockSpotifyAreaController();
 
@@ -100,7 +85,7 @@ describe('SpotifyHubArea', () => {
   beforeEach(() => {
     mockSpotifyArea.name = nanoid();
     mockReset(townController);
-    useInteractableAreaControllerSpy.mockReturnValue(spotifyAreaController);
+    useSpotifyAreaControllerSpy.mockReturnValue(spotifyAreaController);
   });
 
   describe('Rendering', () => {

@@ -27,25 +27,23 @@ export class SongQueue {
   }
 
   addLikeToSong(songName: string): void {
-    const song = this._storage.find((song) => song.name === songName);
-    if (song) {
-      song.likes++;
+    const targetSong = this._storage.find(song => song.name === songName);
+    if (targetSong) {
+      targetSong.likes++;
     }
   }
 
   removeLikeFromSong(songName: string): void {
-    const song = this._storage.find((song) => song.name === songName);
-    if (song) {
-      song.likes--;
+    const targetSong = this._storage.find(song => song.name === songName);
+    if (targetSong) {
+      targetSong.likes--;
     }
   }
 
   addCommentToSong(songName: string, comment: string): void {
-    const song = this._storage.find((song) => song.name === songName);
-    if (song) {
-      song.comments.push(comment);
+    const targetSong = this._storage.find(song => song.name === songName);
+    if (targetSong) {
+      targetSong.comments.push(comment);
     }
   }
-
-  
 }

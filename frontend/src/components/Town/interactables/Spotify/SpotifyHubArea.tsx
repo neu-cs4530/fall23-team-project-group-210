@@ -44,15 +44,13 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
             <Button
               onClick={() => {
                 console.log('song liked');
-              }}
-            >
+              }}>
               Like
             </Button>
             <Button
               onClick={() => {
                 console.log('song disliked');
-              }}
-            >
+              }}>
               Dislike
             </Button>
           </Flex>

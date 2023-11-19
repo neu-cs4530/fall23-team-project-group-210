@@ -1,8 +1,6 @@
 import Interactable, { KnownInteractableTypes } from '../../Interactable';
 
 export default class SpotifyArea extends Interactable {
-
-
   private _labelText?: Phaser.GameObjects.Text;
 
   private _isInteracting = false;

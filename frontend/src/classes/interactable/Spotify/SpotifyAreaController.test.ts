@@ -17,6 +17,8 @@ describe('SpotifyAreaController and SongQueue Tests', () => {
       const queue = new SongQueue();
       expect(queue.size()).toEqual(0);
       let song: Song = {
+        id: '1',
+        uri: 'uri1',
         name: 's1',
         likes: 0,
         dislikes: 0,
@@ -25,6 +27,8 @@ describe('SpotifyAreaController and SongQueue Tests', () => {
       queue.enqueue(song);
       expect(queue.size()).toEqual(1);
       song = {
+        id: '2',
+        uri: 'uri2',
         name: 's2',
         likes: 0,
         dislikes: 0,
@@ -33,6 +37,8 @@ describe('SpotifyAreaController and SongQueue Tests', () => {
       queue.enqueue(song);
       expect(queue.size()).toEqual(2);
       song = {
+        id: '3',
+        uri: 'uri3',
         name: 's3',
         likes: 0,
         dislikes: 0,
@@ -50,6 +56,8 @@ describe('SpotifyAreaController and SongQueue Tests', () => {
     it('SongQueue sorts songs by likes', () => {
       const queue = new SongQueue();
       let song: Song = {
+        id: '1',
+        uri: 'uri1',
         name: 's1',
         likes: 0,
         dislikes: 0,
@@ -57,6 +65,8 @@ describe('SpotifyAreaController and SongQueue Tests', () => {
       };
       queue.enqueue(song);
       song = {
+        id: '2',
+        uri: 'uri2',
         name: 's2',
         likes: 3,
         dislikes: 0,
@@ -64,6 +74,8 @@ describe('SpotifyAreaController and SongQueue Tests', () => {
       };
       queue.enqueue(song);
       song = {
+        id: '3',
+        uri: 'uri3',
         name: 's3',
         likes: 2,
         dislikes: 0,
@@ -71,6 +83,8 @@ describe('SpotifyAreaController and SongQueue Tests', () => {
       };
       queue.enqueue(song);
       song = {
+        id: '4',
+        uri: 'uri4',
         name: 's4',
         likes: 1,
         dislikes: 0,
@@ -78,6 +92,8 @@ describe('SpotifyAreaController and SongQueue Tests', () => {
       };
       queue.enqueue(song);
       song = {
+        id: '5',
+        uri: 'uri5',
         name: 's5',
         likes: 10,
         dislikes: 0,
