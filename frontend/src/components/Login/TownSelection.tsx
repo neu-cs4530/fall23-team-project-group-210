@@ -29,6 +29,7 @@ import { useSpotify } from '../../hooks/useSpotify';
 
 export default function TownSelection(): JSX.Element {
   const clientID = 'ddf7330eed894b0f81b580cba2d1b570';
+
   const [userName, setUserName] = useState<string>('');
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);

@@ -23,6 +23,7 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import SpotifyArea from './SpotifyArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -404,10 +405,17 @@ export default class Town {
       .filter(eachObject => eachObject.type === 'GameArea')
       .map(eachGameAreaObj => GameAreaFactory(eachGameAreaObj, this._broadcastEmitter));
 
+    const spotifyAreas = objectLayer.objects
+      .filter(eachObject => eachObject.type === 'SpotifyArea')
+      .map(eachSpotifyAreaObj =>
+        SpotifyArea.fromMapObject(eachSpotifyAreaObj, this._broadcastEmitter),
+      );
+
     this._interactables = this._interactables
       .concat(viewingAreas)
       .concat(conversationAreas)
-      .concat(gameAreas);
+      .concat(gameAreas)
+      .concat(spotifyAreas);
     this._validateInteractables();
   }
 

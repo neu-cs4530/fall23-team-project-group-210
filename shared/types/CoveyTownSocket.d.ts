@@ -73,6 +73,10 @@ export interface ViewingArea extends Interactable {
   elapsedTimeSec: number;
 }
 
+export interface SpotifyArea extends Interactable {
+  queue: SongQueue;
+}
+
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER';
 /**
  * Base type for the state of a game
@@ -174,7 +178,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | LeaveGameCommand | SpotifyCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -190,6 +194,10 @@ export interface GameMoveCommand<MoveType> {
   type: 'GameMove';
   gameID: GameInstanceID;
   move: MoveType;
+}
+export interface SpotifyCommand {
+  type: 'Spotify';
+  update: SpotifyArea;
 }
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
