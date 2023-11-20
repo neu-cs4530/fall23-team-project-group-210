@@ -36,6 +36,13 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
 
   return (
     <Container>
+      {/* make a search bar text input */}
+      <Heading as='h2' size='md'>
+        Search for a Song
+      </Heading>
+
+      {/* TODO search UI */}
+
       <Heading as='h2' size='md'>
         Spotify Song Queue
       </Heading>

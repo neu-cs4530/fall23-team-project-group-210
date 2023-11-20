@@ -1,6 +1,6 @@
 import assert from 'assert';
 import EventEmitter from 'events';
-import _, { each } from 'lodash';
+import _ from 'lodash';
 import { nanoid } from 'nanoid';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
@@ -793,11 +793,11 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
 
 /**
  * A react hook to retrieve a spotify area controller
- * 
+ *
  * This function will throw an error if the spotify area controller does not exist.
- * 
+ *
  * This hook relies on the TownControllerContext.
- * 
+ *
  * @param spotifyAreaID The ID of the spotify area to retrieve the controller for
  * @returns Error if there is no spotify area controller matching the specified ID
  */
