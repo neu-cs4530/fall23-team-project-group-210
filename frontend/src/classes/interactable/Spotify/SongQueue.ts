@@ -6,7 +6,11 @@ import { Song } from './SpotifyAreaController';
 export class SongQueue {
   private _storage: Song[] = [];
 
-  public get songs(): Song[] {
+  constructor() {
+    this._storage = [];
+  }
+
+  get songs(): Song[] {
     return this._storage;
   }
 
@@ -26,18 +30,25 @@ export class SongQueue {
     return this._storage.length;
   }
 
-  updateFieldsByID(songId: string, likes?: number, dislikes?: number, comments?: string[]): void {
-    const song: Song | undefined = this._storage.find(s => s.id === songId);
-    if (song) {
-      if (likes) {
-        song.likes = likes;
-      }
-      if (dislikes) {
-        song.dislikes = dislikes;
-      }
-      if (comments) {
-        song.comments = comments;
-      }
+  //CHANGE THESE TO IDs instead of names
+  addLikeToSong(songName: string): void {
+    const targetSong = this._storage.find(song => song.name === songName);
+    if (targetSong) {
+      targetSong.likes++;
+    }
+  }
+
+  removeLikeFromSong(songName: string): void {
+    const targetSong = this._storage.find(song => song.name === songName);
+    if (targetSong) {
+      targetSong.likes--;
+    }
+  }
+
+  addCommentToSong(songName: string, comment: string): void {
+    const targetSong = this._storage.find(song => song.name === songName);
+    if (targetSong) {
+      targetSong.comments.push(comment);
     }
   }
 }

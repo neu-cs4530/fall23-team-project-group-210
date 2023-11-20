@@ -27,12 +27,18 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
-import { isConversationArea, isTicTacToeArea, isViewingArea } from '../types/TypeUtils';
+import {
+  isConversationArea,
+  isSpotifyArea,
+  isTicTacToeArea,
+  isViewingArea,
+} from '../types/TypeUtils';
 import ConversationAreaController from './interactable/ConversationAreaController';
 import GameAreaController, { GameEventTypes } from './interactable/GameAreaController';
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from './interactable/InteractableAreaController';
+import { SongQueue } from './interactable/Spotify/SongQueue';
 import SpotifyAreaController from './interactable/Spotify/SpotifyAreaController';
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
@@ -332,6 +338,13 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     return ret as GameAreaController<GameState, GameEventTypes>[];
   }
 
+  public get spotifyAreas() {
+    const ret = this._interactableControllers.filter(
+      eachInteractable => eachInteractable instanceof SpotifyAreaController,
+    );
+    return ret as SpotifyAreaController[];
+  }
+
   /**
    * Begin interacting with an interactable object. Emits an event to all listeners.
    * @param interactedObj
@@ -607,6 +620,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             this._interactableControllers.push(
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
             );
+          } else if (isSpotifyArea(eachInteractable)) {
+            eachInteractable.queue = new SongQueue();
+            this._interactableControllers.push(
+              new SpotifyAreaController(eachInteractable.id, eachInteractable, this),
+            );
           }
         });
         this._userID = initialData.userID;
@@ -681,7 +699,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     if (existingController instanceof SpotifyAreaController) {
       return existingController;
     } else {
-      throw new Error('Spotify area controller not created');
+      throw new Error(`No such spotify area controller ${existingController}`);
     }
   }
 
@@ -771,6 +789,27 @@ export function useInteractableAreaController<T>(interactableAreaID: string): T 
     throw new Error(`Requested interactable area ${interactableAreaID} does not exist`);
   }
   return interactableAreaController as unknown as T;
+}
+
+/**
+ * A react hook to retrieve a spotify area controller
+ *
+ * This function will throw an error if the spotify area controller does not exist.
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @param spotifyAreaID The ID of the spotify area to retrieve the controller for
+ * @returns Error if there is no spotify area controller matching the specified ID
+ */
+export function useSpotifyAreaController(spotifyAreaID: string): SpotifyAreaController {
+  const townController = useTownController();
+  const spotifyAreaController = townController.spotifyAreas.find(
+    eachArea => eachArea.id == spotifyAreaID,
+  );
+  if (!spotifyAreaController) {
+    throw new Error(`Requested spotify area ${spotifyAreaID} does not exist`);
+  }
+  return spotifyAreaController;
 }
 
 /**

@@ -1,31 +1,37 @@
-import SpotifyAreaController, {
-  SpotifyAreaModel,
-} from '../../../../classes/interactable/Spotify/SpotifyAreaController';
+import SpotifyAreaController from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 import { nanoid } from 'nanoid';
-import { SongQueue } from '../../../../classes/interactable/Spotify/Queue';
+import { SongQueue } from '../../../../classes/interactable/Spotify/SongQueue';
 import { mock, mockReset } from 'jest-mock-extended';
-import SpotifyArea from './SpotifyArea';
 import TownController, * as TownControllerHooks from '../../../../classes/TownController';
 import SpotifyHubArea from './SpotifyHubArea';
 import React from 'react';
 import { render } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import TownControllerContext from '../../../../contexts/TownControllerContext';
+import { SpotifyArea as SpotifyAreaModel } from '../../../../types/CoveyTownSocket';
+import SpotifyArea from './SpotifyArea';
+import { Song } from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 
-const MOCK_QUEUE = [
+const MOCK_QUEUE: Song[] = [
   {
+    id: '1',
+    uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 1',
     likes: 10,
     dislikes: 2,
     comments: ['Great song!', 'I love this one'],
   },
   {
+    id: '2',
+    uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 2',
     likes: 5,
     dislikes: 1,
     comments: ['Not my favorite', 'Could be better'],
   },
   {
+    id: '3',
+    uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 3',
     likes: 20,
     dislikes: 0,
@@ -41,12 +47,7 @@ class MockSpotifyAreaController extends SpotifyAreaController {
   get queue(): SongQueue {
     const queue = new SongQueue();
     MOCK_QUEUE.forEach(song => {
-      queue.enqueue({
-        name: song.name,
-        likes: song.likes,
-        dislikes: song.dislikes,
-        comments: song.comments,
-      });
+      queue.enqueue(song);
     });
     return queue;
   }
@@ -63,25 +64,11 @@ class MockSpotifyAreaController extends SpotifyAreaController {
 }
 
 const mockSpotifyArea = mock<SpotifyArea>();
-mockSpotifyArea.getData.mockReturnValue('Spotify');
 
 jest.spyOn(TownControllerHooks, 'useInteractable').mockReturnValue(mockSpotifyArea);
-const useInteractableAreaControllerSpy = jest.spyOn(
-  TownControllerHooks,
-  'useInteractableAreaController',
-);
+const useSpotifyAreaControllerSpy = jest.spyOn(TownControllerHooks, 'useSpotifyAreaController');
 
 describe('SpotifyHubArea', () => {
-  let mockSpotifyAreaController: MockSpotifyAreaController;
-
-  beforeAll(() => {
-    mockSpotifyAreaController = new MockSpotifyAreaController();
-  });
-
-  beforeEach(() => {
-    useInteractableAreaControllerSpy.mockReturnValue(mockSpotifyAreaController);
-  });
-
   const townController = mock<TownController>();
   const spotifyAreaController = new MockSpotifyAreaController();
 
@@ -98,26 +85,7 @@ describe('SpotifyHubArea', () => {
   beforeEach(() => {
     mockSpotifyArea.name = nanoid();
     mockReset(townController);
-    // spotifyAreaController.mockReset();
-    useInteractableAreaControllerSpy.mockReturnValue(spotifyAreaController);
-
-    // ourPlayer = new PlayerController('player x', 'player x', randomLocation());
-    // mockGameArea.name = nanoid();
-    // mockReset(townController);
-    // gameAreaController.mockReset();
-    // useInteractableAreaControllerSpy.mockReturnValue(gameAreaController);
-    // leaderboardComponentSpy.mockClear();
-    // mockToast.mockClear();
-    // gameAreaController.joinGame.mockReset();
-    // gameAreaController.makeMove.mockReset();
-
-    // gameAreaController.joinGame.mockImplementation(
-    //   () =>
-    //     new Promise<void>((resolve, reject) => {
-    //       joinGameResolve = resolve;
-    //       joinGameReject = reject;
-    //     }),
-    // );
+    useSpotifyAreaControllerSpy.mockReturnValue(spotifyAreaController);
   });
 
   describe('Rendering', () => {
@@ -129,7 +97,6 @@ describe('SpotifyHubArea', () => {
 
   describe('Song Details', () => {
     it('should render the correct number of songs', () => {
-      // const { getAllByTestId } = render(<SpotifyHubArea />);
       const { getAllByTestId } = renderSpotifyHubArea();
       expect(getAllByTestId('song').length).toBe(3);
     });

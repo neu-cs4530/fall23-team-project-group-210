@@ -2,14 +2,14 @@
   "jest.jestCommandLine": "npx jest",
   "typescript.tsdk": "node_modules/typescript/lib",
   "prettier.configPath": "./townService/.prettierrc.cjs",
-  "editor.formatOnSave": false,
   // Runs Prettier, then ESLint
-  "editor.codeActionsOnSave": [
-    "source.formatDocument",
-    "source.fixAll.eslint"
-  ],
-  "eslint.workingDirectories": [
-    "./frontend",
-    "./townService",
-  ]
+  "editor.codeActionsOnSave": ["source.formatDocument", "source.fixAll.eslint"],
+  "eslint.workingDirectories": ["./frontend", "./townService"],
+  "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+  "editor.formatOnPaste": false, // required
+  "editor.formatOnType": false, // required
+  "editor.formatOnSave": true, // optional
+  "editor.formatOnSaveMode": "file", // required to format on save
+  "files.autoSave": "onFocusChange", // optional but recommended
+  "vs-code-prettier-eslint.prettierLast": false // set as "true" to run 'prettier' last not first
 }

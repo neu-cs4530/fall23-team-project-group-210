@@ -1,5 +1,3 @@
-import { GameArea, GameState } from '../../../types/CoveyTownSocket';
-import GameAreaController, { GameEventTypes } from '../GameAreaController';
 import TownController from '../../TownController';
 import { SongQueue } from './SongQueue';
 import {
@@ -10,6 +8,10 @@ import {
   // ItemTypes,
 } from '@spotify/web-api-ts-sdk';
 import { v4 as uuidv4 } from 'uuid';
+import { SpotifyArea } from '../../../types/CoveyTownSocket';
+import InteractableAreaController, {
+  BaseInteractableEventMap,
+} from '../InteractableAreaController';
 
 /**
  * Class to contain song data. Using a string for name until we decide on data implementation
@@ -29,56 +31,54 @@ export type Song = {
  * only adding a queueChanged event, but may need more types of events like new comments, likes,
  * song change, playback change, etc. Look at ViewingAreaController for examples.
  */
-export type SpotifyAreaEvents = GameEventTypes & {
+export type SpotifyAreaEvents = BaseInteractableEventMap & {
   queueChange: (newQueue: SongQueue) => void;
 };
-
-// type PlayerCredentials = {
-//   userIdToCredentials
-// }
 
 /**
  * Responsible for managing the queue, likes, comments,
  * changing the queue based on the voting, and the sign in credentials
  */
 //NEED TO UPDATE interactableTypeForObjectType and create a type for spotifyAreaModel
-export interface SpotifyAreaModel extends GameState {
-  queue: SongQueue;
-  //playerCredentials:
-}
-
-export default class SpotifyAreaController extends GameAreaController<
-  SpotifyAreaModel,
-  SpotifyAreaEvents
+export default class SpotifyAreaController extends InteractableAreaController<
+  SpotifyAreaEvents,
+  SpotifyArea
 > {
-  public isActive(): boolean {
-    throw new Error('Method not implemented.');
-  }
-  //private _spotifyAreaModel: SpotifyAreaModel;
+  private _spotifyAreaModel: SpotifyArea;
+  //private _spotifyInterface: APITool;
 
   //NEED TO GET THESE TWO VALUES SOMEHOW
   private _spotifyAPI: SpotifyApi;
 
   private _deviceID: string;
 
+  private _townController: TownController;
+
+  /**
+   * Create a new SpotifyAreaController
+   * @param id
+   * @param topic
+   */
   constructor(
     id: string,
-    gameArea: GameArea<SpotifyAreaModel>,
-    townController: TownController,
     spotifyAPI: SpotifyApi,
+    model: SpotifyArea,
     deviceID: string,
+    townController: TownController,
   ) {
-    super(id, gameArea, townController);
+    super(id);
+    this._spotifyAreaModel = model;
     this._spotifyAPI = spotifyAPI;
     this._deviceID = deviceID;
+    this._townController = townController;
   }
 
   get queue(): SongQueue | undefined {
-    return this._model.game?.state.queue;
+    return this._spotifyAreaModel.queue;
   }
 
   public addToSongQueue(song: Song): void {
-    this._model.game?.state.queue.enqueue(song);
+    this._spotifyAreaModel.queue.enqueue(song);
   }
 
   /**
@@ -136,12 +136,16 @@ export default class SpotifyAreaController extends GameAreaController<
    * @returns Promise of the song that is currently playing so its information can still be displayed
    */
   async playNextSong(): Promise<Song> {
-    const current: Song | undefined = this._model.game?.state.queue.dequeue();
+    const current: Song | undefined = this._spotifyAreaModel.queue.dequeue();
     if (!current) {
       throw new Error('No songs in queue');
     }
     this._spotifyAPI.player.startResumePlayback(this._deviceID, current.uri);
     return current;
+  }
+
+  toInteractableAreaModel(): SpotifyArea {
+    throw new Error('Method not implemented.');
   }
 
   /**
@@ -152,11 +156,23 @@ export default class SpotifyAreaController extends GameAreaController<
    * @param comments comments for song
    */
   updateSong(songId: string, likes?: number, dislikes?: number, comments?: string[]): void {
-    this._model.game?.state.queue.updateFieldsByID(songId, likes, dislikes, comments);
-    this._model.game?.state.queue.sortByLikes();
+    this._spotifyAreaModel.queue.updateFieldsByID(songId, likes, dislikes, comments);
+    this._spotifyAreaModel.queue.sortByLikes();
   }
 
   //Need a method for passing song data to frontend/makeing stream connection. Waiting on API tool
 
   //Need method for handling sign in credentials. Waiting on API Tool
+
+  /**
+   * Emits a queueChanged event if anything about the queue has changed (likes, dislikes comments, order)
+   * @param newModel The new model which is to be checked for changes with the current model
+   */
+  protected _updateFrom(newModel: SpotifyArea): void {
+    throw new Error('Method not implemented.' + newModel);
+  }
+
+  public isActive(): boolean {
+    throw new Error('Method not implemented.');
+  }
 }
