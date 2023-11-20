@@ -15,7 +15,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
-import TownController, { useInteractable, useSpotifyAreaController } from '../../../../classes/TownController';
+import { useInteractable, useSpotifyAreaController } from '../../../../classes/TownController';
 
 import useTownController from '../../../../hooks/useTownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
@@ -62,7 +62,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
             type='text'
             placeholder='Enter song name...'
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </FormControl>
         {/* Button to trigger the search */}
@@ -71,7 +71,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
 
       {/* Display search results */}
       <List aria-label='list of search results'>
-        {searchResults.map((result) => (
+        {searchResults.map(result => (
           <Flex data-testid='search-result' key={result.id} align='center'>
             <Text>{result.name}</Text>
             <Button
@@ -84,7 +84,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
           </Flex>
         ))}
       </List>
-
 
       <Heading as='h2' size='md'>
         Spotify Song Queue
