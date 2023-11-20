@@ -1,6 +1,6 @@
 import assert from 'assert';
 import EventEmitter from 'events';
-import _ from 'lodash';
+import _, { each } from 'lodash';
 import { nanoid } from 'nanoid';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
@@ -38,6 +38,7 @@ import GameAreaController, { GameEventTypes } from './interactable/GameAreaContr
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from './interactable/InteractableAreaController';
+import { SongQueue } from './interactable/Spotify/SongQueue';
 import SpotifyAreaController from './interactable/Spotify/SpotifyAreaController';
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
@@ -620,6 +621,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
             );
           } else if (isSpotifyArea(eachInteractable)) {
+            eachInteractable.queue = new SongQueue();
             this._interactableControllers.push(
               new SpotifyAreaController(eachInteractable.id, eachInteractable, this),
             );

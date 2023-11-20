@@ -6,6 +6,10 @@ import { Song } from './SpotifyAreaController';
 export class SongQueue {
   private _storage: Song[] = [];
 
+  constructor() {
+    this._storage = [];
+  }
+
   queue(): Song[] {
     return this._storage;
   }

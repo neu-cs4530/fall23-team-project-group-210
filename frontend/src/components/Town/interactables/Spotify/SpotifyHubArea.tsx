@@ -5,6 +5,9 @@ import {
   Heading,
   List,
   Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
   ModalHeader,
   ModalOverlay,
   Text,
@@ -80,8 +83,13 @@ export default function SpotifyAreaWrapper(): JSX.Element {
     return (
       <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
         <ModalOverlay />
-        <ModalHeader>{spotifyArea.name}</ModalHeader>
-        <SpotifyHubArea interactableID={spotifyArea.name} />
+        <ModalContent>
+          <ModalHeader>Spotify Area</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <SpotifyHubArea interactableID={spotifyArea.name} />
+          </ModalBody>
+        </ModalContent>
       </Modal>
     );
   }
