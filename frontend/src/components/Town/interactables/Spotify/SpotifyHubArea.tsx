@@ -2,7 +2,9 @@ import {
   Button,
   Container,
   Flex,
+  FormControl,
   Heading,
+  InputGroup,
   List,
   Modal,
   ModalBody,
@@ -42,6 +44,18 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       </Heading>
 
       {/* TODO search UI */}
+      <InputGroup>
+        <Text>Search for a song</Text>
+        <FormControl
+          placeholder='Search for song'
+        ></FormControl>
+        <Button
+          onClick={() => {
+            console.log('searching for song');
+          }}>
+          Search
+        </Button>
+      </InputGroup>
 
       <Heading as='h2' size='md'>
         Spotify Song Queue
