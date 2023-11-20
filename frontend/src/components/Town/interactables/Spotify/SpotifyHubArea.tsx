@@ -26,7 +26,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
 
   const [queue, setQueue] = useState(spotifyAreaController.queue);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
-  const [searchResults, setSearchResults] = useState<any[]>([]); // State to store the search results
+  // const [searchResults, setSearchResults] = useState<any[]>([]); // State to store the search results
 
   const handleSearch = async () => {
     // Implement your Spotify search logic here. You may want to use the Spotify API or another service.
@@ -70,7 +70,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       </InputGroup>
 
       {/* Display search results */}
-      <List aria-label='list of search results'>
+      {/* <List aria-label='list of search results'>
         {searchResults.map(result => (
           <Flex data-testid='search-result' key={result.id} align='center'>
             <Text>{result.name}</Text>
@@ -83,7 +83,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
             </Button>
           </Flex>
         ))}
-      </List>
+      </List> */}
 
       <Heading as='h2' size='md'>
         Spotify Song Queue
