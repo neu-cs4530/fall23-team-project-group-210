@@ -43,6 +43,7 @@ import SpotifyAreaController from './interactable/Spotify/SpotifyAreaController'
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
+import { Device, SpotifyApi } from '@spotify/web-api-ts-sdk';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -51,6 +52,11 @@ export type ConnectionProperties = {
   userName: string;
   townID: string;
   loginController: LoginController;
+};
+
+export type SpotifyData = {
+  spotifyApi: SpotifyApi;
+  device: Device | undefined;
 };
 
 /**
@@ -210,7 +216,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _interactableEmitter = new EventEmitter();
 
-  public constructor({ userName, townID, loginController }: ConnectionProperties) {
+  private _spotifyData: SpotifyData | undefined;
+
+  public constructor(
+    { userName, townID, loginController }: ConnectionProperties,
+    spotifyData?: SpotifyData,
+  ) {
     super();
     this._townID = townID;
     this._userName = userName;
@@ -228,6 +239,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket = io(url, { auth: { userName, townID } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
+    this._spotifyData = spotifyData;
+  }
+
+  set spotifyDetails(spotifyData: SpotifyData | undefined) {
+    this._spotifyData = spotifyData;
+  }
+
+  get spotifyDetails(): SpotifyData | undefined {
+    return this._spotifyData;
   }
 
   public get sessionToken() {

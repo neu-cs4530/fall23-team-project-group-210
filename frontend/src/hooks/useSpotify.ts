@@ -8,7 +8,7 @@ export function useSpotify(
   scopes: string[],
   config?: SdkOptions,
 ) {
-  const [sdk, setSdk] = useState<SpotifyApi | null>(null);
+  const [sdk, setSdk] = useState<SpotifyApi | undefined>(undefined);
   const { current: activeScopes } = useRef(scopes);
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import { SongQueue } from './SongQueue';
 import {
   SpotifyApi,
   SimplifiedArtist,
+  Device,
   // SdkOptions,
   // AuthorizationCodeWithPKCEStrategy,
   // ItemTypes,
@@ -48,9 +49,9 @@ export default class SpotifyAreaController extends InteractableAreaController<
   //private _spotifyInterface: APITool;
 
   //NEED TO GET THESE TWO VALUES SOMEHOW
-  private _spotifyAPI: SpotifyApi;
+  private _spotifyAPI: SpotifyApi | undefined;
 
-  private _deviceID: string;
+  private _device: Device | undefined;
 
   private _townController: TownController;
 
@@ -59,25 +60,28 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param id
    * @param topic
    */
-  constructor(
-    id: string,
-    spotifyAPI: SpotifyApi,
-    model: SpotifyArea,
-    deviceID: string,
-    townController: TownController,
-  ) {
+  constructor(id: string, model: SpotifyArea, townController: TownController) {
     super(id);
     this._spotifyAreaModel = model;
-    this._spotifyAPI = spotifyAPI;
-    this._deviceID = deviceID;
+    //this._spotifyAPI = spotifyAPI;
+    //this._deviceID = deviceID;
     this._townController = townController;
+    // if (!townController.spotifyDetails) {
+    //   throw Error(
+    //     'Spotify details not provided. Spotify hubs will not work unless spotify details are provided on sign in',
+    //   );
+    // }
+    this._spotifyAPI = townController.spotifyDetails?.spotifyApi;
+    this._device = townController.spotifyDetails?.device;
   }
 
   get queue(): SongQueue | undefined {
     return this._spotifyAreaModel.queue;
   }
 
-  public addToSongQueue(song: Song): void {
+  public addSongToQueue(song: Song): void {
+    console.log('ADD SONG TO QUEUE');
+    this.emit('queueUpdated');
     this._spotifyAreaModel.queue.enqueue(song);
   }
 
@@ -117,6 +121,9 @@ export default class SpotifyAreaController extends InteractableAreaController<
    */
   //UPDATE TO BE ABLE TO SEARCH FOR ALBUMS AND ARTISTS AS WELL
   async searchSong(searchString: string): Promise<Song[]> {
+    if (!this._spotifyAPI) {
+      throw Error('Spotify details not provided');
+    }
     const items = await this._spotifyAPI.search(searchString, ['track'], undefined, 5);
     const songs: Song[] = items.tracks.items.map(item => ({
       id: uuidv4(),
@@ -127,6 +134,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
       dislikes: 0,
       comments: [],
     }));
+    console.log(songs.length);
     return songs;
   }
 
@@ -140,7 +148,13 @@ export default class SpotifyAreaController extends InteractableAreaController<
     if (!current) {
       throw new Error('No songs in queue');
     }
-    this._spotifyAPI.player.startResumePlayback(this._deviceID, current.uri);
+    if (!this._device || !this._device.id) {
+      throw new Error('Spotify device not provided or does not have an id');
+    }
+    if (!this._spotifyAPI) {
+      throw new Error('Spotify api not provided');
+    }
+    this._spotifyAPI.player.startResumePlayback(this._device.id, current.uri);
     return current;
   }
 

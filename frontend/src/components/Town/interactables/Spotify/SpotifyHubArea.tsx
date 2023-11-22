@@ -20,34 +20,36 @@ import { useInteractable, useSpotifyAreaController } from '../../../../classes/T
 import useTownController from '../../../../hooks/useTownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
+import { Song } from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 
 function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const spotifyAreaController = useSpotifyAreaController(interactableID);
 
   const [queue, setQueue] = useState(spotifyAreaController.queue);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
-  // const [searchResults, setSearchResults] = useState<any[]>([]); // State to store the search results
+  const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
 
   const handleSearch = async () => {
     // Implement your Spotify search logic here. You may want to use the Spotify API or another service.
     // For simplicity, let's assume a function called searchSpotify in your spotifyAreaController.
-    // try {
-    //   const results = await spotifyAreaController.searchSpotify(searchTerm);
-    //   setSearchResults(results);
-    // } catch (error) {
-    //   console.error('Error searching for songs:', error);
-    // }
+    try {
+      const results = await spotifyAreaController.searchSong(searchTerm);
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Error searching for songs:', error);
+    }
   };
 
   useEffect(() => {
     const updateSpotifyState = () => {
+      console.log('UPDATED SPOTIFY STATE');
       setQueue(spotifyAreaController.queue);
     };
     spotifyAreaController.addListener('queueUpdated', updateSpotifyState);
     return () => {
       spotifyAreaController.removeListener('queueUpdated', updateSpotifyState);
     };
-  }, [spotifyAreaController, spotifyAreaController.queue]);
+  }, [spotifyAreaController, queue]);
 
   return (
     <Container>
@@ -70,12 +72,13 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       </InputGroup>
 
       {/* Display search results */}
-      {/* <List aria-label='list of search results'>
+      <List aria-label='list of search results'>
         {searchResults.map(result => (
           <Flex data-testid='search-result' key={result.id} align='center'>
             <Text>{result.name}</Text>
             <Button
               onClick={() => {
+                spotifyAreaController.addSongToQueue(result);
                 // Add logic to add the selected song to the queue
                 console.log('Song added to queue:', result.name);
               }}>
@@ -83,13 +86,13 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
             </Button>
           </Flex>
         ))}
-      </List> */}
+      </List>
 
       <Heading as='h2' size='md'>
         Spotify Song Queue
       </Heading>
       <List aria-label='list of songs in the queue'>
-        {queue.queue().map(song => (
+        {queue?.songs.map(song => (
           <Flex data-testid='song' key={song.name} align='center'>
             <Text>{song.name}</Text>
             {/* Add like/dislike buttons for each song in the queue, which would update the likes/dislikes fields in each song */}

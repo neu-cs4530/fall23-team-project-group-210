@@ -54,7 +54,7 @@ class MockSpotifyAreaController extends SpotifyAreaController {
 
   currentSong = jest.fn();
 
-  addToSongQueue = jest.fn();
+  addSongToQueue = jest.fn();
 
   removeFromSongQueue = jest.fn();
 
