@@ -18,7 +18,8 @@ import InteractableAreaController, {
  * Class to contain song data. Using a string for name until we decide on data implementation
  */
 export type Song = {
-  id: string;
+  id: string | undefined;
+  albumUri: string;
   uri: string;
   name: string;
   artists: SimplifiedArtist[];
@@ -75,14 +76,28 @@ export default class SpotifyAreaController extends InteractableAreaController<
     this._device = townController.spotifyDetails?.device;
   }
 
-  get queue(): SongQueue | undefined {
+  get queue(): SongQueue {
     return this._spotifyAreaModel.queue;
   }
 
   public addSongToQueue(song: Song): void {
-    console.log('ADD SONG TO QUEUE');
+    const songToAdd: Song = {
+      id: uuidv4(),
+      albumUri: song.albumUri,
+      uri: song.uri,
+      name: song.name,
+      artists: song.artists,
+      likes: song.likes,
+      dislikes: song.dislikes,
+      comments: song.comments,
+    };
+    this._spotifyAreaModel.queue.enqueue(songToAdd);
     this.emit('queueUpdated');
-    this._spotifyAreaModel.queue.enqueue(song);
+  }
+
+  public clearQueue(): void {
+    this._spotifyAreaModel.queue.clearQueue();
+    this.emit('queueUpdated');
   }
 
   /**
@@ -124,9 +139,13 @@ export default class SpotifyAreaController extends InteractableAreaController<
     if (!this._spotifyAPI) {
       throw Error('Spotify details not provided');
     }
+    if (searchString == '') {
+      throw new Error('Search phrase cannot be empty');
+    }
     const items = await this._spotifyAPI.search(searchString, ['track'], undefined, 5);
     const songs: Song[] = items.tracks.items.map(item => ({
       id: uuidv4(),
+      albumUri: item.album.uri,
       uri: item.uri,
       name: item.name,
       artists: item.artists,
@@ -134,7 +153,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
       dislikes: 0,
       comments: [],
     }));
-    console.log(songs.length);
     return songs;
   }
 
@@ -145,6 +163,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    */
   async playNextSong(): Promise<Song> {
     const current: Song | undefined = this._spotifyAreaModel.queue.dequeue();
+    this.emit('queueUpdated');
     if (!current) {
       throw new Error('No songs in queue');
     }
@@ -154,7 +173,9 @@ export default class SpotifyAreaController extends InteractableAreaController<
     if (!this._spotifyAPI) {
       throw new Error('Spotify api not provided');
     }
-    this._spotifyAPI.player.startResumePlayback(this._device.id, current.uri);
+    this._spotifyAPI.player.startResumePlayback(this._device.id, current.albumUri, undefined, {
+      uri: current.uri,
+    });
     return current;
   }
 

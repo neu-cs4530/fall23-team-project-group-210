@@ -13,6 +13,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInteractable, useSpotifyAreaController } from '../../../../classes/TownController';
@@ -24,8 +25,7 @@ import { Song } from '../../../../classes/interactable/Spotify/SpotifyAreaContro
 
 function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const spotifyAreaController = useSpotifyAreaController(interactableID);
-
-  const [queue, setQueue] = useState(spotifyAreaController.queue);
+  const [queue, setQueue] = useState([] as Song[]);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
   const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
 
@@ -42,8 +42,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
 
   useEffect(() => {
     const updateSpotifyState = () => {
-      console.log('UPDATED SPOTIFY STATE');
-      setQueue(spotifyAreaController.queue);
+      setQueue([...spotifyAreaController.queue.songs]);
     };
     spotifyAreaController.addListener('queueUpdated', updateSpotifyState);
     return () => {
@@ -51,6 +50,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
     };
   }, [spotifyAreaController, queue]);
 
+  const toast = useToast();
   return (
     <Container>
       <Heading as='h2' size='md'>
@@ -75,12 +75,14 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       <List aria-label='list of search results'>
         {searchResults.map(result => (
           <Flex data-testid='search-result' key={result.id} align='center'>
-            <Text>{result.name}</Text>
+            <Text>
+              {result.name} - {result.artists[0].name}
+            </Text>
             <Button
               onClick={() => {
                 spotifyAreaController.addSongToQueue(result);
                 // Add logic to add the selected song to the queue
-                console.log('Song added to queue:', result.name);
+                console.log('Song added to queue: ' + result.name);
               }}>
               Add to Queue
             </Button>
@@ -91,10 +93,32 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       <Heading as='h2' size='md'>
         Spotify Song Queue
       </Heading>
+      <Button
+        onClick={() => {
+          spotifyAreaController.clearQueue();
+        }}>
+        Clear Queue
+      </Button>
+      <Button
+        onClick={async () => {
+          try {
+            await spotifyAreaController.playNextSong();
+          } catch (e) {
+            toast({
+              title: 'Error playing song',
+              description: (e as Error).toString(),
+              status: 'error',
+            });
+          }
+        }}>
+        Play
+      </Button>
       <List aria-label='list of songs in the queue'>
-        {queue?.songs.map(song => (
-          <Flex data-testid='song' key={song.name} align='center'>
-            <Text>{song.name}</Text>
+        {queue.map(song => (
+          <Flex data-testid='song' key={song.id} align='center'>
+            <Text>
+              {song.name} - {song.artists[0].name}
+            </Text>
             {/* Add like/dislike buttons for each song in the queue, which would update the likes/dislikes fields in each song */}
             <Button
               onClick={() => {

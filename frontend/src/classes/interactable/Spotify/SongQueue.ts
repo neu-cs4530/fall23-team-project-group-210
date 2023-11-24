@@ -51,4 +51,8 @@ export class SongQueue {
       targetSong.comments.push(comment);
     }
   }
+
+  clearQueue(): void {
+    this._storage = [];
+  }
 }

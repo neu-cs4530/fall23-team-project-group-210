@@ -174,8 +174,8 @@ export default function TownSelection(): JSX.Element {
         let spotifyDetails: SpotifyData | undefined;
         if (spotifyAPI) {
           spotifyDetails = { spotifyApi: spotifyAPI, device: undefined };
-          if (spotifyDevice) {
-            spotifyDetails.device = spotifyDevice;
+          if (spotifyDevices[0]) {
+            spotifyDetails.device = spotifyDevices[0];
           } else {
             toast({
               title: 'Spotify hub playback will not function',
