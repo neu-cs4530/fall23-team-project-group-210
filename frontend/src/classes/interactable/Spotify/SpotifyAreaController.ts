@@ -18,7 +18,7 @@ import InteractableAreaController, {
  * Class to contain song data. Using a string for name until we decide on data implementation
  */
 export type Song = {
-  id: string | undefined;
+  id: string;
   albumUri: string;
   uri: string;
   name: string;
@@ -184,15 +184,30 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   /**
-   * updates the song in the queue with the provided name to the given likes, dislikes, and comments
-   * @param song name of song to update
-   * @param likes number of likes for song
-   * @param dislikes number of dislikes for song
-   * @param comments comments for song
+   * Adds a like to the song with the provided id
+   * @param songId id of the song to add like to
    */
-  updateSong(songId: string, likes?: number, dislikes?: number, comments?: string[]): void {
-    this._spotifyAreaModel.queue.updateFieldsByID(songId, likes, dislikes, comments);
-    this._spotifyAreaModel.queue.sortByLikes();
+  addLikeToSong(songId: string): void {
+    this._spotifyAreaModel.queue.addLikeToSong(songId);
+    this.emit('queueUpdated');
+  }
+
+  /**
+   * Adds a dislike to the song with the provided id
+   * @param songId id of the song to add dislike to
+   */
+  addDislikeToSong(songId: string): void {
+    this._spotifyAreaModel.queue.addDislikeToSong(songId);
+    this.emit('queueUpdated');
+  }
+
+  /**
+   * Adds a like to the song with the provided id
+   * @param songId id of the song to add like to
+   */
+  addCommentToSong(songId: string, comment: string): void {
+    this._spotifyAreaModel.queue.addCommentToSong(songId, comment);
+    this.emit('queueUpdated');
   }
 
   //Need a method for passing song data to frontend/makeing stream connection. Waiting on API tool
