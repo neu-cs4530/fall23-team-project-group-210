@@ -50,7 +50,7 @@ export default function TownSelection(): JSX.Element {
     [],
   );
 
-  const spotifyAPI = useSpotify(
+  const spotifyAPI: SpotifyApi | undefined = useSpotify(
     isSpotifyAttempt,
     clientID, // Figure out env variables
     `${window.location.protocol}//${window.location.host}`,
@@ -231,7 +231,7 @@ export default function TownSelection(): JSX.Element {
         }
       }
     },
-    [userName, spotifyAPI, loginController, videoConnect, setTownController, toast, spotifyDevice],
+    [userName, spotifyAPI, loginController, videoConnect, setTownController, toast, spotifyDevices],
   );
 
   const handleCreate = async () => {

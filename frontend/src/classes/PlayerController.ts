@@ -1,7 +1,6 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
 import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket';
-import { SpotifyApi } from '@spotify/web-api-ts-sdk';
 export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
@@ -21,8 +20,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   private readonly _userName: string;
 
   public gameObjects?: PlayerGameObjects;
-
-  //private _spotifyAPI: SpotifyApi | undefined;
 
   constructor(id: string, userName: string, location: PlayerLocation) {
     super();
