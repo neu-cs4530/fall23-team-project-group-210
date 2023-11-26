@@ -184,7 +184,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   toInteractableAreaModel(): SpotifyArea {
-    throw new Error('Method not implemented.');
+    return this._spotifyAreaModel;
   }
 
   /**
@@ -223,7 +223,8 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param newModel The new model which is to be checked for changes with the current model
    */
   protected _updateFrom(newModel: SpotifyArea): void {
-    throw new Error('Method not implemented.' + newModel);
+    this._spotifyAreaModel = newModel;
+    this.emit('queueUpdated');
   }
 
   public isActive(): boolean {
