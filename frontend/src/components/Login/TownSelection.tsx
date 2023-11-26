@@ -39,7 +39,13 @@ export default function TownSelection(): JSX.Element {
   const [isJoining, setIsJoining] = useState<boolean>(false);
   const [isSpotifyAttempt, setIsSpotifyAttempt] = useState<boolean>(false);
   const [spotifyUser, setSpotifyUser] = useState<UserProfile>({} as UserProfile);
-  const [spotifyDevice, setSpotifyDevice] = useState<Device | null>(null);
+  const [spotifyDevice, setSpotifyDevice] = useState<Device>({
+    is_active: false,
+    is_private_session: false,
+    is_restricted: false,
+    name: 'Device Name',
+    type: 'Not a Device',
+  } as Device);
   const [spotifyDevices, setSpotifyDevices] = useState<Device[]>([] as Device[]);
   const spotifyToken = useMemo(
     () =>
@@ -179,8 +185,8 @@ export default function TownSelection(): JSX.Element {
         let spotifyDetails: SpotifyData | undefined;
         if (spotifyAPI) {
           spotifyDetails = { spotifyApi: spotifyAPI, device: undefined };
-          if (spotifyDevices[0]) {
-            spotifyDetails.device = spotifyDevices[0];
+          if (spotifyDevice.name !== 'Device Name') {
+            spotifyDetails.device = spotifyDevice;
           } else {
             toast({
               title: 'Spotify hub playback will not function',
@@ -234,7 +240,7 @@ export default function TownSelection(): JSX.Element {
         }
       }
     },
-    [userName, spotifyAPI, loginController, videoConnect, setTownController, toast, spotifyDevices],
+    [userName, spotifyAPI, loginController, videoConnect, setTownController, toast, spotifyDevice],
   );
 
   const handleCreate = async () => {
@@ -341,17 +347,24 @@ export default function TownSelection(): JSX.Element {
         {device.name}
       </option>
     ));
+    deviceList.push(
+      <option key={'default'} value={'Device Name'}>
+        Device Name
+      </option>,
+    );
     return <>{deviceList}</>;
   };
   const DeviceDropdown = () => {
     return (
       <div>
         <select
+          value={spotifyDevice?.name}
           onChange={option => {
             const device = spotifyDevices?.find(
               (item: Device) => item.name === option.target.value,
             );
-            setSpotifyDevice(device as Device);
+            console.log('Chosen Device: ' + device?.name);
+            setSpotifyDevice({ ...device } as Device);
           }}>
           <DeviceOptions />
         </select>
@@ -380,18 +393,23 @@ export default function TownSelection(): JSX.Element {
                 </Heading>
                 <br />
                 <br />
+<<<<<<< HEAD
                 {!spotifyDevice ? (
                   <div>
                     <Text>Choose a device to play music on:</Text>
                     <DeviceDropdown />
                   </div>
                 ) : null}
+=======
+                <div>
+                  <text>Choose a device to play music on:</text>
+                  <DeviceDropdown />
+                </div>
+>>>>>>> main
               </>
             ) : (
               <Button
                 onClick={async () => {
-                  // await handleSpotifyAuth();
-                  console.log(spotifyToken);
                   setIsSpotifyAttempt(true);
                 }}>
                 Login to Spotify Account
