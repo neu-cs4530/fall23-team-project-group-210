@@ -13,6 +13,7 @@ import {
   Table,
   TableCaption,
   Tbody,
+  Text,
   Td,
   Th,
   Thead,
@@ -71,6 +72,7 @@ export default function TownSelection(): JSX.Element {
   const toast = useToast();
 
   useEffect(() => {
+    const controller = new AbortController();
     const logAPISearch = async () => {
       // console.log('Searching Spotify for The Beatles...'); // Let's see if the API search is working
       console.log('Searching Spotify for devices...'); // Let's see if the API search is working
@@ -104,14 +106,17 @@ export default function TownSelection(): JSX.Element {
         await logAPISearch();
       }
     })();
+    return () => controller.abort();
   }, [spotifyAPI]);
 
   useEffect(() => {
+    const controller = new AbortController();
     (async () => {
       if (spotifyToken) {
         setIsSpotifyAttempt(true);
       }
     })();
+    return () => controller.abort();
   }, [spotifyToken]);
 
   const updateTownListings = useCallback(() => {
@@ -377,7 +382,7 @@ export default function TownSelection(): JSX.Element {
                 <br />
                 {!spotifyDevice ? (
                   <div>
-                    <text>Choose a device to play music on:</text>
+                    <Text>Choose a device to play music on:</Text>
                     <DeviceDropdown />
                   </div>
                 ) : null}

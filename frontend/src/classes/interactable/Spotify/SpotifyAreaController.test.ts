@@ -4,6 +4,8 @@ import type {
   SimplifiedAlbum,
   ExternalIds,
   ExternalUrls,
+  ItemTypes,
+  Market,
 } from '../../../../node_modules/@spotify/web-api-ts-sdk/dist/mjs/types';
 //import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
 import SpotifyAreaController from './SpotifyAreaController';

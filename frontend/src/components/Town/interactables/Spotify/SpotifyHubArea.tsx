@@ -28,6 +28,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   const [queue, setQueue] = useState([] as Song[]);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
   const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
+  const [songProgress, setSongProgress] = useState(0);
 
   const handleSearch = async () => {
     // Implement your Spotify search logic here. You may want to use the Spotify API or another service.
@@ -56,7 +57,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       <Heading as='h2' size='md'>
         Search for a Song
       </Heading>
-
       <InputGroup>
         {/* Input field for searching */}
         <FormControl>

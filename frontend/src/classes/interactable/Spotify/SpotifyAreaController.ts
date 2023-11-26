@@ -5,6 +5,7 @@ import {
   SimplifiedArtist,
   Device,
   PartialSearchResult,
+  PlaybackState,
   // SdkOptions,
   // AuthorizationCodeWithPKCEStrategy,
   // ItemTypes,
@@ -149,6 +150,14 @@ export default class SpotifyAreaController extends InteractableAreaController<
       comments: [],
     }));
     return songs;
+  }
+
+  async getSongProgress(): Promise<number> {
+    if (!this._spotifyAPI) {
+      throw new Error('Spotify api not provided');
+    }
+    const state: PlaybackState = await this._spotifyAPI.player.getPlaybackState();
+    return state == null ? 0 : state.progress_ms;
   }
 
   /**
