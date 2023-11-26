@@ -96,7 +96,7 @@ describe('Town Selection', () => {
   let mockLoginController: MockProxy<LoginController>;
   let coveyTownControllerConstructorSpy: jest.SpyInstance<
     TownController.default,
-    [TownController.ConnectionProperties]
+    [TownController.ConnectionProperties, (TownController.SpotifyData | undefined)?]
   >;
   let mockedTownController: MockProxy<TownController.default>;
   const expectedProviderVideoToken = nanoid();

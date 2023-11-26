@@ -190,14 +190,12 @@ export default function TownSelection(): JSX.Element {
             status: 'warning',
           });
         }
-        const newController = new TownController(
-          {
-            userName,
-            townID: coveyRoomID,
-            loginController,
-          },
-          spotifyDetails,
-        );
+        const newController = new TownController({
+          userName,
+          townID: coveyRoomID,
+          loginController,
+        });
+        newController.spotifyDetails = spotifyDetails;
         await newController.connect();
         const videoToken = newController.providerVideoToken;
         assert(videoToken);

@@ -4,6 +4,7 @@ import {
   SpotifyApi,
   SimplifiedArtist,
   Device,
+  PartialSearchResult,
   // SdkOptions,
   // AuthorizationCodeWithPKCEStrategy,
   // ItemTypes,
@@ -47,9 +48,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
   SpotifyArea
 > {
   private _spotifyAreaModel: SpotifyArea;
-  //private _spotifyInterface: APITool;
 
-  //NEED TO GET THESE TWO VALUES SOMEHOW
   private _spotifyAPI: SpotifyApi | undefined;
 
   private _device: Device | undefined;
@@ -64,14 +63,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
   constructor(id: string, model: SpotifyArea, townController: TownController) {
     super(id);
     this._spotifyAreaModel = model;
-    //this._spotifyAPI = spotifyAPI;
-    //this._deviceID = deviceID;
     this._townController = townController;
-    // if (!townController.spotifyDetails) {
-    //   throw Error(
-    //     'Spotify details not provided. Spotify hubs will not work unless spotify details are provided on sign in',
-    //   );
-    // }
     this._spotifyAPI = townController.spotifyDetails?.spotifyApi;
     this._device = townController.spotifyDetails?.device;
   }
@@ -142,7 +134,10 @@ export default class SpotifyAreaController extends InteractableAreaController<
     if (searchString == '') {
       throw new Error('Search phrase cannot be empty');
     }
-    const items = await this._spotifyAPI.search(searchString, ['track'], undefined, 5);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line prettier/prettier
+    const items: Required<Pick<PartialSearchResult, "tracks">> = await this._spotifyAPI.search(searchString, ['track'], undefined, 5);
     const songs: Song[] = items.tracks.items.map(item => ({
       id: uuidv4(),
       albumUri: item.album.uri,

@@ -218,10 +218,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   private _spotifyData: SpotifyData | undefined;
 
-  public constructor(
-    { userName, townID, loginController }: ConnectionProperties,
-    spotifyData?: SpotifyData,
-  ) {
+  public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
     this._userName = userName;
@@ -239,7 +236,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket = io(url, { auth: { userName, townID } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
-    this._spotifyData = spotifyData;
   }
 
   set spotifyDetails(spotifyData: SpotifyData | undefined) {
