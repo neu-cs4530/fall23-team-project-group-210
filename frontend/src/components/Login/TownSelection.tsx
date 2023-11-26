@@ -393,19 +393,10 @@ export default function TownSelection(): JSX.Element {
                 </Heading>
                 <br />
                 <br />
-<<<<<<< HEAD
-                {!spotifyDevice ? (
-                  <div>
-                    <Text>Choose a device to play music on:</Text>
-                    <DeviceDropdown />
-                  </div>
-                ) : null}
-=======
                 <div>
-                  <text>Choose a device to play music on:</text>
+                  <Text>Choose a device to play music on:</Text>
                   <DeviceDropdown />
                 </div>
->>>>>>> main
               </>
             ) : (
               <Button
