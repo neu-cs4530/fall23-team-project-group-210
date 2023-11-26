@@ -28,6 +28,14 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._location = location;
   }
 
+  // set spotifyAPI(spotifyAPI: SpotifyApi) {
+  //   this._spotifyAPI = spotifyAPI;
+  // }
+
+  // get spotifyAPI(): SpotifyApi | undefined {
+  //   return this._spotifyAPI;
+  // }
+
   set location(newLocation: PlayerLocation) {
     this._location = newLocation;
     this._updateGameComponentLocation();

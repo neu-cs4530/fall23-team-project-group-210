@@ -1,17 +1,29 @@
-import { SpotifyArea } from '../../../types/CoveyTownSocket';
 import TownController from '../../TownController';
+import { SongQueue } from './SongQueue';
+import {
+  SpotifyApi,
+  SimplifiedArtist,
+  Device,
+  PartialSearchResult,
+  // SdkOptions,
+  // AuthorizationCodeWithPKCEStrategy,
+  // ItemTypes,
+} from '@spotify/web-api-ts-sdk';
+import { v4 as uuidv4 } from 'uuid';
+import { SpotifyArea } from '../../../types/CoveyTownSocket';
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from '../InteractableAreaController';
-import { SongQueue } from './SongQueue';
 
 /**
  * Class to contain song data. Using a string for name until we decide on data implementation
  */
 export type Song = {
   id: string;
+  albumUri: string;
   uri: string;
   name: string;
+  artists: SimplifiedArtist[];
   likes: number;
   dislikes: number;
   comments: string[];
@@ -36,7 +48,10 @@ export default class SpotifyAreaController extends InteractableAreaController<
   SpotifyArea
 > {
   private _spotifyAreaModel: SpotifyArea;
-  //private _spotifyInterface: APITool;
+
+  private _spotifyAPI: SpotifyApi | undefined;
+
+  private _device: Device | undefined;
 
   private _townController: TownController;
 
@@ -49,14 +64,32 @@ export default class SpotifyAreaController extends InteractableAreaController<
     super(id);
     this._spotifyAreaModel = model;
     this._townController = townController;
+    this._spotifyAPI = townController.spotifyDetails?.spotifyApi;
+    this._device = townController.spotifyDetails?.device;
   }
 
   get queue(): SongQueue {
     return this._spotifyAreaModel.queue;
   }
 
-  public addToSongQueue(song: Song): void {
-    this._spotifyAreaModel.queue.enqueue(song);
+  public addSongToQueue(song: Song): void {
+    const songToAdd: Song = {
+      id: uuidv4(),
+      albumUri: song.albumUri,
+      uri: song.uri,
+      name: song.name,
+      artists: song.artists,
+      likes: song.likes,
+      dislikes: song.dislikes,
+      comments: song.comments,
+    };
+    this._spotifyAreaModel.queue.enqueue(songToAdd);
+    this.emit('queueUpdated');
+  }
+
+  public clearQueue(): void {
+    this._spotifyAreaModel.queue.clearQueue();
+    this.emit('queueUpdated');
   }
 
   /**
@@ -93,8 +126,52 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * Return the search results of the provided song name
    * @param songName the name of the song provided by the frontend from the user
    */
-  searchSong(songName: string): Song[] {
-    throw new Error('Method not implemented.' + songName);
+  //UPDATE TO BE ABLE TO SEARCH FOR ALBUMS AND ARTISTS AS WELL
+  async searchSong(searchString: string): Promise<Song[]> {
+    if (!this._spotifyAPI) {
+      throw Error('Spotify details not provided');
+    }
+    if (searchString == '') {
+      throw new Error('Search phrase cannot be empty');
+    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line prettier/prettier
+    const items: Required<Pick<PartialSearchResult, "tracks">> = await this._spotifyAPI.search(searchString, ['track'], undefined, 5);
+    const songs: Song[] = items.tracks.items.map(item => ({
+      id: uuidv4(),
+      albumUri: item.album.uri,
+      uri: item.uri,
+      name: item.name,
+      artists: item.artists,
+      likes: 0,
+      dislikes: 0,
+      comments: [],
+    }));
+    return songs;
+  }
+
+  /**
+   * Plays the song at the top of the queue to the device. Removes that song from the queue, so this song
+   * is returned by this function so its data can still be displayed.
+   * @returns Promise of the song that is currently playing so its information can still be displayed
+   */
+  async playNextSong(): Promise<Song> {
+    const current: Song | undefined = this._spotifyAreaModel.queue.dequeue();
+    this.emit('queueUpdated');
+    if (!current) {
+      throw new Error('No songs in queue');
+    }
+    if (!this._device || !this._device.id) {
+      throw new Error('Spotify device not provided or does not have an id');
+    }
+    if (!this._spotifyAPI) {
+      throw new Error('Spotify api not provided');
+    }
+    this._spotifyAPI.player.startResumePlayback(this._device.id, current.albumUri, undefined, {
+      uri: current.uri,
+    });
+    return current;
   }
 
   toInteractableAreaModel(): SpotifyArea {
@@ -102,14 +179,30 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   /**
-   * updates the song in the queue with the provided name to the given likes, dislikes, and comments
-   * @param song name of song to update
-   * @param likes number of likes for song
-   * @param dislikes number of dislikes for song
-   * @param comments comments for song
+   * Adds a like to the song with the provided id
+   * @param songId id of the song to add like to
    */
-  updateSong(song: string, likes: number, dislikes: number, comments: string[]): void {
-    throw new Error('Method not implemented.' + song + likes + dislikes + comments);
+  addLikeToSong(songId: string): void {
+    this._spotifyAreaModel.queue.addLikeToSong(songId);
+    this.emit('queueUpdated');
+  }
+
+  /**
+   * Adds a dislike to the song with the provided id
+   * @param songId id of the song to add dislike to
+   */
+  addDislikeToSong(songId: string): void {
+    this._spotifyAreaModel.queue.addDislikeToSong(songId);
+    this.emit('queueUpdated');
+  }
+
+  /**
+   * Adds a like to the song with the provided id
+   * @param songId id of the song to add like to
+   */
+  addCommentToSong(songId: string, comment: string): void {
+    this._spotifyAreaModel.queue.addCommentToSong(songId, comment);
+    this.emit('queueUpdated');
   }
 
   //Need a method for passing song data to frontend/makeing stream connection. Waiting on API tool

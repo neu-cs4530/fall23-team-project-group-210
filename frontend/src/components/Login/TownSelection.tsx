@@ -21,9 +21,9 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { Town } from '../../generated/client';
-import { Device, UserProfile } from '@spotify/web-api-ts-sdk';
+import { Device, SpotifyApi, UserProfile } from '@spotify/web-api-ts-sdk';
 import useLoginController from '../../hooks/useLoginController';
-import TownController from '../../classes/TownController';
+import TownController, { SpotifyData } from '../../classes/TownController';
 import useVideoContext from '../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 import { useSpotify } from '../../hooks/useSpotify';
 
@@ -50,7 +50,7 @@ export default function TownSelection(): JSX.Element {
     [],
   );
 
-  const spotifyAPI = useSpotify(
+  const spotifyAPI: SpotifyApi | undefined = useSpotify(
     isSpotifyAttempt,
     clientID, // Figure out env variables
     `${window.location.protocol}//${window.location.host}`,
@@ -171,11 +171,31 @@ export default function TownSelection(): JSX.Element {
           }
         }, 1000);
         setIsJoining(true);
+        let spotifyDetails: SpotifyData | undefined;
+        if (spotifyAPI) {
+          spotifyDetails = { spotifyApi: spotifyAPI, device: undefined };
+          if (spotifyDevices[0]) {
+            spotifyDetails.device = spotifyDevices[0];
+          } else {
+            toast({
+              title: 'Spotify hub playback will not function',
+              description: 'No spotify device specified',
+              status: 'warning',
+            });
+          }
+        } else {
+          toast({
+            title: 'Spotify Hubs will not function',
+            description: 'Spotify login was not performed or failed',
+            status: 'warning',
+          });
+        }
         const newController = new TownController({
           userName,
           townID: coveyRoomID,
           loginController,
         });
+        newController.spotifyDetails = spotifyDetails;
         await newController.connect();
         const videoToken = newController.providerVideoToken;
         assert(videoToken);
@@ -209,7 +229,7 @@ export default function TownSelection(): JSX.Element {
         }
       }
     },
-    [setTownController, userName, toast, videoConnect, loginController],
+    [userName, spotifyAPI, loginController, videoConnect, setTownController, toast, spotifyDevices],
   );
 
   const handleCreate = async () => {

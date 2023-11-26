@@ -10,7 +10,7 @@ export class SongQueue {
     this._storage = [];
   }
 
-  queue(): Song[] {
+  get songs(): Song[] {
     return this._storage;
   }
 
@@ -22,7 +22,7 @@ export class SongQueue {
     return this._storage.shift();
   }
 
-  orderByLikes(): void {
+  sortByLikes(): void {
     this._storage.sort((a: Song, b: Song) => b.likes - a.likes);
   }
 
@@ -30,24 +30,35 @@ export class SongQueue {
     return this._storage.length;
   }
 
-  addLikeToSong(songName: string): void {
-    const targetSong = this._storage.find(song => song.name === songName);
+  addLikeToSong(songId: string): void {
+    const targetSong = this._storage.find(song => song.id === songId);
     if (targetSong) {
       targetSong.likes++;
     }
   }
 
-  removeLikeFromSong(songName: string): void {
-    const targetSong = this._storage.find(song => song.name === songName);
+  addDislikeToSong(songId: string): void {
+    const targetSong = this._storage.find(song => song.id === songId);
+    if (targetSong) {
+      targetSong.dislikes++;
+    }
+  }
+
+  removeLikeFromSong(songId: string): void {
+    const targetSong = this._storage.find(song => song.id === songId);
     if (targetSong) {
       targetSong.likes--;
     }
   }
 
-  addCommentToSong(songName: string, comment: string): void {
-    const targetSong = this._storage.find(song => song.name === songName);
+  addCommentToSong(songId: string, comment: string): void {
+    const targetSong = this._storage.find(song => song.id === songId);
     if (targetSong) {
       targetSong.comments.push(comment);
     }
+  }
+
+  clearQueue(): void {
+    this._storage = [];
   }
 }
