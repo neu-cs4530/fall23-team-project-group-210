@@ -389,7 +389,7 @@ export default function TownSelection(): JSX.Element {
                 <br />
                 <br />
                 <div>
-                  <text>Choose a device to play music on:</text>
+                  <text>Choose Device to Play Music</text>
                   <DeviceDropdown />
                 </div>
               </>
