@@ -15,7 +15,18 @@ export type TownJoinResponse = {
   isPubliclyListed: boolean;
   /** Current state of interactables in this town */
   interactables: TypedInteractable[];
-}
+};
+
+export type Song = {
+  id: string;
+  albumUri: string;
+  uri: string;
+  name: string;
+  artists: SimplifiedArtist[];
+  likes: number;
+  dislikes: number;
+  comments: string[];
+};
 
 export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'SpotifyArea';
 export interface Interactable {
@@ -27,7 +38,7 @@ export interface Interactable {
 export type TownSettingsUpdate = {
   friendlyName?: string;
   isPubliclyListed?: boolean;
-}
+};
 
 export type Direction = 'front' | 'back' | 'left' | 'right';
 
@@ -36,9 +47,9 @@ export interface Player {
   id: PlayerID;
   userName: string;
   location: PlayerLocation;
-};
+}
 
-export type XY = { x: number, y: number };
+export type XY = { x: number; y: number };
 
 export interface PlayerLocation {
   /* The CENTER x coordinate of this player's location */
@@ -49,7 +60,7 @@ export interface PlayerLocation {
   rotation: Direction;
   moving: boolean;
   interactableID?: string;
-};
+}
 export type ChatMessage = {
   author: string;
   sid: string;
@@ -59,13 +70,13 @@ export type ChatMessage = {
 
 export interface ConversationArea extends Interactable {
   topic?: string;
-};
+}
 export interface BoundingBox {
   x: number;
   y: number;
   width: number;
   height: number;
-};
+}
 
 export interface ViewingArea extends Interactable {
   video?: string;
@@ -73,8 +84,10 @@ export interface ViewingArea extends Interactable {
   elapsedTimeSec: number;
 }
 
-export interface SpotifyArea extends Interactable {
-  queue: SongQueue;
+export interface SpotifyModel extends Interactable {
+  queue: Song[];
+  currentlyPlaying: Song | undefined;
+  playSong: boolean;
 }
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER';
@@ -83,7 +96,7 @@ export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER';
  */
 export interface GameState {
   status: GameStatus;
-} 
+}
 
 /**
  * Type for the state of a game that can be won
@@ -178,8 +191,15 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | LeaveGameCommand | SpotifyCommand;
-export interface ViewingAreaUpdateCommand  {
+export type InteractableCommand =
+  | ViewingAreaUpdateCommand
+  | JoinGameCommand
+  | GameMoveCommand<TicTacToeMove>
+  | LeaveGameCommand
+  | SpotifyPlaySongCommand
+  | SpotifyUpdateSongCommand
+  | SpotifyAddSongCommand;
+export interface ViewingAreaUpdateCommand {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
 }
@@ -195,23 +215,42 @@ export interface GameMoveCommand<MoveType> {
   gameID: GameInstanceID;
   move: MoveType;
 }
-export interface SpotifyCommand {
-  type: 'Spotify';
-  update: SpotifyArea;
+export interface SpotifyPlaySongCommand {
+  type: 'SpotifyPlaySongCommand';
 }
-export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
-  CommandType extends JoinGameCommand ? { gameID: string}:
-  CommandType extends ViewingAreaUpdateCommand ? undefined :
-  CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
-  CommandType extends LeaveGameCommand ? undefined :
-  never;
+export interface SpotifyAddSongCommand {
+  type: 'SpotifyAddSongCommand';
+  song: Song;
+}
+
+export interface SpotifyUpdateSongCommand {
+  type: 'SpotifyUpdateSongCommand';
+  song: Song;
+}
+
+export type InteractableCommandReturnType<CommandType extends InteractableCommand> =
+  CommandType extends JoinGameCommand
+    ? { gameID: string }
+    : CommandType extends ViewingAreaUpdateCommand
+    ? undefined
+    : CommandType extends GameMoveCommand<TicTacToeMove>
+    ? undefined
+    : CommandType extends LeaveGameCommand
+    ? undefined
+    : CommandType extends SpotifyAddSongCommand
+    ? undefined
+    : CommandType extends SpotifyPlaySongCommand
+    ? undefined
+    : CommandType extends SpotifyUpdateSongCommand
+    ? undefined
+    : never;
 
 export type InteractableCommandResponse<MessageType> = {
   commandID: CommandID;
   interactableID: InteractableID;
   error?: string;
   payload?: InteractableCommandResponseMap[MessageType];
-}
+};
 
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;

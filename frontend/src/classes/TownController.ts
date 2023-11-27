@@ -38,7 +38,6 @@ import GameAreaController, { GameEventTypes } from './interactable/GameAreaContr
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from './interactable/InteractableAreaController';
-import { SongQueue } from './interactable/Spotify/SongQueue';
 import SpotifyAreaController from './interactable/Spotify/SpotifyAreaController';
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
@@ -637,7 +636,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
             );
           } else if (isSpotifyArea(eachInteractable)) {
-            eachInteractable.queue = new SongQueue();
+            eachInteractable.queue = [];
             this._interactableControllers.push(
               new SpotifyAreaController(eachInteractable.id, eachInteractable, this),
             );

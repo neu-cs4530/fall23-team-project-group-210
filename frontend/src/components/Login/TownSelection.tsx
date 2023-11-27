@@ -13,6 +13,7 @@ import {
   Table,
   TableCaption,
   Tbody,
+  Text,
   Td,
   Th,
   Thead,
@@ -389,7 +390,7 @@ export default function TownSelection(): JSX.Element {
                 <br />
                 <br />
                 <div>
-                  <text>Choose Device to Play Music</text>
+                  <Text>Choose Device to Play Music</Text>
                   <DeviceDropdown />
                 </div>
               </>

@@ -159,6 +159,7 @@ export default class TicTacToeAreaController extends GameAreaController<
    * If the turn has not changed, does not emit the event.
    */
   protected _updateFrom(newModel: GameArea<TicTacToeGameState>): void {
+    console.log('UPDATE tic tac toes');
     const wasOurTurn = this.whoseTurn?.id === this._townController.ourPlayer.id;
     super._updateFrom(newModel);
     const newState = newModel.game;

@@ -5,7 +5,7 @@ import InvalidParametersError from '../lib/InvalidParametersError';
 import IVideoClient from '../lib/IVideoClient';
 import Player from '../lib/Player';
 import TwilioVideo from '../lib/TwilioVideo';
-import { isViewingArea } from '../TestUtils';
+import { isSpotifyArea, isViewingArea } from '../TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
@@ -23,7 +23,7 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
-import SpotifyArea from './SpotifyArea';
+import SpotifyArea from './Spotify/SpotifyArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -146,13 +146,21 @@ export default class Town {
     });
 
     // Set up a listener to process updates to interactables.
-    // Currently only knows how to process updates for ViewingArea's, and
+    // Currently only knows how to process updates for ViewingArea's and Spotify Area's, and
     // ignores any other updates for any other kind of interactable.
-    // For ViewingArea's: dispatches an updateModel call to the viewingArea that
+    // For ViewingArea's or SpotifyArea's: dispatches an updateModel call to the viewingArea/spotifyArea that
     // corresponds to the interactable being updated. Does not throw an error if
     // the specified viewing area does not exist.
     socket.on('interactableUpdate', (update: Interactable) => {
-      if (isViewingArea(update)) {
+      if (isSpotifyArea(update)) {
+        newPlayer.townEmitter.emit('interactableUpdate', update);
+        const spotifyArea = this._interactables.find(
+          eachInteractable => eachInteractable.id === update.id,
+        );
+        if (spotifyArea) {
+          (spotifyArea as SpotifyArea).updateModel(update);
+        }
+      } else if (isViewingArea(update)) {
         newPlayer.townEmitter.emit('interactableUpdate', update);
         const viewingArea = this._interactables.find(
           eachInteractable => eachInteractable.id === update.id,

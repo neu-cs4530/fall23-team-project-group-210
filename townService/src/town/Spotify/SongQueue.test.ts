@@ -1,10 +1,12 @@
-import { SongQueue } from './SongQueue';
-//import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
-import { Song } from './SpotifyAreaController';
+// import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
+
+import { Song } from '../../types/CoveyTownSocket';
+import SongQueue from './SongQueue';
+
 describe('SongQueue Tests', () => {
   describe('SongQueue order', () => {
     it('SongQueue adds and removes songs in the right order', () => {
-      const queue = new SongQueue();
+      const queue = new SongQueue([]);
       expect(queue.size()).toEqual(0);
       let song: Song = {
         name: 's1',
@@ -50,7 +52,7 @@ describe('SongQueue Tests', () => {
       expect(queue.size()).toEqual(0);
     });
     it('SongQueue sorts songs by likes', () => {
-      const queue = new SongQueue();
+      const queue = new SongQueue([]);
       let song: Song = {
         name: 's1',
         likes: 0,
@@ -117,9 +119,9 @@ describe('SongQueue Tests', () => {
   });
 
   describe('Updating queue', () => {
-    let queue = new SongQueue();
+    let queue = new SongQueue([]);
     beforeEach(() => {
-      queue = new SongQueue();
+      queue = new SongQueue([]);
       let song: Song = {
         name: 's1',
         likes: 0,
@@ -156,54 +158,63 @@ describe('SongQueue Tests', () => {
       };
       queue.enqueue(song);
     });
-    it('Changing the number of likes is done correctly', () => {
+    it('Updating song works correctly', () => {
       expect(queue.size()).toEqual(3);
+      queue.songs[1].likes = 3;
       expect(queue.songs[0].likes).toEqual(0);
-      expect(queue.songs[1].likes).toEqual(0);
-      expect(queue.songs[2].likes).toEqual(0);
-      queue.addLikeToSong('1');
-      queue.addLikeToSong('1');
-      queue.addLikeToSong('2');
-      queue.addLikeToSong('2');
-      queue.addLikeToSong('2');
-      queue.addLikeToSong('2');
-      expect(queue.songs[0].likes).toEqual(2);
-      expect(queue.songs[1].likes).toEqual(4);
-      expect(queue.songs[2].likes).toEqual(0);
+      expect(queue.songs[1].likes).toEqual(3);
+      queue.songs[1].id = queue.songs[0].id;
+      queue.updateSong(queue.songs[1]);
+      expect(queue.songs[0].likes).toEqual(3);
     });
-    it('Changing the number of dislikes is done correctly', () => {
-      expect(queue.size()).toEqual(3);
-      expect(queue.songs[0].dislikes).toEqual(0);
-      expect(queue.songs[1].dislikes).toEqual(0);
-      expect(queue.songs[2].dislikes).toEqual(0);
-      queue.addDislikeToSong('1');
-      queue.addDislikeToSong('1');
-      queue.addDislikeToSong('1');
-      queue.addDislikeToSong('2');
-      queue.addDislikeToSong('3');
-      queue.addDislikeToSong('3');
-      queue.addDislikeToSong('3');
-      queue.addDislikeToSong('3');
-      expect(queue.songs[0].dislikes).toEqual(3);
-      expect(queue.songs[1].dislikes).toEqual(1);
-      expect(queue.songs[2].dislikes).toEqual(4);
-    });
+    // it('Changing the number of likes is done correctly', () => {
+    //   expect(queue.size()).toEqual(3);
+    //   expect(queue.songs[0].likes).toEqual(0);
+    //   expect(queue.songs[1].likes).toEqual(0);
+    //   expect(queue.songs[2].likes).toEqual(0);
+    //   queue.('1');
+    //   queue.addLikeToSong('1');
+    //   queue.addLikeToSong('2');
+    //   queue.addLikeToSong('2');
+    //   queue.addLikeToSong('2');
+    //   queue.addLikeToSong('2');
+    //   expect(queue.songs[0].likes).toEqual(2);
+    //   expect(queue.songs[1].likes).toEqual(4);
+    //   expect(queue.songs[2].likes).toEqual(0);
+    // });
+    // it('Changing the number of dislikes is done correctly', () => {
+    //   expect(queue.size()).toEqual(3);
+    //   expect(queue.songs[0].dislikes).toEqual(0);
+    //   expect(queue.songs[1].dislikes).toEqual(0);
+    //   expect(queue.songs[2].dislikes).toEqual(0);
+    //   queue.addDislikeToSong('1');
+    //   queue.addDislikeToSong('1');
+    //   queue.addDislikeToSong('1');
+    //   queue.addDislikeToSong('2');
+    //   queue.addDislikeToSong('3');
+    //   queue.addDislikeToSong('3');
+    //   queue.addDislikeToSong('3');
+    //   queue.addDislikeToSong('3');
+    //   expect(queue.songs[0].dislikes).toEqual(3);
+    //   expect(queue.songs[1].dislikes).toEqual(1);
+    //   expect(queue.songs[2].dislikes).toEqual(4);
+    // });
 
-    it('Changing the number of comments is done correctly', () => {
-      expect(queue.size()).toEqual(3);
-      expect(queue.songs[0].comments).toEqual([]);
-      expect(queue.songs[1].comments).toEqual([]);
-      expect(queue.songs[2].comments).toEqual([]);
-      queue.addCommentToSong('1', '1');
-      queue.addCommentToSong('2', '2');
-      queue.addCommentToSong('2', '2');
-      queue.addCommentToSong('3', '3');
-      queue.addCommentToSong('3', '3');
-      queue.addCommentToSong('3', '3');
+    // it('Changing the number of comments is done correctly', () => {
+    //   expect(queue.size()).toEqual(3);
+    //   expect(queue.songs[0].comments).toEqual([]);
+    //   expect(queue.songs[1].comments).toEqual([]);
+    //   expect(queue.songs[2].comments).toEqual([]);
+    //   queue.addCommentToSong('1', '1');
+    //   queue.addCommentToSong('2', '2');
+    //   queue.addCommentToSong('2', '2');
+    //   queue.addCommentToSong('3', '3');
+    //   queue.addCommentToSong('3', '3');
+    //   queue.addCommentToSong('3', '3');
 
-      expect(queue.songs[0].comments).toEqual(['1']);
-      expect(queue.songs[1].comments).toEqual(['2', '2']);
-      expect(queue.songs[2].comments).toEqual(['3', '3', '3']);
-    });
+    //   expect(queue.songs[0].comments).toEqual(['1']);
+    //   expect(queue.songs[1].comments).toEqual(['2', '2']);
+    //   expect(queue.songs[2].comments).toEqual(['3', '3', '3']);
+    // });
   });
 });
