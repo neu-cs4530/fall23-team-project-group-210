@@ -1,6 +1,5 @@
 import SpotifyAreaController from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 import { nanoid } from 'nanoid';
-import { SongQueue } from '../../../../classes/interactable/Spotify/SongQueue';
 import { mock, mockReset } from 'jest-mock-extended';
 import TownController, * as TownControllerHooks from '../../../../classes/TownController';
 import SpotifyHubArea from './SpotifyHubArea';
@@ -8,9 +7,8 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import TownControllerContext from '../../../../contexts/TownControllerContext';
-import { SpotifyModel as SpotifyAreaModel } from '../../../../types/CoveyTownSocket';
+import { Song, SpotifyModel as SpotifyAreaModel } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
-import { Song } from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 
 const MOCK_QUEUE: Song[] = [
   {
@@ -50,12 +48,8 @@ class MockSpotifyAreaController extends SpotifyAreaController {
   }
 
   // mock the functions that are called in the constructor
-  get queue(): SongQueue {
-    const queue = new SongQueue();
-    MOCK_QUEUE.forEach(song => {
-      queue.enqueue(song);
-    });
-    return queue;
+  get queue(): Song[] {
+    return MOCK_QUEUE;
   }
 
   currentSong = jest.fn();

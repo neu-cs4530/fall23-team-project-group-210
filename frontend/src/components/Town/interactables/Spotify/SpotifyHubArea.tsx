@@ -139,7 +139,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         {queue.map(song => (
           <Flex data-testid='song' key={song.id} align='center'>
             <Text>
-              {song.name} - {song.artists[0].name}
+              {song.name} - {song.artists[0]?.name}
             </Text>
             {/* Add like/dislike buttons for each song in the queue, which would update the likes/dislikes fields in each song */}
             {likeDict[song.id] < 1 ? (

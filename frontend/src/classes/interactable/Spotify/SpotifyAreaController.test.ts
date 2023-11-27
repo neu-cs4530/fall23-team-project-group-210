@@ -145,7 +145,14 @@ describe('SpotifyAreaController Tests', () => {
   //mockTownController.spotifyDetails = undefined;
   const controller: SpotifyAreaController = new SpotifyAreaController(
     '1',
-    { id: '1', type: 'SpotifyArea', occupants: [], queue: {} },
+    {
+      id: '1',
+      type: 'SpotifyArea',
+      occupants: [],
+      queue: [],
+      currentlyPlaying: undefined,
+      playSong: false,
+    },
     mockTownController,
   );
   beforeEach(() => {});
