@@ -208,9 +208,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param newModel The new model which is to be checked for changes with the current model
    */
   protected _updateFrom(newModel: SpotifyModel): void {
-    console.log('UPDATE');
-    console.log(this._spotifyAreaModel.queue.length);
-    console.log(newModel.queue.length);
     this._spotifyAreaModel = newModel;
     if (this._spotifyAreaModel.playSong) {
       try {
