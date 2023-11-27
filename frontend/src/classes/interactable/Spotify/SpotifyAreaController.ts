@@ -80,19 +80,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   /**
-   * Persistence? Is saving done when a button is pressed or automatically? When then?
-   * - save song button that saves song and data for a user
-   * - get saved songs
-   *
-   * Interactions between frontend and API:
-   * - search songs by name of the song (then genre and artist) and return top three
-   * - Get playback data or setup connection to frontend
-   *
-   * Other
-   * - Add like/dislike/comment to song and update queue order
-   */
-
-  /**
    * Save the given song to the database for the given userId
    * @param song song to be saved
    * @param playerId playerId who saved the song
@@ -147,6 +134,10 @@ export default class SpotifyAreaController extends InteractableAreaController<
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifySetCurrentSongCommand',
     });
+    return this._playCurrentSong();
+  }
+
+  private _playCurrentSong(): Song {
     const current = this._spotifyAreaModel.currentlyPlaying;
     if (!current) {
       throw new Error('No songs in queue');
@@ -157,6 +148,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
     if (!this._spotifyAPI) {
       throw new Error('Spotify api not provided');
     }
+    console.log('SHOULD PLAY');
     this._spotifyAPI.player.startResumePlayback(this._device.id, current.albumUri, undefined, {
       uri: current.uri,
     });
@@ -168,30 +160,40 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   /**
-   * Adds a like to the song with the provided id
-   * @param songId id of the song to add like to
+   * Adds a like to the song
+   * @param songId song to add like to
    */
-  addLikeToSong(songId: string): void {
-    // this._spotifyAreaModel.queue.addLikeToSong(songId);
-    // this.emit('queueUpdated');
+  async addLikeToSong(song: Song): Promise<void> {
+    song.likes = song.likes + 1;
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyUpdateSongCommand',
+      song: song,
+    });
   }
 
   /**
-   * Adds a dislike to the song with the provided id
-   * @param songId id of the song to add dislike to
+   * Adds a dislike to the song
+   * @param song song to add dislike to
    */
-  addDislikeToSong(songId: string): void {
-    // this._spotifyAreaModel.queue.addDislikeToSong(songId);
-    // this.emit('queueUpdated');
+  async addDislikeToSong(song: Song): Promise<void> {
+    song.dislikes = song.dislikes + 1;
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyUpdateSongCommand',
+      song: song,
+    });
   }
 
   /**
-   * Adds a like to the song with the provided id
-   * @param songId id of the song to add like to
+   * Adds a comment to the provided song
+   * @param song song to add comment to
+   * @param comment comment to add to song
    */
-  addCommentToSong(songId: string, comment: string): void {
-    //this._spotifyAreaModel.queue.addCommentToSong(songId, comment);
-    //await this._townController.sendInteractableCommand(this.id, )
+  async addCommentToSong(song: Song, comment: string): Promise<void> {
+    song.comments.push(comment);
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyUpdateSongCommand',
+      song: song,
+    });
   }
 
   //Need a method for passing song data to frontend/makeing stream connection. Waiting on API tool
@@ -203,11 +205,20 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param newModel The new model which is to be checked for changes with the current model
    */
   protected _updateFrom(newModel: SpotifyModel): void {
+    console.log('UPDATE');
+    console.log(this._spotifyAreaModel.queue.length);
+    console.log(newModel.queue.length);
+    //const wasPlaying = this._spotifyAreaModel.isPlaying;
     this._spotifyAreaModel = newModel;
+    //BROKEN -------------------------------------------------------------------
+    // if (!wasPlaying && this._spotifyAreaModel.isPlaying) {
+    //   this._playCurrentSong();
+    //   //console.log('PLAY');
+    // }
     this.emit('queueUpdated');
   }
 
   public isActive(): boolean {
-    return this._spotifyAPI != undefined;
+    return this._spotifyAPI !== undefined && this.occupants.length > 0;
   }
 }

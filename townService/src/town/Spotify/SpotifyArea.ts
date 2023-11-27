@@ -19,6 +19,8 @@ export default class SpotifyArea extends InteractableArea {
 
   private _currentSong: Song | undefined;
 
+  private _isPlaying: boolean;
+
   public constructor(
     { id, queue }: Omit<SpotifyModel, 'type'>,
     coordinates: BoundingBox,
@@ -26,6 +28,7 @@ export default class SpotifyArea extends InteractableArea {
   ) {
     super(id, coordinates, townEmitter);
     this._queue = new SongQueue(queue);
+    this._isPlaying = false;
   }
 
   public toModel(): SpotifyModel {
@@ -34,6 +37,7 @@ export default class SpotifyArea extends InteractableArea {
       occupants: this.occupantsByID,
       type: 'SpotifyArea',
       queue: this._queue.songs,
+      isPlaying: this._isPlaying,
       currentlyPlaying: this._currentSong,
     };
   }
@@ -56,8 +60,19 @@ export default class SpotifyArea extends InteractableArea {
   public setCurrentSong() {
     const current = this._queue.dequeue();
     this._currentSong = current;
+    this._isPlaying = true;
     this._emitAreaChanged();
   }
+
+  // public remove(player: Player): void {
+  //   super.remove(player);
+  //   if (this._occupants.length === 0) {
+  //     this._currentSong = undefined;
+  //     this._queue = new SongQueue([]);
+  //     this._isPlaying = false;
+  //     this._emitAreaChanged();
+  //   }
+  // }
 
   public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
@@ -72,7 +87,16 @@ export default class SpotifyArea extends InteractableArea {
       this.setCurrentSong();
       return {} as InteractableCommandReturnType<CommandType>;
     }
+    if (command.type === 'SpotifyUpdateSongCommand') {
+      this.updateSong(command.song);
+      return {} as InteractableCommandReturnType<CommandType>;
+    }
     throw new InvalidParametersError('Unknown command type');
+  }
+
+  updateSong(song: Song) {
+    this._queue.updateSong(song);
+    this._emitAreaChanged();
   }
 
   public static fromMapObject(mapObject: ITiledMapObject, townEmitter: TownEmitter): SpotifyArea {
@@ -82,7 +106,13 @@ export default class SpotifyArea extends InteractableArea {
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
     return new SpotifyArea(
-      { id: name as InteractableID, queue: [], currentlyPlaying: undefined, occupants: [] },
+      {
+        id: name as InteractableID,
+        queue: [],
+        currentlyPlaying: undefined,
+        isPlaying: false,
+        occupants: [],
+      },
       rect,
       townEmitter,
     );

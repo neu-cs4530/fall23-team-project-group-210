@@ -87,6 +87,7 @@ export interface ViewingArea extends Interactable {
 export interface SpotifyModel extends Interactable {
   queue: Song[];
   currentlyPlaying: Song | undefined;
+  isPlaying: boolean;
 }
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER';
@@ -196,6 +197,7 @@ export type InteractableCommand =
   | GameMoveCommand<TicTacToeMove>
   | LeaveGameCommand
   | SpotifySetCurrentSongCommand
+  | SpotifyUpdateSongCommand
   | SpotifyAddSongCommand;
 export interface ViewingAreaUpdateCommand {
   type: 'ViewingAreaUpdate';
@@ -220,6 +222,12 @@ export interface SpotifyAddSongCommand {
   type: 'SpotifyAddSongCommand';
   song: Song;
 }
+
+export interface SpotifyUpdateSongCommand {
+  type: 'SpotifyUpdateSongCommand';
+  song: Song;
+}
+
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> =
   CommandType extends JoinGameCommand
     ? { gameID: string }
@@ -232,6 +240,8 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
     : CommandType extends SpotifyAddSongCommand
     ? undefined
     : CommandType extends SpotifySetCurrentSongCommand
+    ? undefined
+    : CommandType extends SpotifyUpdateSongCommand
     ? undefined
     : never;
 

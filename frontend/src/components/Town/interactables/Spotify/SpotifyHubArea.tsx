@@ -22,11 +22,18 @@ import useTownController from '../../../../hooks/useTownController';
 import { InteractableID, Song } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
 
+type SongRating = {
+  [key in keyof Song]: -1 | 0 | 1;
+};
+
+type SongDictionary = Record<string, SongRating>;
+
 function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const spotifyAreaController = useSpotifyAreaController(interactableID);
   const [queue, setQueue] = useState([] as Song[]);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
   const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
+  const [likeDict, setLikeDict] = useState<SongDictionary>({} as SongDictionary); // TODO: add this functionality
 
   const handleSearch = async () => {
     // Implement your Spotify search logic here. You may want to use the Spotify API or another service.
@@ -94,7 +101,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       </Heading>
       <Button
         onClick={() => {
-    
           spotifyAreaController.clearQueue();
         }}>
         Clear Queue
@@ -111,7 +117,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
             });
           }
         }}>
-        Play
+        Play Next
       </Button>
       <List aria-label='list of songs in the queue'>
         {queue.map(song => (
@@ -124,14 +130,14 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
               onClick={() => {
                 console.log('song liked');
                 console.log(song.likes);
-                spotifyAreaController.addLikeToSong(song.id);
+                spotifyAreaController.addLikeToSong(song);
               }}>
               Like
             </Button>
             <Button
               onClick={() => {
                 console.log('song disliked');
-                spotifyAreaController.addDislikeToSong(song.id);
+                spotifyAreaController.addDislikeToSong(song);
               }}>
               Dislike
             </Button>
