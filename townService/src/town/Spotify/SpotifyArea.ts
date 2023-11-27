@@ -19,7 +19,7 @@ export default class SpotifyArea extends InteractableArea {
 
   private _currentSong: Song | undefined;
 
-  private _isPlaying: boolean;
+  private _playSong: boolean;
 
   public constructor(
     { id, queue }: Omit<SpotifyModel, 'type'>,
@@ -28,7 +28,7 @@ export default class SpotifyArea extends InteractableArea {
   ) {
     super(id, coordinates, townEmitter);
     this._queue = new SongQueue(queue);
-    this._isPlaying = false;
+    this._playSong = false;
   }
 
   public toModel(): SpotifyModel {
@@ -37,7 +37,7 @@ export default class SpotifyArea extends InteractableArea {
       occupants: this.occupantsByID,
       type: 'SpotifyArea',
       queue: this._queue.songs,
-      isPlaying: this._isPlaying,
+      playSong: this._playSong,
       currentlyPlaying: this._currentSong,
     };
   }
@@ -50,6 +50,7 @@ export default class SpotifyArea extends InteractableArea {
   public updateModel(update: SpotifyModel) {
     this._queue = new SongQueue(update.queue);
     this._currentSong = update.currentlyPlaying;
+    this._emitAreaChanged();
   }
 
   public addSong(song: Song) {
@@ -57,10 +58,10 @@ export default class SpotifyArea extends InteractableArea {
     this._emitAreaChanged();
   }
 
-  public setCurrentSong() {
+  public playSong() {
     const current = this._queue.dequeue();
     this._currentSong = current;
-    this._isPlaying = true;
+    this._playSong = true;
     this._emitAreaChanged();
   }
 
@@ -83,8 +84,8 @@ export default class SpotifyArea extends InteractableArea {
       this.addSong(spotifyCommand.song);
       return {} as InteractableCommandReturnType<CommandType>;
     }
-    if (command.type === 'SpotifySetCurrentSongCommand') {
-      this.setCurrentSong();
+    if (command.type === 'SpotifyPlaySongCommand') {
+      this.playSong();
       return {} as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'SpotifyUpdateSongCommand') {
@@ -110,7 +111,7 @@ export default class SpotifyArea extends InteractableArea {
         id: name as InteractableID,
         queue: [],
         currentlyPlaying: undefined,
-        isPlaying: false,
+        playSong: false,
         occupants: [],
       },
       rect,

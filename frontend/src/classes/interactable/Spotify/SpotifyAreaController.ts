@@ -102,6 +102,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    */
   //UPDATE TO BE ABLE TO SEARCH FOR ALBUMS AND ARTISTS AS WELL
   async searchSong(searchString: string): Promise<Song[]> {
+    console.log(this._spotifyAreaModel.queue.length);
     if (!this._spotifyAPI) {
       throw Error('Spotify details not provided');
     }
@@ -130,11 +131,13 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * is returned by this function so its data can still be displayed.
    * @returns Promise of the song that is currently playing so its information can still be displayed
    */
-  async playNextSong(): Promise<Song> {
+  async playNextSong(): Promise<void> {
+    if (this.queue.length === 0) {
+      throw new Error('No songs in queue');
+    }
     await this._townController.sendInteractableCommand(this.id, {
-      type: 'SpotifySetCurrentSongCommand',
+      type: 'SpotifyPlaySongCommand',
     });
-    return this._playCurrentSong();
   }
 
   private _playCurrentSong(): Song {
@@ -208,13 +211,15 @@ export default class SpotifyAreaController extends InteractableAreaController<
     console.log('UPDATE');
     console.log(this._spotifyAreaModel.queue.length);
     console.log(newModel.queue.length);
-    //const wasPlaying = this._spotifyAreaModel.isPlaying;
     this._spotifyAreaModel = newModel;
-    //BROKEN -------------------------------------------------------------------
-    // if (!wasPlaying && this._spotifyAreaModel.isPlaying) {
-    //   this._playCurrentSong();
-    //   //console.log('PLAY');
-    // }
+    if (this._spotifyAreaModel.playSong) {
+      try {
+        this._playCurrentSong();
+      } catch (e) {
+        console.log('Error playing song on this device');
+      }
+      this._spotifyAreaModel.playSong = false;
+    }
     this.emit('queueUpdated');
   }
 

@@ -22,15 +22,13 @@ import useTownController from '../../../../hooks/useTownController';
 import { InteractableID, Song } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
 
-type SongRating = {
-  [key in keyof Song]: -1 | 0 | 1;
-};
+type SongRating = -1 | 0 | 1;
 
 type SongDictionary = Record<string, SongRating>;
 
 function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const spotifyAreaController = useSpotifyAreaController(interactableID);
-  const [queue, setQueue] = useState([] as Song[]);
+  const [queue, setQueue] = useState(spotifyAreaController.queue);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
   const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
   const [likeDict, setLikeDict] = useState<SongDictionary>({} as SongDictionary); // TODO: add this functionality
@@ -49,12 +47,32 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   useEffect(() => {
     const updateSpotifyState = () => {
       setQueue([...spotifyAreaController.queue]);
+
+      const songLikeDict = spotifyAreaController.queue.reduce((acc, song) => {
+        const oldLikeStatus = likeDict[song.id];
+        if (oldLikeStatus !== undefined) {
+          acc[song.id] = likeDict[song.id];
+        } else {
+          acc[song.id] = 0;
+        }
+        return acc;
+      }, {} as Record<string, SongRating>);
+      setLikeDict(songLikeDict);
+    };
+
+    const synchornizeQueues = () => {
+      if (spotifyAreaController.queue.length !== 0) {
+        console.log('We got to synchronization attempt.');
+        spotifyAreaController.emit('queueUpdated');
+      }
     };
     spotifyAreaController.addListener('queueUpdated', updateSpotifyState);
+    spotifyAreaController.addListener('occupantsChange', synchornizeQueues);
     return () => {
       spotifyAreaController.removeListener('queueUpdated', updateSpotifyState);
+      spotifyAreaController.removeListener('occupantsChange', synchornizeQueues);
     };
-  }, [spotifyAreaController, queue]);
+  }, [spotifyAreaController, likeDict, queue]);
 
   const toast = useToast();
   return (
@@ -62,7 +80,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       <Heading as='h2' size='md'>
         Search for a Song
       </Heading>
-
       <InputGroup>
         {/* Input field for searching */}
         <FormControl>
@@ -95,7 +112,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
           </Flex>
         ))}
       </List>
-
       <Heading as='h2' size='md'>
         Spotify Song Queue
       </Heading>
@@ -126,24 +142,34 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
               {song.name} - {song.artists[0].name}
             </Text>
             {/* Add like/dislike buttons for each song in the queue, which would update the likes/dislikes fields in each song */}
-            <Button
-              onClick={() => {
-                console.log('song liked');
-                console.log(song.likes);
-                spotifyAreaController.addLikeToSong(song);
-              }}>
-              Like
-            </Button>
-            <Button
-              onClick={() => {
-                console.log('song disliked');
-                spotifyAreaController.addDislikeToSong(song);
-              }}>
-              Dislike
-            </Button>
-            <Text>
-              {song.likes} - {song.dislikes}
-            </Text>
+            {likeDict[song.id] < 1 ? (
+              <Button
+                onClick={() => {
+                  console.log('song liked');
+                  console.log(song.likes);
+                  spotifyAreaController.addLikeToSong(song);
+                  const songLikeDict = likeDict;
+                  songLikeDict[song.id] += 1;
+                  setLikeDict({ ...songLikeDict });
+                }}>
+                Like
+              </Button>
+            ) : null}
+
+            {likeDict[song.id] > -1 ? (
+              <Button
+                onClick={() => {
+                  console.log('song disliked');
+                  spotifyAreaController.addDislikeToSong(song);
+                  const songLikeDict = likeDict;
+                  songLikeDict[song.id] -= 1;
+                  setLikeDict({ ...songLikeDict });
+                }}>
+                Dislike
+              </Button>
+            ) : null}
+
+            <Text>{song.likes - song.dislikes}</Text>
           </Flex>
         ))}
       </List>
