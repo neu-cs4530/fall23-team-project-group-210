@@ -3,21 +3,21 @@ import InteractableAreaController, {
   BaseInteractableEventMap,
 } from '../InteractableAreaController';
 import { SongQueue } from './Queue';
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getDatabase, onValue, ref, set } from "firebase/database"; 
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
+import { getDatabase, onValue, ref, set } from 'firebase/database';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAIE5wWApYIghDcv-GQJCtN3_CCJHzlGmg",
-  authDomain: "spotify-819f9.firebaseapp.com",
-  databaseURL: "https://spotify-819f9-default-rtdb.firebaseio.com",
-  projectId: "spotify-819f9",
-  storageBucket: "spotify-819f9.appspot.com",
-  messagingSenderId: "643647635154",
-  appId: "1:643647635154:web:c8b7f2a749b6d44054b70b",
-  measurementId: "G-GXPWKR312B"
+  apiKey: 'AIzaSyAIE5wWApYIghDcv-GQJCtN3_CCJHzlGmg',
+  authDomain: 'spotify-819f9.firebaseapp.com',
+  databaseURL: 'https://spotify-819f9-default-rtdb.firebaseio.com',
+  projectId: 'spotify-819f9',
+  storageBucket: 'spotify-819f9.appspot.com',
+  messagingSenderId: '643647635154',
+  appId: '1:643647635154:web:c8b7f2a749b6d44054b70b',
+  measurementId: 'G-GXPWKR312B',
 };
 
 // Initialize Firebase
@@ -94,33 +94,45 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * Save the given song to the database for the given userId
    * @param song song to be saved
    * @param playerId playerId who saved the song
+   * @param votes the number of votes the song has
    */
   saveSong(song: Song, playerId: number): void {
-    const db = getDatabase(); 
-    const reference = ref(db, "player/" + playerId); 
+    const db = getDatabase();
+    const reference = ref(db, 'player/' + playerId + '/saved songs');
 
-    set(reference, {
-        username: playerId, 
-        song: song, 
-    }); 
-
+    set(reference, song);
   }
 
   /**
    * return the saved songs of the player with the provided id
    * @param playerId the Id of the player whose saved songs we're fetching
    */
-  getSavedSongs(playerId: number): Song[] {
-    const db = getDatabase(); 
-    const songRef = ref(db, 'player/' + playerId + '/saved songs'); 
-    onValue(songRef, (snapshot) => {
-      snapshot.forEach(childSnapshot) => {
-        const childKey = childSnapshot.key; 
-        const childData = childSnapshot.val(); 
+  getSavedSongs(playerId: number): Promise<Song[]> {
+    const db = getDatabase();
+    const refference = ref(db, 'player/' + playerId + '/saved songs');
+    let savedSongs: Song[] = [];
+
+    onValue(refference, snapshot => {
+      if (snapshot.val()) {
+        snapshot.forEach(childSnapshot => {
+          const songData = childSnapshot.val();
+          if (songData) {
+            const song: Song = {
+              name: songData.name,
+              likes: songData.likes,
+              dislikes: songData.dislikes,
+              comments: songData.comments,
+            };
+            savedSongs.push(song);
+          }
+        });
+      } else {
+        console.warn(`No songs found for player ${playerId}`);
+        savedSongs = [];
       }
-   }), {
-    onlyOnce: true 
-   }
+    });
+
+    return Promise.resolve(savedSongs);
   }
 
   /**
@@ -161,4 +173,8 @@ export default class SpotifyAreaController extends InteractableAreaController<
   public isActive(): boolean {
     throw new Error('Method not implemented.');
   }
+
+  /**
+   *
+   */
 }

@@ -8,7 +8,7 @@ import { Song } from './SpotifyAreaController';
  */
 export class ShareSession {
   private players: Player[] = [];
-  private sharedQueue: Queue[]
+  private sharedQueue: Song[] = []; 
 
   /** 
    * Adds a player to the list of players in the shared session.  
@@ -41,9 +41,9 @@ export class ShareSession {
    * @param song The song to be added. 
    */
   addToQueue(song: Song): void {
-    this.players.forEach(function (getPlayerQueue)) {
+    this.players.forEach(function (getPlayerQueue) {
         this.sharedQueue.enqueue(song); 
-    }
+    });
   }
 
   /** 
@@ -51,13 +51,13 @@ export class ShareSession {
    * @param player The player in the shared session
    */
   getPlayerQueue(player: Player): boolean {
-
+    if ()
   }
   
   /** 
    * Returns the shared queue of from all users. 
    */
-  getSharedQueue(): SongQueue {
+  getSharedQueue(): Song[] {
     return this.sharedQueue;
   }
 }
