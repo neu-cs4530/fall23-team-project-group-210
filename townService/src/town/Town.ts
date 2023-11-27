@@ -23,7 +23,7 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
-import SpotifyArea from './SpotifyArea';
+import SpotifyArea from './Spotify/SpotifyArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that

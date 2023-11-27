@@ -4,7 +4,7 @@ import {
   TicTacToeGameState,
   ViewingArea,
   GameArea,
-  SpotifyArea,
+  SpotifyModel,
 } from './CoveyTownSocket';
 
 /**
@@ -27,6 +27,6 @@ export function isTicTacToeArea(
   return interactable.type === 'TicTacToeArea';
 }
 
-export function isSpotifyArea(interactable: Interactable): interactable is SpotifyArea {
+export function isSpotifyArea(interactable: Interactable): interactable is SpotifyModel {
   return interactable.type === 'SpotifyArea';
 }

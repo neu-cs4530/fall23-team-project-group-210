@@ -19,9 +19,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useInteractable, useSpotifyAreaController } from '../../../../classes/TownController';
 
 import useTownController from '../../../../hooks/useTownController';
-import { InteractableID } from '../../../../types/CoveyTownSocket';
+import { InteractableID, Song } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
-import { Song } from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 
 function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const spotifyAreaController = useSpotifyAreaController(interactableID);
@@ -42,7 +41,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
 
   useEffect(() => {
     const updateSpotifyState = () => {
-      setQueue([...spotifyAreaController.queue.songs]);
+      setQueue([...spotifyAreaController.queue]);
     };
     spotifyAreaController.addListener('queueUpdated', updateSpotifyState);
     return () => {
@@ -95,6 +94,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       </Heading>
       <Button
         onClick={() => {
+    
           spotifyAreaController.clearQueue();
         }}>
         Clear Queue

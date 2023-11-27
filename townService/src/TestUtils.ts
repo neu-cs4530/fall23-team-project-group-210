@@ -21,7 +21,7 @@ import {
   PlayerLocation,
   ServerToClientEvents,
   SocketData,
-  SpotifyArea,
+  SpotifyModel,
   TownEmitter,
   ViewingArea,
 } from './types/CoveyTownSocket';
@@ -214,6 +214,6 @@ export function isConversationArea(interactable: Interactable): interactable is 
   return 'topic' in interactable;
 }
 
-export function isSpotifyArea(interactable: Interactable): interactable is SpotifyArea {
+export function isSpotifyArea(interactable: Interactable): interactable is SpotifyModel {
   return 'queue' in interactable;
 }

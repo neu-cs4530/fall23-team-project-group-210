@@ -24,7 +24,6 @@ import {
   InteractableID,
   PlayerID,
   PlayerLocation,
-  SongQueue,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -637,7 +636,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
               new TicTacToeAreaController(eachInteractable.id, eachInteractable, this),
             );
           } else if (isSpotifyArea(eachInteractable)) {
-            eachInteractable.queue = new SongQueue();
+            eachInteractable.queue = [];
             this._interactableControllers.push(
               new SpotifyAreaController(eachInteractable.id, eachInteractable, this),
             );
@@ -726,10 +725,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public emitViewingAreaUpdate(viewingArea: ViewingAreaController) {
     this._socket.emit('interactableUpdate', viewingArea.toInteractableAreaModel());
-  }
-
-  public emitSpotifyAreaUpdate(spotifyArea: SpotifyAreaController) {
-    this._socket.emit('interactableUpdate', spotifyArea.toInteractableAreaModel());
   }
 
   /**

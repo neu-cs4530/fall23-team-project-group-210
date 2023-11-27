@@ -8,7 +8,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { ChakraProvider } from '@chakra-ui/react';
 import TownControllerContext from '../../../../contexts/TownControllerContext';
-import { SpotifyArea as SpotifyAreaModel } from '../../../../types/CoveyTownSocket';
+import { SpotifyModel as SpotifyAreaModel } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
 import { Song } from '../../../../classes/interactable/Spotify/SpotifyAreaController';
 

@@ -17,6 +17,17 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 };
 
+export type Song = {
+  id: string;
+  albumUri: string;
+  uri: string;
+  name: string;
+  artists: SimplifiedArtist[];
+  likes: number;
+  dislikes: number;
+  comments: string[];
+};
+
 export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'SpotifyArea';
 export interface Interactable {
   type: InteractableType;
@@ -73,9 +84,9 @@ export interface ViewingArea extends Interactable {
   elapsedTimeSec: number;
 }
 
-export interface SpotifyArea extends Interactable {
-  queue: SongQueue;
-  isPlaying: boolean;
+export interface SpotifyModel extends Interactable {
+  queue: Song[];
+  currentlyPlaying: Song | undefined;
 }
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER';
@@ -184,7 +195,8 @@ export type InteractableCommand =
   | JoinGameCommand
   | GameMoveCommand<TicTacToeMove>
   | LeaveGameCommand
-  | SpotifyCommand;
+  | SpotifySetCurrentSongCommand
+  | SpotifyAddSongCommand;
 export interface ViewingAreaUpdateCommand {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -201,9 +213,12 @@ export interface GameMoveCommand<MoveType> {
   gameID: GameInstanceID;
   move: MoveType;
 }
-export interface SpotifyCommand {
-  type: 'SpotifyAreaUpdate';
-  update: SpotifyArea;
+export interface SpotifySetCurrentSongCommand {
+  type: 'SpotifySetCurrentSongCommand';
+}
+export interface SpotifyAddSongCommand {
+  type: 'SpotifyAddSongCommand';
+  song: Song;
 }
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> =
   CommandType extends JoinGameCommand
@@ -214,7 +229,9 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
     ? undefined
     : CommandType extends LeaveGameCommand
     ? undefined
-    : CommandType extends SpotifyCommand
+    : CommandType extends SpotifyAddSongCommand
+    ? undefined
+    : CommandType extends SpotifySetCurrentSongCommand
     ? undefined
     : never;
 
@@ -242,67 +259,4 @@ export interface ClientToServerEvents {
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
   interactableCommand: (command: InteractableCommand & InteractableCommandBase) => void;
-}
-
-/**
- * Basic generic Queue class. Need to update to allow queue order to be changed by votes.
- */
-export class SongQueue {
-  private _storage: Song[] = [];
-
-  constructor() {
-    this._storage = [];
-  }
-
-  get songs(): Song[] {
-    return this._storage;
-  }
-
-  enqueue(song: Song): void {
-    this._storage.push(song);
-  }
-
-  dequeue(): Song | undefined {
-    return this._storage.shift();
-  }
-
-  sortByLikes(): void {
-    this._storage.sort((a: Song, b: Song) => b.likes - a.likes);
-  }
-
-  size(): number {
-    return this._storage.length;
-  }
-
-  addLikeToSong(songId: string): void {
-    const targetSong = this._storage.find(song => song.id === songId);
-    if (targetSong) {
-      targetSong.likes++;
-    }
-  }
-
-  addDislikeToSong(songId: string): void {
-    const targetSong = this._storage.find(song => song.id === songId);
-    if (targetSong) {
-      targetSong.dislikes++;
-    }
-  }
-
-  removeLikeFromSong(songId: string): void {
-    const targetSong = this._storage.find(song => song.id === songId);
-    if (targetSong) {
-      targetSong.likes--;
-    }
-  }
-
-  addCommentToSong(songId: string, comment: string): void {
-    const targetSong = this._storage.find(song => song.id === songId);
-    if (targetSong) {
-      targetSong.comments.push(comment);
-    }
-  }
-
-  clearQueue(): void {
-    this._storage = [];
-  }
 }
