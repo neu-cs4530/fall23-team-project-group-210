@@ -24,6 +24,7 @@ import {
   InteractableID,
   PlayerID,
   PlayerLocation,
+  SongQueue,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -38,7 +39,6 @@ import GameAreaController, { GameEventTypes } from './interactable/GameAreaContr
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from './interactable/InteractableAreaController';
-import { SongQueue } from './interactable/Spotify/SongQueue';
 import SpotifyAreaController from './interactable/Spotify/SpotifyAreaController';
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
@@ -726,6 +726,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public emitViewingAreaUpdate(viewingArea: ViewingAreaController) {
     this._socket.emit('interactableUpdate', viewingArea.toInteractableAreaModel());
+  }
+
+  public emitSpotifyAreaUpdate(spotifyArea: SpotifyAreaController) {
+    this._socket.emit('interactableUpdate', spotifyArea.toInteractableAreaModel());
   }
 
   /**

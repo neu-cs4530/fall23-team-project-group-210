@@ -1,5 +1,4 @@
 import TownController from '../../TownController';
-import { SongQueue } from './SongQueue';
 import {
   SpotifyApi,
   SimplifiedArtist,
@@ -10,7 +9,7 @@ import {
   // ItemTypes,
 } from '@spotify/web-api-ts-sdk';
 import { v4 as uuidv4 } from 'uuid';
-import { SpotifyArea } from '../../../types/CoveyTownSocket';
+import { SongQueue, SpotifyArea } from '../../../types/CoveyTownSocket';
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from '../InteractableAreaController';
@@ -84,6 +83,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
       comments: song.comments,
     };
     this._spotifyAreaModel.queue.enqueue(songToAdd);
+    this._townController.emitSpotifyAreaUpdate(this);
     this.emit('queueUpdated');
   }
 

@@ -1,5 +1,5 @@
-import { SongQueue } from './SongQueue';
 //import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
+import { SongQueue } from '../../../types/CoveyTownSocket';
 import { Song } from './SpotifyAreaController';
 describe('SongQueue Tests', () => {
   describe('SongQueue order', () => {

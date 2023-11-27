@@ -6,6 +6,7 @@ import {
   InteractableCommand,
   InteractableCommandReturnType,
   InteractableID,
+  SongQueue,
   SpotifyArea as SpotifyAreaModel,
   SpotifyCommand,
   TownEmitter,
@@ -13,7 +14,9 @@ import {
 import InteractableArea from './InteractableArea';
 
 export default class SpotifyArea extends InteractableArea {
-  private _model: SpotifyAreaModel;
+  private _queue: SongQueue;
+
+  private _isPlaying: boolean;
 
   public constructor(
     { id, queue }: Omit<SpotifyAreaModel, 'type'>,
@@ -21,20 +24,37 @@ export default class SpotifyArea extends InteractableArea {
     townEmitter: TownEmitter,
   ) {
     super(id, coordinates, townEmitter);
-    this._model = { type: 'SpotifyArea', id: this.id, occupants: this.occupantsByID, queue };
+    this._queue = queue;
+    this._isPlaying = false;
   }
 
   public toModel(): SpotifyAreaModel {
-    return this._model;
+    return {
+      id: this.id,
+      occupants: this.occupantsByID,
+      type: 'SpotifyArea',
+      queue: this._queue,
+      isPlaying: this._isPlaying,
+    };
+  }
+
+  /**
+   * Updates the state of this ViewingArea, setting the video, isPlaying and progress properties
+   *
+   * @param viewingArea updated model
+   */
+  public updateModel(update: SpotifyAreaModel) {
+    this._queue = update.queue;
+    this._isPlaying = update.isPlaying;
   }
 
   public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    if (command.type === 'Spotify') {
+    if (command.type === 'SpotifyAreaUpdate') {
       const spotifyCommand = command as SpotifyCommand;
-      this._model = spotifyCommand.update;
+      this.updateModel(spotifyCommand.update);
       return {} as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError('Unknown command type');
@@ -47,7 +67,7 @@ export default class SpotifyArea extends InteractableArea {
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
     return new SpotifyArea(
-      { id: name as InteractableID, queue: {}, occupants: [] },
+      { id: name as InteractableID, queue: new SongQueue(), isPlaying: false, occupants: [] },
       rect,
       townEmitter,
     );
