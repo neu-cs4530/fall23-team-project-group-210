@@ -9,6 +9,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import TownControllerContext from '../../../../contexts/TownControllerContext';
 import { Song, SpotifyModel as SpotifyAreaModel } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
+import { forEach } from 'lodash';
 
 const MOCK_QUEUE: Song[] = [
   {
@@ -106,44 +107,17 @@ describe('SpotifyHubArea', () => {
   describe('Rendering', () => {
     it('should render the SpotifyHubArea component', () => {
       const { getByText } = renderSpotifyHubArea();
-      expect(getByText('Spotify Song Queue')).toBeInTheDocument();
+      expect(getByText('Queue')).toBeInTheDocument();
+    });
+    it('should render the correct number of songs in queue', () => {
+      const { getAllByTestId } = renderSpotifyHubArea();
+      expect(getAllByTestId('queue-song').length).toBe(3);
+    });
+    it('should render the correct number of likes for each song in the queue', () => {
+      const { getByText } = renderSpotifyHubArea();
+      forEach(MOCK_QUEUE, song => {
+        expect(getByText(song.likes.toString())).toBeInTheDocument();
+      });
     });
   });
-
-  describe('Song Details', () => {
-    // it('should render the correct number of songs', () => {
-    //   const { getAllByTestId } = renderSpotifyHubArea();
-    //   expect(getAllByTestId('song').length).toBe(3);
-    // });
-    // it('should render the correct number of likes', () => {
-    //   // const { getAllByTestId } = render(<SpotifyHubArea />);
-    //   const { getAllByTestId } = renderSpotifyHubArea();
-    //   expect(getAllByTestId('like').length).toBe(3);
-    // });
-    // it('should render the correct number of dislikes', () => {
-    //   // const { getAllByTestId } = render(<SpotifyHubArea />);
-    //   const { getAllByTestId } = renderSpotifyHubArea();
-    //   expect(getAllByTestId('dislike').length).toBe(3);
-    // });
-    // it('should render the correct number of comments', () => {
-    //   // const { getAllByTestId } = render(<SpotifyHubArea />);
-    //   const { getAllByTestId } = renderSpotifyHubArea();
-    //   expect(getAllByTestId('comment').length).toBe(6);
-    // });
-  });
-
-  // TODO: implement buttons to SpotifyHubArea modal
-  // describe('Action Buttons', () => {
-  //   it('should render the correct number of add buttons', () => {
-  //     // const { getAllByTestId } = render(<SpotifyHubArea />);
-  //     const { getAllByTestId } = renderSpotifyHubArea();
-  //     expect(getAllByTestId('add').length).toBe(3);
-  //   });
-
-  //   it('should render the correct number of remove buttons', () => {
-  //     // const { getAllByTestId } = render(<SpotifyHubArea />);
-  //     const { getAllByTestId } = renderSpotifyHubArea();
-  //     expect(getAllByTestId('remove').length).toBe(3);
-  //   });
-  // });
 });

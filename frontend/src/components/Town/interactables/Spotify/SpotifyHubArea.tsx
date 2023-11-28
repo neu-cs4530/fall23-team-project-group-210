@@ -223,6 +223,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
           {queue.map(song => (
             <Grid
               key={song.id}
+              data-testid='queue-song'
               templateColumns='100px 200px 60px 20px 100px 100px'
               gap={2}
               justifyItems='left'
