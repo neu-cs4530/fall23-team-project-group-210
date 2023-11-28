@@ -64,7 +64,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.test.tsx', '**/TestUtils.ts', '**/SpotifyHubArea.tsx'],
+      files: ['*.test.tsx', '**/TestUtils.ts'],
       rules: {
         'no-await-in-loop': 0,
         '@typescript-eslint/no-explicit-any': 0,
