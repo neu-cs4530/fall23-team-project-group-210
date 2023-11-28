@@ -1,9 +1,13 @@
 import {
   Button,
   Container,
+  Divider,
   Flex,
   FormControl,
+  Grid,
   Heading,
+  Icon,
+  Image,
   InputGroup,
   List,
   Modal,
@@ -21,6 +25,7 @@ import { useInteractable, useSpotifyAreaController } from '../../../../classes/T
 import useTownController from '../../../../hooks/useTownController';
 import { InteractableID, Song } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
+import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'react-icons/ai';
 
 type SongRating = -1 | 0 | 1;
 
@@ -86,20 +91,26 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   return (
     <Container>
       <Heading as='h2' size='md'>
-        Search for a Song
+        Song Search
       </Heading>
+      {/* add small gap of 10 px */}
+      <Divider style={{ width: '20px' }} />
       <InputGroup>
         {/* Input field for searching */}
-        <FormControl>
+        <FormControl color='black'>
           <input
             type='text'
-            placeholder='Enter song name...'
+            style={{ width: '400px' }}
+            placeholder='What do you want to listen to?'
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
           />
         </FormControl>
         {/* Button to trigger the search */}
         <Button
+          bg='gray.800'
+          variant='outline'
+          colorScheme='white'
           onClick={async () => {
             const error: Error | undefined = await handleSearch();
             if (error) {
@@ -117,14 +128,21 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       {/* Display search results */}
       <List aria-label='list of search results'>
         {searchResults.map(result => (
-          <Flex data-testid='search-result' key={result.id} align='center'>
+          <Flex
+            data-testid='search-result'
+            key={result.id}
+            align='center'
+            justifyContent='space-between'
+            mb={2}>
             <Text>
               {result.name} - {result.artists[0].name}
             </Text>
             <Button
+              bg='gray.800'
+              variant='outline'
+              colorScheme='white'
               onClick={() => {
                 spotifyAreaController.addSongToQueue(result);
-                // Add logic to add the selected song to the queue
                 console.log('Song added to queue: ' + result.name);
               }}>
               Add to Queue
@@ -133,15 +151,21 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         ))}
       </List>
       <Heading as='h2' size='md'>
-        Spotify Song Queue
+        Queue
       </Heading>
       <Button
+        bg='gray.800'
+        variant='outline'
+        colorScheme='white'
         onClick={() => {
           spotifyAreaController.clearQueue();
         }}>
         Clear Queue
       </Button>
       <Button
+        bg='gray.800'
+        variant='outline'
+        colorScheme='white'
         onClick={async () => {
           try {
             await spotifyAreaController.playNextSong();
@@ -157,13 +181,21 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       </Button>
       <List aria-label='list of songs in the queue'>
         {queue.map(song => (
-          <Flex data-testid='song' key={song.id} align='center'>
+          <Grid
+            key={song.id}
+            templateColumns='450px 60px 20px 30px'
+            gap={1}
+            justifyItems='left'
+            alignItems='center'>
+            {/* Text */}
             <Text>
               {song.name} - {song.artists[0]?.name}
             </Text>
-            {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
-            {/* {likeDict[song.id] < 1 ? ( */}
+
+            {/* Like Button */}
             <Button
+              variant={likeDict[song.id] === 1 ? 'solid' : 'outline'}
+              colorScheme='green'
               isActive={likeDict[song.id] === 1}
               onClick={() => {
                 const songLikeDict = likeDict;
@@ -180,9 +212,16 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 }
                 setLikeDict({ ...songLikeDict });
               }}>
-              Like
+              {likeDict[song.id] === 1 ? <Icon as={AiFillLike} /> : <Icon as={AiOutlineLike} />}
             </Button>
+
+            {/* Likes Ticker */}
+            <Text>{song.likes}</Text>
+
+            {/* Dislike Button */}
             <Button
+              variant={likeDict[song.id] === -1 ? 'solid' : 'outline'}
+              colorScheme='red'
               isActive={likeDict[song.id] === -1}
               onClick={() => {
                 const songLikeDict = likeDict;
@@ -199,11 +238,13 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 }
                 setLikeDict({ ...songLikeDict });
               }}>
-              Dislike
+              {likeDict[song.id] === -1 ? (
+                <Icon as={AiFillDislike} />
+              ) : (
+                <Icon as={AiOutlineDislike} />
+              )}
             </Button>
-
-            <Text>{song.likes}</Text>
-          </Flex>
+          </Grid>
         ))}
       </List>
     </Container>
@@ -237,10 +278,14 @@ export default function SpotifyAreaWrapper(): JSX.Element {
 
   if (spotifyArea) {
     return (
-      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
+      <Modal size={'4xl'} isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Spotify Area</ModalHeader>
+        <ModalContent bg='gray.800' color='white'>
+          {/* <ModalHeader>Spotify Area</ModalHeader> */}
+          <Flex align='center'>
+            <Image src={'./images/spotify-icon.png'} alt='Spotify Logo' boxSize='30px' ml='4' />
+            <ModalHeader fontSize='3xl'>Spotify</ModalHeader>
+          </Flex>
           <ModalCloseButton />
           <ModalBody>
             <SpotifyHubArea interactableID={spotifyArea.name} />

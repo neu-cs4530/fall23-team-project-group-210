@@ -15,7 +15,7 @@ module.exports = {
     'prettier',
     'plugin:react-hooks/recommended',
     'plugin:react/recommended',
-    'plugin:@next/next/recommended'
+    'plugin:@next/next/recommended',
   ],
   settings: {
     react: {
@@ -41,8 +41,8 @@ module.exports = {
       },
       {
         selector: 'variable',
-        types: ['function'], 
-        format: ['camelCase', 'PascalCase']
+        types: ['function'],
+        format: ['camelCase', 'PascalCase'],
       },
       {
         selector: 'typeLike',
@@ -64,7 +64,7 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.test.tsx', '**/TestUtils.ts'],
+      files: ['*.test.tsx', '**/TestUtils.ts', '**/SpotifyHubArea.tsx'],
       rules: {
         'no-await-in-loop': 0,
         '@typescript-eslint/no-explicit-any': 0,
