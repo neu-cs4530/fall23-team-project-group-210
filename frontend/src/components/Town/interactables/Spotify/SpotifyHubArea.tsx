@@ -68,17 +68,17 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       console.log('Updated likeDict: ', songLikeDict);
     };
 
-    const synchornizeQueues = () => {
+    const synchronizeQueues = () => {
       if (spotifyAreaController.queue.length !== 0) {
         console.log('Rendering queue for new player.');
         spotifyAreaController.refreshQueue();
       }
     };
     spotifyAreaController.addListener('queueUpdated', updateSpotifyState);
-    townController.addListener('playersChanged', synchornizeQueues);
+    townController.addListener('playersChanged', synchronizeQueues);
     return () => {
       spotifyAreaController.removeListener('queueUpdated', updateSpotifyState);
-      townController.removeListener('playersChanged', synchornizeQueues);
+      townController.removeListener('playersChanged', synchronizeQueues);
     };
   }, [spotifyAreaController, likeDict, queue, townController]);
 
@@ -162,32 +162,45 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
               {song.name} - {song.artists[0]?.name}
             </Text>
             {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
-            {likeDict[song.id] < 1 ? (
-              <Button
-                onClick={() => {
-                  console.log('song liked');
-                  console.log(song.likes);
+            {/* {likeDict[song.id] < 1 ? ( */}
+            <Button
+              isActive={likeDict[song.id] === 1}
+              onClick={() => {
+                const songLikeDict = likeDict;
+                if (likeDict[song.id] === 0) {
                   spotifyAreaController.addLikeToSong(song);
-                  const songLikeDict = likeDict;
-                  songLikeDict[song.id] += 1;
-                  setLikeDict({ ...songLikeDict });
-                }}>
-                Like
-              </Button>
-            ) : null}
-
-            {likeDict[song.id] > -1 ? (
-              <Button
-                onClick={() => {
-                  console.log('song disliked');
+                  songLikeDict[song.id] = 1;
+                } else if (likeDict[song.id] === -1) {
+                  spotifyAreaController.addLikeToSong(song);
+                  spotifyAreaController.addLikeToSong(song);
+                  songLikeDict[song.id] = 1;
+                } else {
                   spotifyAreaController.addDislikeToSong(song);
-                  const songLikeDict = likeDict;
-                  songLikeDict[song.id] -= 1;
-                  setLikeDict({ ...songLikeDict });
-                }}>
-                Dislike
-              </Button>
-            ) : null}
+                  songLikeDict[song.id] = 0;
+                }
+                setLikeDict({ ...songLikeDict });
+              }}>
+              Like
+            </Button>
+            <Button
+              isActive={likeDict[song.id] === -1}
+              onClick={() => {
+                const songLikeDict = likeDict;
+                if (likeDict[song.id] === 1) {
+                  spotifyAreaController.addDislikeToSong(song);
+                  spotifyAreaController.addDislikeToSong(song);
+                  songLikeDict[song.id] = -1;
+                } else if (likeDict[song.id] === 0) {
+                  spotifyAreaController.addDislikeToSong(song);
+                  songLikeDict[song.id] = -1;
+                } else {
+                  spotifyAreaController.addLikeToSong(song);
+                  songLikeDict[song.id] = 0;
+                }
+                setLikeDict({ ...songLikeDict });
+              }}>
+              Dislike
+            </Button>
 
             <Text>{song.likes}</Text>
           </Flex>

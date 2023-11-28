@@ -102,6 +102,7 @@ export default class SpotifyArea extends InteractableArea {
 
   updateSong(song: Song) {
     this._queue.updateSong(song);
+    this._queue.sortByLikes();
     this._emitAreaChanged();
   }
 
