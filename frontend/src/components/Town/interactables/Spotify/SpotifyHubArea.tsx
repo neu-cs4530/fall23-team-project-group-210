@@ -18,7 +18,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  Image,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -186,13 +185,21 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       </Button>
       <List aria-label='list of songs in the queue'>
         {queue.map(song => (
-          <Flex data-testid='song' key={song.id} align='center'>
+          <Grid
+            key={song.id}
+            templateColumns='450px 60px 20px 30px'
+            gap={1}
+            justifyItems='left'
+            alignItems='center'>
             <Box w='50px' bg='red.500'>
               <Image src={song.albumImage.url} />
             </Box>
+            {/* Text */}
             <Text fontSize={15} w='150px' noOfLines={[1, 2]}>
               {song.name} - {song.artists[0]?.name}
             </Text>
+
+            {/* Like Button */}
             {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
             <Button
               variant={likeDict[song.id] === 1 ? 'solid' : 'outline'}
@@ -245,7 +252,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 <Icon as={AiOutlineDislike} />
               )}
             </Button>
-          </Flex>
+          </Grid>
         ))}
       </List>
     </Container>
