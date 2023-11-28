@@ -31,6 +31,11 @@ export default class SpotifyArea extends InteractableArea {
     this._playSong = false;
   }
 
+  /**
+   * Convert this SpotifyArea instance to a simple SpotifyModel
+   *
+   * @returns SpotifyModel
+   */
   public toModel(): SpotifyModel {
     return {
       id: this.id,
@@ -43,7 +48,7 @@ export default class SpotifyArea extends InteractableArea {
   }
 
   /**
-   * Updates the state of this ViewingArea, setting the video, isPlaying and progress properties
+   * Updates the state of this SpotifyArea, setting the queue, and currentSong properties
    *
    * @param viewingArea updated model
    */
@@ -53,11 +58,20 @@ export default class SpotifyArea extends InteractableArea {
     this._emitAreaChanged();
   }
 
+  /**
+   * Add song to the model's queue
+   *
+   * @param song new song to add
+   */
   public addSong(song: Song) {
     this._queue.enqueue(song);
     this._emitAreaChanged();
   }
 
+  /**
+   * Play song that's next on the model's queue
+   *
+   */
   public playSong() {
     const current = this._queue.dequeue();
     this._currentSong = current;
@@ -66,16 +80,13 @@ export default class SpotifyArea extends InteractableArea {
     this._playSong = false;
   }
 
-  // public remove(player: Player): void {
-  //   super.remove(player);
-  //   if (this._occupants.length === 0) {
-  //     this._currentSong = undefined;
-  //     this._queue = new SongQueue([]);
-  //     this._isPlaying = false;
-  //     this._emitAreaChanged();
-  //   }
-  // }
-
+  /**
+   * Handle the various commands from the frontend
+   *
+   * @param command new command to the model
+   * @param player player who sent the command
+   * @returns empty InteractableCommandReturnType verification
+   */
   public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
     player: Player,
@@ -105,12 +116,23 @@ export default class SpotifyArea extends InteractableArea {
     throw new InvalidParametersError('Unknown command type');
   }
 
+  /**
+   * Update song on the model's queue
+   *
+   * @param song song to update
+   */
   updateSong(song: Song) {
     this._queue.updateSong(song);
     this._queue.sortByLikes();
     this._emitAreaChanged();
   }
 
+  /**
+   * Creates a new SpotifyArea object that will represent a Spotify Area object in the town map.
+   * @param mapObject An ITiledMapObject that represents a rectangle in which this spotify area exists
+   * @param broadcastEmitter An emitter that can be used by this spotify area to broadcast updates
+   * @returns new SpotifyArea object
+   */
   public static fromMapObject(mapObject: ITiledMapObject, townEmitter: TownEmitter): SpotifyArea {
     const { name, width, height } = mapObject;
     if (!width || !height) {
