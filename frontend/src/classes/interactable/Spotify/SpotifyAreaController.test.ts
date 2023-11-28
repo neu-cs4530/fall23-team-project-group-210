@@ -12,6 +12,7 @@ import type {
 import SpotifyAreaController from './SpotifyAreaController';
 import { SpotifyApi, PartialSearchResult } from '@spotify/web-api-ts-sdk';
 import TownController from '../../TownController';
+import TracksEndpoints from '@spotify/web-api-ts-sdk/dist/mjs/endpoints/TracksEndpoints';
 describe('SpotifyAreaController Tests', () => {
   const mockSpotifyApi = mock<SpotifyApi>();
   const out: Pick<PartialSearchResult, 'tracks'> = {};
@@ -150,25 +151,13 @@ describe('SpotifyAreaController Tests', () => {
     return features;
   };
 
-  const audioFeaturesArrayMock = async (ids: string[]): Promise<AudioFeatures[]> => {
-    // Return an array of AudioFeatures for an array of IDs
-    return [features];
-  };
-
   // Assign the overloads to the mockSpotifyApi.tracks.audioFeatures
   mockSpotifyApi.tracks = {
     audioFeatures: audioFeaturesMock as unknown as {
       (id: string): Promise<AudioFeatures>;
       (ids: string[]): Promise<AudioFeatures[]>;
     },
-    get: audioFeaturesMock as unknown as {
-      (id: string, market?: Market): Promise<Track>;
-      (ids: string[], market?: Market): Promise<Track[]>;
-    },
-    audioAnalysis: audioFeaturesMock as unknown as {
-      (id: string): Promise<AudioAnalysis>;
-    },
-  };
+  } as unknown as TracksEndpoints;
   // mockSpotifyApi.search.mockImplementation(
   //   async (s: string, t: readonly ItemTypes[], d?: Market, w?: number) => {
   //     return out;
