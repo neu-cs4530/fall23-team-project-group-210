@@ -28,10 +28,16 @@ type SongDictionary = Record<string, SongRating>;
 
 function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const spotifyAreaController = useSpotifyAreaController(interactableID);
+  const townController = useTownController();
   const [queue, setQueue] = useState(spotifyAreaController.queue);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
   const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
-  const [likeDict, setLikeDict] = useState<SongDictionary>({} as SongDictionary); // TODO: add this functionality
+  const [likeDict, setLikeDict] = useState<SongDictionary>(
+    spotifyAreaController.queue.reduce((acc, song) => {
+      acc[song.id] = 0;
+      return acc;
+    }, {} as Record<string, SongRating>),
+  ); // State to store the user's like/dislike status of each song
 
   const handleSearch = async () => {
     // Implement your Spotify search logic here. You may want to use the Spotify API or another service.
@@ -58,21 +64,22 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         return acc;
       }, {} as Record<string, SongRating>);
       setLikeDict(songLikeDict);
+      console.log('Updated likeDict: ', songLikeDict);
     };
 
     const synchornizeQueues = () => {
       if (spotifyAreaController.queue.length !== 0) {
-        console.log('We got to synchronization attempt.');
-        spotifyAreaController.emit('queueUpdated');
+        console.log('Rendering queue for new player.');
+        spotifyAreaController.refreshQueue();
       }
     };
     spotifyAreaController.addListener('queueUpdated', updateSpotifyState);
-    spotifyAreaController.addListener('occupantsChange', synchornizeQueues);
+    townController.addListener('playersChanged', synchornizeQueues);
     return () => {
       spotifyAreaController.removeListener('queueUpdated', updateSpotifyState);
-      spotifyAreaController.removeListener('occupantsChange', synchornizeQueues);
+      townController.removeListener('playersChanged', synchornizeQueues);
     };
-  }, [spotifyAreaController, likeDict, queue]);
+  }, [spotifyAreaController, likeDict, queue, townController]);
 
   const toast = useToast();
   return (

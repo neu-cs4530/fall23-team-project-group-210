@@ -74,6 +74,15 @@ export default class SpotifyAreaController extends InteractableAreaController<
     });
   }
 
+  /**
+   * Refresh the queue using the townService model
+   */
+  public async refreshQueue(): Promise<void> {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyQueueRefreshCommand',
+    });
+  }
+
   public clearQueue(): void {
     // this._spotifyAreaModel.queue.clearQueue();
     // this.emit('queueUpdated');

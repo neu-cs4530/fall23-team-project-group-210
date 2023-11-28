@@ -103,6 +103,7 @@ export default abstract class InteractableAreaController<
       //eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.emit('occupantsChange', newOccupants);
+      console.log('Occupants Change event fired');
       this._occupants = newOccupants;
     }
   }
