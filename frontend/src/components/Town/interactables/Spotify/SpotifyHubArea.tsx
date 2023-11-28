@@ -324,8 +324,43 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 }}>
                 Write comment
               </Button>
+              {/* Button to save a song */}
+              <Button
+                bg='gray.800'
+                variant='outline'
+                colorScheme='white'
+                onClick={async () => {
+                  await spotifyAreaController.saveSong(song);
+                }}>
+                Save Song
+              </Button>
             </Grid>
           ))}
+        </List>
+
+        <Heading as='h3' size='md'>
+          Saved Songs
+        </Heading>
+        {/* Display the List of Saved Songs */}
+        <List aria-label='list of save songs' mb={10}>
+          {.map(song => (
+            <Grid
+              key={song.id}
+              data-testid='queue-song'
+              templateColumns='100px 200px 60px 20px 100px 100px'
+              gap={2}
+              justifyItems='left'
+              alignItems='center'
+              justifyContent='center'
+              mt={4}
+              mb={2}>
+              <Box w='50px' bg='red.500'>
+                <Image src={song.albumImage.url} />
+              </Box>
+              {/* Text */}
+              <Text fontSize={15} w='150px' noOfLines={[1, 2]}>
+                {song.name} - {song.artists[0]?.name}
+              </Text>
         </List>
       </Container>
 
