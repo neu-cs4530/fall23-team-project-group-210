@@ -47,6 +47,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
   const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
   const [songAnalytics, setSongAnalytics] = useState(false);
+  const [songForAnalytics, setSongForAnalytics] = useState<Song>();
   const [likeDict, setLikeDict] = useState<SongDictionary>(
     spotifyAreaController.queue.reduce((acc, song) => {
       acc[song.id] = 0;
@@ -193,18 +194,29 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 colorScheme='white'
                 onClick={() => {
                   setSongAnalytics(true);
+                  setSongForAnalytics(result);
                 }}>
                 Song Attributes
               </Button>
               <Modal isOpen={songAnalytics} onClose={() => setSongAnalytics(false)}>
                 <ModalOverlay />
                 <ModalContent bg='gray.800' color='white'>
-                  <ModalHeader>&quot;{result.name}&quot; Analytics</ModalHeader>
+                  <ModalHeader>&quot;{songForAnalytics?.name}&quot; Analytics</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody>
-                    <Text>Danceability: {result.songAnalytics?.danceability ?? 0}/1 </Text>
-                    <Text>Energy: {result.songAnalytics?.energy ?? 0}/1 </Text>
-                    <Text>Acousticness: {result.songAnalytics?.acousticness ?? 0}/1 </Text>
+                    <Text>
+                      Genre:{' '}
+                      {songForAnalytics?.genres && songForAnalytics.genres.length > 0
+                        ? songForAnalytics.genres[0]
+                        : 'unspecified'}{' '}
+                    </Text>
+                    <Text>
+                      Danceability: {songForAnalytics?.songAnalytics?.danceability ?? 0}/1{' '}
+                    </Text>
+                    <Text>Energy: {songForAnalytics?.songAnalytics?.energy ?? 0}/1 </Text>
+                    <Text>
+                      Acousticness: {songForAnalytics?.songAnalytics?.acousticness ?? 0}/1{' '}
+                    </Text>
                   </ModalBody>
                 </ModalContent>
               </Modal>
