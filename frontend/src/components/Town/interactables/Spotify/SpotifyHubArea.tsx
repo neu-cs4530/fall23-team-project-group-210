@@ -3,7 +3,6 @@ import {
   Button,
   ChakraProvider,
   Container,
-  Divider,
   extendTheme,
   Flex,
   FormControl,
@@ -31,7 +30,6 @@ import { InteractableID, Song } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
 import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'react-icons/ai';
 import { FaSearch } from 'react-icons/fa';
-import { set } from 'lodash';
 
 type SongRating = -1 | 0 | 1;
 
@@ -221,9 +219,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
           Play Next
         </Button>
         {/* The queue */}
-        <List
-          aria-label='list of songs in the queue'
-          mb={10}>
+        <List aria-label='list of songs in the queue' mb={10}>
           {queue.map(song => (
             <Grid
               key={song.id}
@@ -341,7 +337,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         </ModalContent>
       </Modal>
     </ChakraProvider>
-
   );
 }
 
