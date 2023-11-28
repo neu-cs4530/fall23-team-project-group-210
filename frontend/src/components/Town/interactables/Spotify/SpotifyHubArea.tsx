@@ -136,8 +136,8 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         Spotify Song Queue
       </Heading>
       <Button
-        onClick={() => {
-          spotifyAreaController.clearQueue();
+        onClick={async () => {
+          await spotifyAreaController.clearQueue();
         }}>
         Clear Queue
       </Button>

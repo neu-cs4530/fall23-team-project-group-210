@@ -198,7 +198,8 @@ export type InteractableCommand =
   | SpotifyPlaySongCommand
   | SpotifyUpdateSongCommand
   | SpotifyQueueRefreshCommand
-  | SpotifyAddSongCommand;
+  | SpotifyAddSongCommand
+  | SpotifyClearQueueCommand;
 export interface ViewingAreaUpdateCommand {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -232,6 +233,10 @@ export interface SpotifyQueueRefreshCommand {
   type: 'SpotifyQueueRefreshCommand';
 }
 
+export interface SpotifyClearQueueCommand {
+  type: 'SpotifyClearQueueCommand';
+}
+
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> =
   CommandType extends JoinGameCommand
     ? { gameID: string }
@@ -248,6 +253,8 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
     : CommandType extends SpotifyUpdateSongCommand
     ? undefined
     : CommandType extends SpotifyQueueRefreshCommand
+    ? undefined
+    : CommandType extends SpotifyClearQueueCommand
     ? undefined
     : never;
 
