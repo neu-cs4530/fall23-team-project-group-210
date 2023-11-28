@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Container,
   Divider,
@@ -17,6 +18,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  Image,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -134,7 +136,10 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
             align='center'
             justifyContent='space-between'
             mb={2}>
-            <Text>
+            <Box w='50px' bg='red.500'>
+              <Image src={result.albumImage.url} />
+            </Box>
+            <Text fontSize={15} w='200px' h='50px' noOfLines={[1, 2]}>
               {result.name} - {result.artists[0].name}
             </Text>
             <Button
@@ -181,18 +186,14 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       </Button>
       <List aria-label='list of songs in the queue'>
         {queue.map(song => (
-          <Grid
-            key={song.id}
-            templateColumns='450px 60px 20px 30px'
-            gap={1}
-            justifyItems='left'
-            alignItems='center'>
-            {/* Text */}
-            <Text>
+          <Flex data-testid='song' key={song.id} align='center'>
+            <Box w='50px' bg='red.500'>
+              <Image src={song.albumImage.url} />
+            </Box>
+            <Text fontSize={15} w='150px' noOfLines={[1, 2]}>
               {song.name} - {song.artists[0]?.name}
             </Text>
-
-            {/* Like Button */}
+            {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
             <Button
               variant={likeDict[song.id] === 1 ? 'solid' : 'outline'}
               colorScheme='green'
@@ -244,7 +245,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 <Icon as={AiOutlineDislike} />
               )}
             </Button>
-          </Grid>
+          </Flex>
         ))}
       </List>
     </Container>

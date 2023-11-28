@@ -16,6 +16,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       expect(queue.size()).toEqual(1);
@@ -27,6 +33,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       expect(queue.size()).toEqual(2);
@@ -38,6 +50,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       expect(queue.size()).toEqual(3);
@@ -58,6 +76,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       song = {
@@ -68,6 +92,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       song = {
@@ -78,6 +108,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       song = {
@@ -88,6 +124,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       song = {
@@ -98,6 +140,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       expect(queue.size()).toEqual(5);
@@ -122,6 +170,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       expect(queue.size()).toEqual(1);
@@ -133,6 +187,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
       expect(queue.size()).toEqual(2);
@@ -144,6 +204,12 @@ describe('SongQueue Tests', () => {
         uri: '',
         artists: [],
         albumUri: '',
+        albumImage: {
+          url: '',
+          height: 0,
+          width: 0,
+        },
+        songAnalytics: undefined,
       };
       queue.enqueue(song);
     });

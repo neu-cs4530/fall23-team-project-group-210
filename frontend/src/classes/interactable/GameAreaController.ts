@@ -37,7 +37,6 @@ export default abstract class GameAreaController<
   constructor(id: InteractableID, gameArea: GameArea<State>, townController: TownController) {
     super(id);
     this._model = gameArea;
-    console.log('CONSTRUCTOR ' + this._model.game?.players);
     this._townController = townController;
 
     const game = gameArea.game;

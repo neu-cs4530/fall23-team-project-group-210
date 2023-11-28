@@ -19,6 +19,12 @@ const MOCK_QUEUE: Song[] = [
     comments: ['Great song!', 'I love this one'],
     albumUri: '',
     artists: [],
+    albumImage: {
+      url: '',
+      height: 0,
+      width: 0,
+    },
+    songAnalytics: undefined,
   },
   {
     id: '2',
@@ -28,6 +34,12 @@ const MOCK_QUEUE: Song[] = [
     comments: ['Not my favorite', 'Could be better'],
     albumUri: '',
     artists: [],
+    albumImage: {
+      url: '',
+      height: 0,
+      width: 0,
+    },
+    songAnalytics: undefined,
   },
   {
     id: '3',
@@ -37,6 +49,12 @@ const MOCK_QUEUE: Song[] = [
     comments: ['This is amazing!', 'Best song ever'],
     albumUri: '',
     artists: [],
+    albumImage: {
+      url: '',
+      height: 0,
+      width: 0,
+    },
+    songAnalytics: undefined,
   },
 ];
 class MockSpotifyAreaController extends SpotifyAreaController {
