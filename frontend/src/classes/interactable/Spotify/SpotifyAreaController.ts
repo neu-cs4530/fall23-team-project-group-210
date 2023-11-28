@@ -152,6 +152,10 @@ export default class SpotifyAreaController extends InteractableAreaController<
     return inputString.replace(/\b\w/g, char => char.toUpperCase());
   }
 
+  private _capitalizeEveryWord(inputString: string): string {
+    return inputString.replace(/\b\w/g, char => char.toUpperCase());
+  }
+
   /**
    * Return the search results of the provided song name
    * @param songName the name of the song provided by the frontend from the user
@@ -184,11 +188,17 @@ export default class SpotifyAreaController extends InteractableAreaController<
     }));
     const out: Song[] = await Promise.all(songs);
     out.forEach(async song => {
-      song.genres =
+      const genres =
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         (await this._spotifyAPI?.search(song.artists[0].name, ['artist']))?.artists?.items[0]
           .genres ?? undefined;
+      if (genres) {
+        for (let i = 0; i < genres.length; i++) {
+          genres[i] = this._capitalizeEveryWord(genres[i]);
+        }
+        song.genres = genres;
+      }
     });
     return out;
   }
