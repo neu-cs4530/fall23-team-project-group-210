@@ -24,7 +24,6 @@ export type Song = {
   name: string;
   artists: SimplifiedArtist[];
   likes: number;
-  dislikes: number;
   comments: string[];
 };
 
@@ -198,6 +197,7 @@ export type InteractableCommand =
   | LeaveGameCommand
   | SpotifyPlaySongCommand
   | SpotifyUpdateSongCommand
+  | SpotifyQueueRefreshCommand
   | SpotifyAddSongCommand;
 export interface ViewingAreaUpdateCommand {
   type: 'ViewingAreaUpdate';
@@ -228,6 +228,10 @@ export interface SpotifyUpdateSongCommand {
   song: Song;
 }
 
+export interface SpotifyQueueRefreshCommand {
+  type: 'SpotifyQueueRefreshCommand';
+}
+
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> =
   CommandType extends JoinGameCommand
     ? { gameID: string }
@@ -242,6 +246,8 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
     : CommandType extends SpotifyPlaySongCommand
     ? undefined
     : CommandType extends SpotifyUpdateSongCommand
+    ? undefined
+    : CommandType extends SpotifyQueueRefreshCommand
     ? undefined
     : never;
 

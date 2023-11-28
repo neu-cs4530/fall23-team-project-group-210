@@ -63,6 +63,7 @@ export default class SpotifyArea extends InteractableArea {
     this._currentSong = current;
     this._playSong = true;
     this._emitAreaChanged();
+    this._playSong = false;
   }
 
   // public remove(player: Player): void {
@@ -92,11 +93,16 @@ export default class SpotifyArea extends InteractableArea {
       this.updateSong(command.song);
       return {} as InteractableCommandReturnType<CommandType>;
     }
+    if (command.type === 'SpotifyQueueRefreshCommand') {
+      this._emitAreaChanged();
+      return {} as InteractableCommandReturnType<CommandType>;
+    }
     throw new InvalidParametersError('Unknown command type');
   }
 
   updateSong(song: Song) {
     this._queue.updateSong(song);
+    this._queue.sortByLikes();
     this._emitAreaChanged();
   }
 

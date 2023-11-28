@@ -65,12 +65,20 @@ export default class SpotifyAreaController extends InteractableAreaController<
       name: song.name,
       artists: song.artists,
       likes: song.likes,
-      dislikes: song.dislikes,
       comments: song.comments,
     };
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyAddSongCommand',
       song: songToAdd,
+    });
+  }
+
+  /**
+   * Refresh the queue using the townService model
+   */
+  public async refreshQueue(): Promise<void> {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyQueueRefreshCommand',
     });
   }
 
@@ -120,7 +128,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
       name: item.name,
       artists: item.artists,
       likes: 0,
-      dislikes: 0,
       comments: [],
     }));
     return songs;
@@ -135,6 +142,17 @@ export default class SpotifyAreaController extends InteractableAreaController<
     if (this.queue.length === 0) {
       throw new Error('No songs in queue');
     }
+    if (!this._device || !this._device.id) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'SpotifyPlaySongCommand',
+      });
+      throw new Error(
+        'Spotify device not provided on sign in or does not have an id. Song will still play for other players',
+      );
+    }
+    if (!this._spotifyAPI) {
+      throw new Error('Spotify api not provided');
+    }
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyPlaySongCommand',
     });
@@ -143,7 +161,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
   private _playCurrentSong(): Song {
     const current = this._spotifyAreaModel.currentlyPlaying;
     if (!current) {
-      throw new Error('No songs in queue');
+      throw new Error('Current song not set');
     }
     if (!this._device || !this._device.id) {
       throw new Error('Spotify device not provided or does not have an id');
@@ -179,7 +197,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param song song to add dislike to
    */
   async addDislikeToSong(song: Song): Promise<void> {
-    song.dislikes = song.dislikes + 1;
+    song.likes = song.likes - 1;
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyUpdateSongCommand',
       song: song,
@@ -204,7 +222,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
   //Need method for handling sign in credentials. Waiting on API Tool
 
   /**
-   * Emits a queueChanged event if anything about the queue has changed (likes, dislikes comments, order)
+   * Emits a queueChanged event if anything about the queue has changed (likes, comments, order)
    * @param newModel The new model which is to be checked for changes with the current model
    */
   protected _updateFrom(newModel: SpotifyModel): void {
