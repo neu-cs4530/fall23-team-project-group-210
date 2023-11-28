@@ -176,6 +176,7 @@ describe('SpotifyAreaController Tests', () => {
 
   const audioFeaturesMock = async (): Promise<AudioFeatures> => {
     // Return a single AudioFeatures for a single ID
+    features.id = id;
     return features;
   };
 
