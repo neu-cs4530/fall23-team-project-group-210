@@ -51,10 +51,17 @@ export type Song = {
   name: string;
   artists: SimplifiedArtist[];
   likes: number;
-  comments: string[];
+  comments: Comment[];
   albumImage: Image;
   songAnalytics: AudioFeatures | undefined;
   genres?: string[] | undefined;
+};
+
+export type Comment = {
+  id: string;
+  author: string;
+  body: string;
+  likes: number;
 };
 
 export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'SpotifyArea';
@@ -269,24 +276,24 @@ export interface SpotifyClearQueueCommand {
 
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> =
   CommandType extends JoinGameCommand
-    ? { gameID: string }
-    : CommandType extends ViewingAreaUpdateCommand
-    ? undefined
-    : CommandType extends GameMoveCommand<TicTacToeMove>
-    ? undefined
-    : CommandType extends LeaveGameCommand
-    ? undefined
-    : CommandType extends SpotifyAddSongCommand
-    ? undefined
-    : CommandType extends SpotifyPlaySongCommand
-    ? undefined
-    : CommandType extends SpotifyUpdateSongCommand
-    ? undefined
-    : CommandType extends SpotifyQueueRefreshCommand
-    ? undefined
-    : CommandType extends SpotifyClearQueueCommand
-    ? undefined
-    : never;
+  ? { gameID: string }
+  : CommandType extends ViewingAreaUpdateCommand
+  ? undefined
+  : CommandType extends GameMoveCommand<TicTacToeMove>
+  ? undefined
+  : CommandType extends LeaveGameCommand
+  ? undefined
+  : CommandType extends SpotifyAddSongCommand
+  ? undefined
+  : CommandType extends SpotifyPlaySongCommand
+  ? undefined
+  : CommandType extends SpotifyUpdateSongCommand
+  ? undefined
+  : CommandType extends SpotifyQueueRefreshCommand
+  ? undefined
+  : CommandType extends SpotifyClearQueueCommand
+  ? undefined
+  : never;
 
 export type InteractableCommandResponse<MessageType> = {
   commandID: CommandID;

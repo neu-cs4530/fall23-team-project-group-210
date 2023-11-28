@@ -10,6 +10,7 @@ import {
   Heading,
   Icon,
   Image,
+  Input,
   InputGroup,
   List,
   Modal,
@@ -29,11 +30,11 @@ import useTownController from '../../../../hooks/useTownController';
 import { InteractableID, Song } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
 import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'react-icons/ai';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaCommentDots, FaTimes } from 'react-icons/fa';
 
-type SongRating = -1 | 0 | 1;
+type Rating = -1 | 0 | 1;
 
-type SongDictionary = Record<string, SongRating>;
+type RatingDictionary = Record<string, Rating>;
 
 /**
  * A component that renders the Spotify Hub Area.
@@ -48,12 +49,23 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
   const [songAnalytics, setSongAnalytics] = useState(false);
   const [songForAnalytics, setSongForAnalytics] = useState<Song>();
-  const [likeDict, setLikeDict] = useState<SongDictionary>(
+  const [songLikeDict, setSongLikeDict] = useState<RatingDictionary>(
     spotifyAreaController.queue.reduce((acc, song) => {
       acc[song.id] = 0;
       return acc;
-    }, {} as Record<string, SongRating>),
-  ); // State to store the user's like/dislike status of each song
+    }, {} as Record<string, Rating>),
+  ); // State to store the user's like/dislike status of each song]
+  const [commentLikeDict, setCommentLikeDict] = useState<RatingDictionary>(
+    // Initialize an empty dictionary. Then iterate through each song in the queue, and for each 
+    // comment in each song, add the comment to the dictionary with a value of 0
+    spotifyAreaController.queue.reduce((acc, song) => {
+      song.comments.forEach(comment => {
+        acc[comment.id] = 0;
+      });
+      return acc;
+    }, {} as Record<string, Rating>),
+  ); // State to store the user's like/dislike status of each comment]
+  const [selectedSongForCommenting, setSelectedSongForCommenting] = useState<Song | undefined>(undefined); // State to store the selected song
   const [commentModalIsOpen, setCommentModalIsOpen] = useState<boolean>(false); // State to store whether the comment modal is open
   const [commentInput, setCommentInput] = useState<string>(''); // State to store the comment input
 
@@ -76,15 +88,16 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       setQueue([...spotifyAreaController.queue]);
 
       const songLikeDict = spotifyAreaController.queue.reduce((acc, song) => {
-        const oldLikeStatus = likeDict[song.id];
+        const oldLikeStatus = songLikeDict[song.id];
         if (oldLikeStatus !== undefined) {
-          acc[song.id] = likeDict[song.id];
+          acc[song.id] = songLikeDict[song.id];
         } else {
           acc[song.id] = 0;
         }
         return acc;
-      }, {} as Record<string, SongRating>);
-      setLikeDict(songLikeDict);
+      }, {} as Record<string, Rating>);
+      setSongLikeDict(songLikeDict);
+      console.log('Updated likeDict: ', songLikeDict);
     };
 
     const synchronizeQueues = () => {
@@ -98,7 +111,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       spotifyAreaController.removeListener('queueUpdated', updateSpotifyState);
       townController.removeListener('playersChanged', synchronizeQueues);
     };
-  }, [spotifyAreaController, likeDict, queue, townController]);
+  }, [spotifyAreaController, songLikeDict, queue, townController]);
 
   const spotifyButtonTheme = extendTheme({
     colors: {
@@ -128,19 +141,35 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         <Heading as='h2' size='md'>
           Song Search
         </Heading>
-        {/* add small gap of 10 px */}
         <InputGroup>
-          {/* Input field for searching */}
-          <FormControl color='black'>
-            <input
+          <FormControl>
+            <Input
+              bg='white'
+              color='black'
               type='text'
               style={{ width: '400px' }}
               placeholder='What do you want to listen to?'
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch(); // Trigger search when Enter key is pressed
+                }
+              }}
+              paddingRight='10px' // Add padding to the right to make space for the clear button
             />
+            {searchTerm && (
+              <Icon
+                as={FaTimes}
+                position='absolute'
+                right='3'
+                top='50%'
+                transform='translateY(-50%)'
+                cursor='pointer'
+                onClick={() => setSearchTerm('')}
+              />
+            )}
           </FormControl>
-          {/* Button to trigger the search */}
           <Button
             mr={10}
             bg='gray.800'
@@ -155,14 +184,15 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                   status: 'error',
                 });
               }
-            }}>
+            }}
+          >
             <Icon as={FaSearch} mr={2} />
             Search
           </Button>
         </InputGroup>
 
         {/* Display search results */}
-        <List aria-label='list of search results'>
+        <List aria-label='list of search results' mt={5}>
           {searchResults.map(result => (
             <Flex
               data-testid='search-result'
@@ -273,25 +303,25 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
               {/* Like Button */}
               {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
               <Button
-                variant={likeDict[song.id] === 1 ? 'green' : 'outline'}
+                variant={songLikeDict[song.id] === 1 ? 'green' : 'outline'}
                 colorScheme='white'
-                isActive={likeDict[song.id] === 1}
+                isActive={songLikeDict[song.id] === 1}
                 onClick={() => {
-                  const songLikeDict = likeDict;
-                  if (likeDict[song.id] === 0) {
+                  const likeDict = songLikeDict;
+                  if (songLikeDict[song.id] === 0) {
                     spotifyAreaController.addLikeToSong(song);
-                    songLikeDict[song.id] = 1;
-                  } else if (likeDict[song.id] === -1) {
+                    likeDict[song.id] = 1;
+                  } else if (songLikeDict[song.id] === -1) {
                     spotifyAreaController.addLikeToSong(song);
                     spotifyAreaController.addLikeToSong(song);
-                    songLikeDict[song.id] = 1;
+                    likeDict[song.id] = 1;
                   } else {
                     spotifyAreaController.addDislikeToSong(song);
-                    songLikeDict[song.id] = 0;
+                    likeDict[song.id] = 0;
                   }
-                  setLikeDict({ ...songLikeDict });
+                  setSongLikeDict({ ...likeDict });
                 }}>
-                {likeDict[song.id] === 1 ? <Icon as={AiFillLike} /> : <Icon as={AiOutlineLike} />}
+                {songLikeDict[song.id] === 1 ? <Icon as={AiFillLike} /> : <Icon as={AiOutlineLike} />}
               </Button>
 
               {/* Likes Ticker */}
@@ -299,25 +329,25 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
 
               {/* Dislike Button */}
               <Button
-                variant={likeDict[song.id] === -1 ? 'green' : 'outline'}
+                variant={songLikeDict[song.id] === -1 ? 'green' : 'outline'}
                 colorScheme='white'
-                isActive={likeDict[song.id] === -1}
+                isActive={songLikeDict[song.id] === -1}
                 onClick={() => {
-                  const songLikeDict = likeDict;
-                  if (likeDict[song.id] === 1) {
+                  const likeDict = songLikeDict;
+                  if (songLikeDict[song.id] === 1) {
                     spotifyAreaController.addDislikeToSong(song);
                     spotifyAreaController.addDislikeToSong(song);
-                    songLikeDict[song.id] = -1;
-                  } else if (likeDict[song.id] === 0) {
+                    likeDict[song.id] = -1;
+                  } else if (songLikeDict[song.id] === 0) {
                     spotifyAreaController.addDislikeToSong(song);
-                    songLikeDict[song.id] = -1;
+                    likeDict[song.id] = -1;
                   } else {
                     spotifyAreaController.addLikeToSong(song);
-                    songLikeDict[song.id] = 0;
+                    likeDict[song.id] = 0;
                   }
-                  setLikeDict({ ...songLikeDict });
+                  setSongLikeDict({ ...likeDict });
                 }}>
-                {likeDict[song.id] === -1 ? (
+                {songLikeDict[song.id] === -1 ? (
                   <Icon as={AiFillDislike} />
                 ) : (
                   <Icon as={AiOutlineDislike} />
@@ -329,45 +359,135 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 variant='outline'
                 colorScheme='white'
                 onClick={() => {
+                  setSelectedSongForCommenting(song);
                   setCommentModalIsOpen(true);
                 }}>
-                Write comment
+                <Icon as={FaCommentDots} mr={2} />
+                Comments
               </Button>
             </Grid>
           ))}
         </List>
       </Container>
 
-      {/* Modal for posting a comment */}
-      <Modal isOpen={commentModalIsOpen} onClose={() => setCommentModalIsOpen(false)}>
-        <ModalOverlay />
-        <ModalContent bg='gray.800' color='white'>
-          <ModalHeader>Write a comment</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <FormControl>
-              <Textarea
-                placeholder='Write a comment'
-                value={commentInput}
-                onChange={e => setCommentInput(e.target.value)}
-              />
-            </FormControl>
-            <Button
-              mt={4}
-              bg='gray.800'
-              variant='outline'
-              colorScheme='white'
-              onClick={async () => {
-                // TODO: Implement postComment
-                // await spotifyAreaController.postComment(commentInput);
-                setCommentInput('');
-                // setCommentModalIsOpen(false);
-              }}>
-              Post
-            </Button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      {/* Modal for reading/writing comments */}
+      {selectedSongForCommenting && (
+        <Modal
+          isCentered
+          isOpen={commentModalIsOpen}
+          onClose={() => {
+            setSelectedSongForCommenting(undefined);
+            setCommentModalIsOpen(false);
+          }}>
+          <ModalOverlay />
+          <ModalContent bg='gray.800' color='white'>
+            <ModalHeader>Write a comment for {selectedSongForCommenting.name}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <FormControl>
+                <Textarea
+                  placeholder='Write a comment'
+                  value={commentInput}
+                  onChange={e => setCommentInput(e.target.value)}
+                />
+              </FormControl>
+              <Button
+                mt={4}
+                bg='gray.800'
+                variant='outline'
+                colorScheme='white'
+                onClick={async () => {
+                  if (commentInput === '') {
+                    toast({
+                      title: 'Error posting comment',
+                      description: 'Comment cannot be empty',
+                      status: 'error',
+                    });
+                    return;
+                  }
+                  await spotifyAreaController.addCommentToSong(selectedSongForCommenting, commentInput);
+                  setCommentInput('');
+                }}>
+                Post
+              </Button>
+              {/* Show all comments */}
+              <Heading as='h2' size='md' mt={4}>
+                Comments
+              </Heading>
+              <List aria-label='list of comments' mt={4}>
+                {selectedSongForCommenting.comments.map(comment => (
+                  <Grid
+                    key={comment.id}
+                    templateColumns='200px 60px 20px 60px'
+                    gap={2}
+                    justifyItems='left'
+                    alignItems='center'
+                    justifyContent='center'
+                    mt={4}
+                    mb={2}>
+                    <Text>
+                      {comment.author}: {comment.body}
+                    </Text>
+                    {/* Like Button */}
+                    {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
+                    <Button
+                      variant={commentLikeDict[comment.id] === 1 ? 'green' : 'outline'}
+                      colorScheme='white'
+                      isActive={commentLikeDict[comment.id] === 1}
+                      onClick={() => {
+                        const likeDict = commentLikeDict;
+                        if (commentLikeDict[comment.id] === 0) {
+                          spotifyAreaController.addLikeToComment(comment, selectedSongForCommenting);
+                          likeDict[comment.id] = 1;
+                        } else if (commentLikeDict[comment.id] === -1) {
+                          spotifyAreaController.addLikeToComment(comment, selectedSongForCommenting);
+                          spotifyAreaController.addLikeToComment(comment, selectedSongForCommenting);
+                          likeDict[comment.id] = 1;
+                        } else {
+                          spotifyAreaController.addDislikeToComment(comment, selectedSongForCommenting);
+                          likeDict[comment.id] = 0;
+                        }
+                        setCommentLikeDict({ ...likeDict });
+                      }}>
+                      {commentLikeDict[comment.id] === 1 ? <Icon as={AiFillLike} /> : <Icon as={AiOutlineLike} />}
+                    </Button>
+
+                    {/* Likes Ticker */}
+                    <Text>{comment.likes}</Text>
+
+                    {/* Dislike Button */}
+                    <Button
+                      variant={commentLikeDict[comment.id] === -1 ? 'green' : 'outline'}
+                      colorScheme='white'
+                      isActive={commentLikeDict[comment.id] === -1}
+                      onClick={() => {
+                        const likeDict = commentLikeDict;
+                        if (commentLikeDict[comment.id] === 1) {
+                          spotifyAreaController.addDislikeToComment(comment, selectedSongForCommenting);
+                          spotifyAreaController.addDislikeToComment(comment, selectedSongForCommenting);
+                          likeDict[comment.id] = -1;
+                        } else if (commentLikeDict[comment.id] === 0) {
+                          spotifyAreaController.addDislikeToComment(comment, selectedSongForCommenting);
+                          likeDict[comment.id] = -1;
+                        } else {
+                          spotifyAreaController.addLikeToComment(comment, selectedSongForCommenting);
+                          likeDict[comment.id] = 0;
+                        }
+                        setCommentLikeDict({ ...likeDict });
+                      }}>
+                      {commentLikeDict[comment.id] === -1 ? (
+                        <Icon as={AiFillDislike} />
+                      ) : (
+                        <Icon as={AiOutlineDislike} />
+                      )}
+                    </Button>
+                  </Grid>
+                ))}
+              </List>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      )}
     </ChakraProvider>
   );
 }
