@@ -63,6 +63,7 @@ export default class SpotifyArea extends InteractableArea {
     this._currentSong = current;
     this._playSong = true;
     this._emitAreaChanged();
+    this._playSong = false;
   }
 
   // public remove(player: Player): void {

@@ -33,14 +33,15 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
   const [likeDict, setLikeDict] = useState<SongDictionary>({} as SongDictionary); // TODO: add this functionality
 
-  const handleSearch = async () => {
+  const handleSearch: () => Promise<Error | undefined> = async (): Promise<Error | undefined> => {
     // Implement your Spotify search logic here. You may want to use the Spotify API or another service.
     // For simplicity, let's assume a function called searchSpotify in your spotifyAreaController.
     try {
       const results = await spotifyAreaController.searchSong(searchTerm);
       setSearchResults(results);
+      return undefined;
     } catch (error) {
-      console.error('Error searching for songs:', error);
+      return error as Error;
     }
   };
 
@@ -91,7 +92,19 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
           />
         </FormControl>
         {/* Button to trigger the search */}
-        <Button onClick={handleSearch}>Search</Button>
+        <Button
+          onClick={async () => {
+            const error: Error | undefined = await handleSearch();
+            if (error) {
+              toast({
+                title: 'Error searching for song',
+                description: error.message,
+                status: 'error',
+              });
+            }
+          }}>
+          Search
+        </Button>
       </InputGroup>
 
       {/* Display search results */}
@@ -141,7 +154,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
             <Text>
               {song.name} - {song.artists[0]?.name}
             </Text>
-            {/* Add like/dislike buttons for each song in the queue, which would update the likes/dislikes fields in each song */}
+            {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
             {likeDict[song.id] < 1 ? (
               <Button
                 onClick={() => {
@@ -169,7 +182,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
               </Button>
             ) : null}
 
-            <Text>{song.likes - song.dislikes}</Text>
+            <Text>{song.likes}</Text>
           </Flex>
         ))}
       </List>

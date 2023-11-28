@@ -24,7 +24,6 @@ export type Song = {
   name: string;
   artists: SimplifiedArtist[];
   likes: number;
-  dislikes: number;
   comments: string[];
 };
 

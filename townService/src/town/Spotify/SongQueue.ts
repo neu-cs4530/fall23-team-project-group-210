@@ -34,7 +34,6 @@ export default class SongQueue {
     const targetSong = this._storage.find(song => song.id === updatedSong.id);
     if (targetSong) {
       targetSong.likes = updatedSong.likes;
-      targetSong.dislikes = updatedSong.dislikes;
       targetSong.comments = updatedSong.comments;
     }
   }

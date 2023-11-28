@@ -11,7 +11,6 @@ describe('SongQueue Tests', () => {
       let song: Song = {
         name: 's1',
         likes: 0,
-        dislikes: 0,
         comments: [],
         id: '1',
         uri: '',
@@ -23,7 +22,6 @@ describe('SongQueue Tests', () => {
       song = {
         name: 's2',
         likes: 0,
-        dislikes: 0,
         comments: [],
         id: '2',
         uri: '',
@@ -35,7 +33,6 @@ describe('SongQueue Tests', () => {
       song = {
         name: 's3',
         likes: 0,
-        dislikes: 0,
         comments: [],
         id: '3',
         uri: '',
@@ -56,7 +53,6 @@ describe('SongQueue Tests', () => {
       let song: Song = {
         name: 's1',
         likes: 0,
-        dislikes: 0,
         comments: [],
         id: '',
         uri: '',
@@ -67,7 +63,6 @@ describe('SongQueue Tests', () => {
       song = {
         name: 's2',
         likes: 3,
-        dislikes: 0,
         comments: [],
         id: '',
         uri: '',
@@ -78,7 +73,6 @@ describe('SongQueue Tests', () => {
       song = {
         name: 's3',
         likes: 2,
-        dislikes: 0,
         comments: [],
         id: '',
         uri: '',
@@ -89,7 +83,6 @@ describe('SongQueue Tests', () => {
       song = {
         name: 's4',
         likes: 1,
-        dislikes: 0,
         comments: [],
         id: '',
         uri: '',
@@ -100,7 +93,6 @@ describe('SongQueue Tests', () => {
       song = {
         name: 's5',
         likes: 10,
-        dislikes: 0,
         comments: [],
         id: '',
         uri: '',
@@ -125,7 +117,6 @@ describe('SongQueue Tests', () => {
       let song: Song = {
         name: 's1',
         likes: 0,
-        dislikes: 0,
         comments: [],
         id: '1',
         uri: '',
@@ -137,7 +128,6 @@ describe('SongQueue Tests', () => {
       song = {
         name: 's2',
         likes: 0,
-        dislikes: 0,
         comments: [],
         id: '2',
         uri: '',
@@ -149,7 +139,6 @@ describe('SongQueue Tests', () => {
       song = {
         name: 's3',
         likes: 0,
-        dislikes: 0,
         comments: [],
         id: '3',
         uri: '',
