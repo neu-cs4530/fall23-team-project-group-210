@@ -97,6 +97,11 @@ export default class SpotifyArea extends InteractableArea {
       this._emitAreaChanged();
       return {} as InteractableCommandReturnType<CommandType>;
     }
+    if (command.type === 'SpotifyClearQueueCommand') {
+      this._queue = new SongQueue([]);
+      this._emitAreaChanged();
+      return {} as InteractableCommandReturnType<CommandType>;
+    }
     throw new InvalidParametersError('Unknown command type');
   }
 

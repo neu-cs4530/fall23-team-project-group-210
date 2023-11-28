@@ -82,9 +82,10 @@ export default class SpotifyAreaController extends InteractableAreaController<
     });
   }
 
-  public clearQueue(): void {
-    // this._spotifyAreaModel.queue.clearQueue();
-    // this.emit('queueUpdated');
+  public async clearQueue(): Promise<void> {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyClearQueueCommand',
+    });
   }
 
   /**

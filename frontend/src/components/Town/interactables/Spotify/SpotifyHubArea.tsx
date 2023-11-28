@@ -157,8 +157,8 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         bg='gray.800'
         variant='outline'
         colorScheme='white'
-        onClick={() => {
-          spotifyAreaController.clearQueue();
+        onClick={async () => {
+          await spotifyAreaController.clearQueue();
         }}>
         Clear Queue
       </Button>
