@@ -341,6 +341,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         </ModalContent>
       </Modal>
     </ChakraProvider>
+
   );
 }
 
