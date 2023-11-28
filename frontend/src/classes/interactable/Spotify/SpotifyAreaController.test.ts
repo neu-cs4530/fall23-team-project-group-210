@@ -5,8 +5,6 @@ import type {
   ExternalIds,
   ExternalUrls,
   AudioFeatures,
-  Market,
-  AudioAnalysis,
 } from '../../../../node_modules/@spotify/web-api-ts-sdk/dist/mjs/types';
 //import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
 import SpotifyAreaController from './SpotifyAreaController';
@@ -148,6 +146,7 @@ describe('SpotifyAreaController Tests', () => {
   };
   const audioFeaturesMock = async (id: string): Promise<AudioFeatures> => {
     // Return a single AudioFeatures for a single ID
+    features.id = id;
     return features;
   };
 

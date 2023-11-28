@@ -199,7 +199,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
               <Modal isOpen={songAnalytics} onClose={() => setSongAnalytics(false)}>
                 <ModalOverlay />
                 <ModalContent bg='gray.800' color='white'>
-                  <ModalHeader>"{result.name}" Analytics</ModalHeader>
+                  <ModalHeader>&quot;{result.name}&quot; Analytics</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody>
                     <Text>Danceability: {result.songAnalytics?.danceability ?? 0}/1 </Text>
