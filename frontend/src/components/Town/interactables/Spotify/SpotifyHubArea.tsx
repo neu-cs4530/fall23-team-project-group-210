@@ -50,7 +50,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   const [songAnalytics, setSongAnalytics] = useState(false);
   const [songForAnalytics, setSongForAnalytics] = useState<Song>();
   const [songLikeDict, setSongLikeDict] = useState<RatingDictionary>(
-    spotifyAreaController.queue.reduce((acc, song) => {
+    queue.reduce((acc, song) => {
       acc[song.id] = 0;
       return acc;
     }, {} as Record<string, Rating>),
@@ -58,7 +58,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   const [commentLikeDict, setCommentLikeDict] = useState<RatingDictionary>(
     // Initialize an empty dictionary. Then iterate through each song in the queue, and for each 
     // comment in each song, add the comment to the dictionary with a value of 0
-    spotifyAreaController.queue.reduce((acc, song) => {
+    queue.reduce((acc, song) => {
       song.comments.forEach(comment => {
         acc[comment.id] = 0;
       });
@@ -87,7 +87,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
     const updateSpotifyState = () => {
       setQueue([...spotifyAreaController.queue]);
 
-      const songLikeDict = spotifyAreaController.queue.reduce((acc, song) => {
+      const newSongLikeDict = spotifyAreaController.queue.reduce((acc, song) => {
         const oldLikeStatus = songLikeDict[song.id];
         if (oldLikeStatus !== undefined) {
           acc[song.id] = songLikeDict[song.id];
@@ -96,8 +96,22 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         }
         return acc;
       }, {} as Record<string, Rating>);
-      setSongLikeDict(songLikeDict);
-      console.log('Updated likeDict: ', songLikeDict);
+      setSongLikeDict(newSongLikeDict);
+      console.log('Updated songLikeDict: ', newSongLikeDict);
+
+      const newCommentLikeDict = spotifyAreaController.queue.reduce((acc, song) => {
+        song.comments.forEach(comment => {
+          const oldLikeStatus = commentLikeDict[comment.id];
+          if (oldLikeStatus !== undefined) {
+            acc[comment.id] = commentLikeDict[comment.id];
+          } else {
+            acc[comment.id] = 0;
+          }
+        });
+        return acc;
+      }, {} as Record<string, Rating>);
+      setCommentLikeDict(newCommentLikeDict);
+      console.log('Updated commentLikeDict: ', newCommentLikeDict);
     };
 
     const synchronizeQueues = () => {
@@ -111,7 +125,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       spotifyAreaController.removeListener('queueUpdated', updateSpotifyState);
       townController.removeListener('playersChanged', synchronizeQueues);
     };
-  }, [spotifyAreaController, songLikeDict, queue, townController]);
+  }, [spotifyAreaController, songLikeDict, commentLikeDict, queue, townController]);
 
   const spotifyButtonTheme = extendTheme({
     colors: {
@@ -141,7 +155,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         <Heading as='h2' size='md'>
           Song Search
         </Heading>
-        <InputGroup>
+        <InputGroup mt={2}>
           <FormControl>
             <Input
               bg='white'
@@ -254,6 +268,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
           Queue
         </Heading>
         <Button
+          mt={2}
           bg='gray.800'
           variant='outline'
           colorScheme='white'
@@ -263,6 +278,8 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
           Clear Queue
         </Button>
         <Button
+          mt={2}
+          ml={2}
           bg='gray.800'
           variant='outline'
           colorScheme='white'
@@ -280,6 +297,8 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
           Play Next
         </Button>
         {/* The queue */}
+        {/* if no songs in queue, just put a text that says queue is empty */}
+        {queue.length === 0 && <Text>Queue is empty</Text>}
         <List aria-label='list of songs in the queue' mb={10}>
           {queue.map(song => (
             <Grid
@@ -306,17 +325,21 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 variant={songLikeDict[song.id] === 1 ? 'green' : 'outline'}
                 colorScheme='white'
                 isActive={songLikeDict[song.id] === 1}
-                onClick={() => {
+                onClick={async () => {
                   const likeDict = songLikeDict;
+                  // print out songLikeDict[song.id] and a confirmation message that the like button was clicked
+                  console.log('Song like button clicked')
+                  console.log('Song ID: ' + song.id);
+                  console.log('Song like status: ' + songLikeDict[song.id]);
                   if (songLikeDict[song.id] === 0) {
-                    spotifyAreaController.addLikeToSong(song);
+                    await spotifyAreaController.addLikeToSong(song);
                     likeDict[song.id] = 1;
                   } else if (songLikeDict[song.id] === -1) {
-                    spotifyAreaController.addLikeToSong(song);
-                    spotifyAreaController.addLikeToSong(song);
+                    await spotifyAreaController.addLikeToSong(song);
+                    await spotifyAreaController.addLikeToSong(song);
                     likeDict[song.id] = 1;
                   } else {
-                    spotifyAreaController.addDislikeToSong(song);
+                    await spotifyAreaController.addDislikeToSong(song);
                     likeDict[song.id] = 0;
                   }
                   setSongLikeDict({ ...likeDict });
@@ -332,17 +355,21 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 variant={songLikeDict[song.id] === -1 ? 'green' : 'outline'}
                 colorScheme='white'
                 isActive={songLikeDict[song.id] === -1}
-                onClick={() => {
+                onClick={async () => {
                   const likeDict = songLikeDict;
+                  // print out songLikeDict[song.id] and a confirmation message that the dislike button was clicked
+                  console.log('Song dislike button clicked')
+                  console.log('Song ID: ' + song.id);
+                  console.log('Song like status: ' + songLikeDict[song.id]);
                   if (songLikeDict[song.id] === 1) {
-                    spotifyAreaController.addDislikeToSong(song);
-                    spotifyAreaController.addDislikeToSong(song);
+                    await spotifyAreaController.addDislikeToSong(song);
+                    await spotifyAreaController.addDislikeToSong(song);
                     likeDict[song.id] = -1;
                   } else if (songLikeDict[song.id] === 0) {
-                    spotifyAreaController.addDislikeToSong(song);
+                    await spotifyAreaController.addDislikeToSong(song);
                     likeDict[song.id] = -1;
                   } else {
-                    spotifyAreaController.addLikeToSong(song);
+                    await spotifyAreaController.addLikeToSong(song);
                     likeDict[song.id] = 0;
                   }
                   setSongLikeDict({ ...likeDict });
@@ -414,6 +441,8 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
               <Heading as='h2' size='md' mt={4}>
                 Comments
               </Heading>
+              {/* if no comments, just put a text that says no comments */}
+              {selectedSongForCommenting.comments.length === 0 && <Text>No comments yet</Text>}
               <List aria-label='list of comments' mt={4}>
                 {selectedSongForCommenting.comments.map(comment => (
                   <Grid
