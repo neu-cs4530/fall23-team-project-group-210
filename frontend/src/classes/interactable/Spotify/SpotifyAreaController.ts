@@ -111,7 +111,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * Return the search results of the provided song name
    * @param songName the name of the song provided by the frontend from the user
    */
-  //UPDATE TO BE ABLE TO SEARCH FOR ALBUMS AND ARTISTS AS WELL
   async searchSong(searchString: string): Promise<Song[]> {
     console.log(this._spotifyAreaModel.queue.length);
     if (!this._spotifyAPI) {
@@ -135,11 +134,18 @@ export default class SpotifyAreaController extends InteractableAreaController<
       artists: item.artists,
       likes: 0,
       comments: [],
-      genres: item.album.genres,
+      genres: undefined,
       albumImage: item.album.images[0],
       songAnalytics: await this._getSongAnalytics(item.uri),
     }));
     const out: Song[] = await Promise.all(songs);
+    out.forEach(async song => {
+      song.genres =
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        (await this._spotifyAPI?.search(song.artists[0].name, ['artist']))?.artists?.items[0]
+          .genres ?? undefined;
+    });
     return out;
   }
 
