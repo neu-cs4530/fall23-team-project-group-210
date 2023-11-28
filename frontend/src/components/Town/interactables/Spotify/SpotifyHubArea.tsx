@@ -85,12 +85,10 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         return acc;
       }, {} as Record<string, SongRating>);
       setLikeDict(songLikeDict);
-      console.log('Updated likeDict: ', songLikeDict);
     };
 
     const synchronizeQueues = () => {
       if (spotifyAreaController.queue.length !== 0) {
-        console.log('Rendering queue for new player.');
         spotifyAreaController.refreshQueue();
       }
     };
@@ -184,7 +182,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 colorScheme='white'
                 onClick={() => {
                   spotifyAreaController.addSongToQueue(result);
-                  console.log('Song added to queue: ' + result.name);
                 }}>
                 Add to Queue
               </Button>

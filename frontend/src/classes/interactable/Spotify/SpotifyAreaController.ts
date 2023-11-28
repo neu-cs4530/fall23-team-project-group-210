@@ -62,7 +62,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
       songAnalytics: song.songAnalytics,
       genres: song.genres,
     };
-    console.log('url: ' + song.albumImage.url);
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyAddSongCommand',
       song: songToAdd,
@@ -116,7 +115,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param songName the name of the song provided by the frontend from the user
    */
   async searchSong(searchString: string): Promise<Song[]> {
-    console.log(this._spotifyAreaModel.queue.length);
     if (!this._spotifyAPI) {
       throw Error('Spotify details not provided');
     }
@@ -127,9 +125,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
     // @ts-ignore
     // eslint-disable-next-line prettier/prettier
     const items: Required<Pick<PartialSearchResult, "tracks">> = await this._spotifyAPI.search(searchString, ['track'], undefined, 5);
-    items.tracks.items.forEach(item => {
-      console.log(item.album);
-    });
     const songs: Promise<Song>[] = items.tracks.items.map(async item => ({
       id: uuidv4(),
       albumUri: item.album.uri,
@@ -195,7 +190,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
     if (!this._spotifyAPI) {
       throw new Error('Spotify api not provided');
     }
-    console.log('SHOULD PLAY');
     this._spotifyAPI.player.startResumePlayback(this._device.id, current.albumUri, undefined, {
       uri: current.uri,
     });
