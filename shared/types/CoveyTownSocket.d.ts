@@ -17,6 +17,33 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 };
 
+export type Image = {
+  url: string;
+  height: number;
+  width: number;
+}
+
+export interface AudioFeatures {
+  danceability: number;
+  energy: number;
+  key: number;
+  loudness: number;
+  mode: number;
+  speechiness: number;
+  acousticness: number;
+  instrumentalness: number;
+  liveness: number;
+  valence: number;
+  tempo: number;
+  type: string;
+  id: string;
+  uri: string;
+  track_href: string;
+  analysis_url: string;
+  duration_ms: number;
+  time_signature: number;
+}
+
 export type Song = {
   id: string;
   albumUri: string;
@@ -25,6 +52,8 @@ export type Song = {
   artists: SimplifiedArtist[];
   likes: number;
   comments: string[];
+  albumImage: Image;
+  songAnalytics: AudioFeatures | undefined;
 };
 
 export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'SpotifyArea';
@@ -198,7 +227,8 @@ export type InteractableCommand =
   | SpotifyPlaySongCommand
   | SpotifyUpdateSongCommand
   | SpotifyQueueRefreshCommand
-  | SpotifyAddSongCommand;
+  | SpotifyAddSongCommand
+  | SpotifyClearQueueCommand;
 export interface ViewingAreaUpdateCommand {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -232,6 +262,10 @@ export interface SpotifyQueueRefreshCommand {
   type: 'SpotifyQueueRefreshCommand';
 }
 
+export interface SpotifyClearQueueCommand {
+  type: 'SpotifyClearQueueCommand';
+}
+
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> =
   CommandType extends JoinGameCommand
     ? { gameID: string }
@@ -248,6 +282,8 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
     : CommandType extends SpotifyUpdateSongCommand
     ? undefined
     : CommandType extends SpotifyQueueRefreshCommand
+    ? undefined
+    : CommandType extends SpotifyClearQueueCommand
     ? undefined
     : never;
 

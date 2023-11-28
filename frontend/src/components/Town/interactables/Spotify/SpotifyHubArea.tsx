@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Container,
   Flex,
@@ -13,6 +14,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  Image,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -118,7 +120,10 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       <List aria-label='list of search results'>
         {searchResults.map(result => (
           <Flex data-testid='search-result' key={result.id} align='center'>
-            <Text>
+            <Box w='50px' bg='red.500'>
+              <Image src={result.albumImage.url} />
+            </Box>
+            <Text fontSize={15} w='200px' h='50px' noOfLines={[1, 2]}>
               {result.name} - {result.artists[0].name}
             </Text>
             <Button
@@ -136,8 +141,8 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         Spotify Song Queue
       </Heading>
       <Button
-        onClick={() => {
-          spotifyAreaController.clearQueue();
+        onClick={async () => {
+          await spotifyAreaController.clearQueue();
         }}>
         Clear Queue
       </Button>
@@ -158,11 +163,13 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       <List aria-label='list of songs in the queue'>
         {queue.map(song => (
           <Flex data-testid='song' key={song.id} align='center'>
-            <Text>
+            <Box w='50px' bg='red.500'>
+              <Image src={song.albumImage.url} />
+            </Box>
+            <Text fontSize={15} w='150px' noOfLines={[1, 2]}>
               {song.name} - {song.artists[0]?.name}
             </Text>
             {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
-            {/* {likeDict[song.id] < 1 ? ( */}
             <Button
               isActive={likeDict[song.id] === 1}
               onClick={() => {
@@ -201,7 +208,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
               }}>
               Dislike
             </Button>
-
             <Text>{song.likes}</Text>
           </Flex>
         ))}
