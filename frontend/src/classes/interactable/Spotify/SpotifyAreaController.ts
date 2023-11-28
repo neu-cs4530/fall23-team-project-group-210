@@ -1,18 +1,10 @@
 import TownController from '../../TownController';
-import {
-  SpotifyApi,
-  Device,
-  PartialSearchResult,
-  // SdkOptions,
-  // AuthorizationCodeWithPKCEStrategy,
-  // ItemTypes,
-} from '@spotify/web-api-ts-sdk';
+import { SpotifyApi, Device, PartialSearchResult, AudioFeatures } from '@spotify/web-api-ts-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { Song, SpotifyModel } from '../../../types/CoveyTownSocket';
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from '../InteractableAreaController';
-//import SongQueue from '../../../../../shared/types/SongQueue';
 
 /**
  * Events to be emitted. I believe this tells the frontend to rerender. Right now
@@ -66,11 +58,22 @@ export default class SpotifyAreaController extends InteractableAreaController<
       artists: song.artists,
       likes: song.likes,
       comments: song.comments,
+      albumImage: song.albumImage,
+      songAnalytics: song.songAnalytics,
     };
+    console.log('url: ' + song.albumImage.url);
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyAddSongCommand',
       song: songToAdd,
     });
+  }
+
+  public async _getSongAnalytics(uri: string): Promise<AudioFeatures | undefined> {
+    const parts = uri.split(':');
+    const id = parts[2];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return this._spotifyAPI?.tracks.audioFeatures(id);
   }
 
   /**
@@ -122,7 +125,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
     // @ts-ignore
     // eslint-disable-next-line prettier/prettier
     const items: Required<Pick<PartialSearchResult, "tracks">> = await this._spotifyAPI.search(searchString, ['track'], undefined, 5);
-    const songs: Song[] = items.tracks.items.map(item => ({
+    const songs: Promise<Song>[] = items.tracks.items.map(async item => ({
       id: uuidv4(),
       albumUri: item.album.uri,
       uri: item.uri,
@@ -130,8 +133,11 @@ export default class SpotifyAreaController extends InteractableAreaController<
       artists: item.artists,
       likes: 0,
       comments: [],
+      albumImage: item.album.images[0],
+      songAnalytics: await this._getSongAnalytics(item.uri),
     }));
-    return songs;
+    const out: Song[] = await Promise.all(songs);
+    return out;
   }
 
   /**
