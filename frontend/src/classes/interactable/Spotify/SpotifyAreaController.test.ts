@@ -4,11 +4,13 @@ import type {
   SimplifiedAlbum,
   ExternalIds,
   ExternalUrls,
+  AudioFeatures,
 } from '../../../../node_modules/@spotify/web-api-ts-sdk/dist/mjs/types';
 //import SpotifyAreaController, { SpotifyAreaModel } from './SpotifyAreaController';
 import SpotifyAreaController from './SpotifyAreaController';
 import { SpotifyApi, PartialSearchResult } from '@spotify/web-api-ts-sdk';
 import TownController from '../../TownController';
+import TracksEndpoints from '@spotify/web-api-ts-sdk/dist/mjs/endpoints/TracksEndpoints';
 describe('SpotifyAreaController Tests', () => {
   const mockSpotifyApi = mock<SpotifyApi>();
   const out: Pick<PartialSearchResult, 'tracks'> = {};
@@ -122,6 +124,39 @@ describe('SpotifyAreaController Tests', () => {
   };
   tracks.push(track3);
   mockSpotifyApi.search.mockResolvedValue(out);
+  const features: AudioFeatures = {
+    danceability: 0,
+    energy: 0,
+    key: 0,
+    loudness: 0,
+    mode: 0,
+    speechiness: 0,
+    acousticness: 0,
+    instrumentalness: 0,
+    liveness: 0,
+    valence: 0,
+    tempo: 0,
+    type: '',
+    id: '',
+    uri: '',
+    track_href: '',
+    analysis_url: '',
+    duration_ms: 0,
+    time_signature: 0,
+  };
+  const audioFeaturesMock = async (id: string): Promise<AudioFeatures> => {
+    // Return a single AudioFeatures for a single ID
+    features.id = id;
+    return features;
+  };
+
+  // Assign the overloads to the mockSpotifyApi.tracks.audioFeatures
+  mockSpotifyApi.tracks = {
+    audioFeatures: audioFeaturesMock as unknown as {
+      (id: string): Promise<AudioFeatures>;
+      (ids: string[]): Promise<AudioFeatures[]>;
+    },
+  } as unknown as TracksEndpoints;
   // mockSpotifyApi.search.mockImplementation(
   //   async (s: string, t: readonly ItemTypes[], d?: Market, w?: number) => {
   //     return out;
@@ -158,15 +193,13 @@ describe('SpotifyAreaController Tests', () => {
   beforeEach(() => {});
   describe('SpotifyAreaController search', () => {
     it('Returns the correct search results with the proper data', async () => {
-      expect(1).toBe(2 - 1);
-      controller.isActive();
-      // const results = await controller.searchSong('song');
-      // const resultNames: string[] = results.map(song => song.name);
-      // const resultArtists: string[] = results.map(song => song.artists[0].name);
-      // const resultUri: string[] = results.map(song => song.uri);
-      // expect(resultNames).toEqual(['song_1', 'song_2', 'song_3']);
-      // expect(resultArtists).toEqual(['artist1', 'artist2', 'artist3']);
-      // expect(resultUri).toEqual(['song_1_uri', 'song_2_uri', 'song_3_uri']);
+      const results = await controller.searchSong('song');
+      const resultNames: string[] = results.map(song => song.name);
+      const resultArtists: string[] = results.map(song => song.artists[0].name);
+      const resultUri: string[] = results.map(song => song.uri);
+      expect(resultNames).toEqual(['song_1', 'song_2', 'song_3']);
+      expect(resultArtists).toEqual(['artist1', 'artist2', 'artist3']);
+      expect(resultUri).toEqual(['song_1_uri', 'song_2_uri', 'song_3_uri']);
     });
   });
 });

@@ -46,6 +46,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   const [queue, setQueue] = useState(spotifyAreaController.queue);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
   const [searchResults, setSearchResults] = useState<Song[]>([]); // State to store the search results
+  const [songAnalytics, setSongAnalytics] = useState(false);
   const [likeDict, setLikeDict] = useState<SongDictionary>(
     spotifyAreaController.queue.reduce((acc, song) => {
       acc[song.id] = 0;
@@ -186,6 +187,27 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 }}>
                 Add to Queue
               </Button>
+              <Button
+                bg='gray.800'
+                variant='outline'
+                colorScheme='white'
+                onClick={() => {
+                  setSongAnalytics(true);
+                }}>
+                Song Attributes
+              </Button>
+              <Modal isOpen={songAnalytics} onClose={() => setSongAnalytics(false)}>
+                <ModalOverlay />
+                <ModalContent bg='gray.800' color='white'>
+                  <ModalHeader>&quot;{result.name}&quot; Analytics</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <Text>Danceability: {result.songAnalytics?.danceability ?? 0}/1 </Text>
+                    <Text>Energy: {result.songAnalytics?.energy ?? 0}/1 </Text>
+                    <Text>Acousticness: {result.songAnalytics?.acousticness ?? 0}/1 </Text>
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
             </Flex>
           ))}
         </List>
