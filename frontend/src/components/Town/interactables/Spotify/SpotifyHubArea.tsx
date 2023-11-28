@@ -1,10 +1,15 @@
 import {
   Box,
   Button,
+  ChakraProvider,
   Container,
+  extendTheme,
   Flex,
   FormControl,
+  Grid,
   Heading,
+  Icon,
+  Image,
   InputGroup,
   List,
   Modal,
@@ -14,7 +19,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  Image,
+  Textarea,
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -23,11 +28,18 @@ import { useInteractable, useSpotifyAreaController } from '../../../../classes/T
 import useTownController from '../../../../hooks/useTownController';
 import { InteractableID, Song } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
+import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'react-icons/ai';
+import { FaSearch } from 'react-icons/fa';
 
 type SongRating = -1 | 0 | 1;
 
 type SongDictionary = Record<string, SongRating>;
 
+/**
+ * A component that renders the Spotify Hub Area.
+ * @param interactableID the ID of the Spotify Hub Area
+ * @returns a component that renders the Spotify Hub Area
+ */
 function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const spotifyAreaController = useSpotifyAreaController(interactableID);
   const townController = useTownController();
@@ -40,10 +52,14 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       return acc;
     }, {} as Record<string, SongRating>),
   ); // State to store the user's like/dislike status of each song
+  const [commentModalIsOpen, setCommentModalIsOpen] = useState<boolean>(false); // State to store whether the comment modal is open
+  const [commentInput, setCommentInput] = useState<string>(''); // State to store the comment input
 
+  /**
+   * Function to handle searching for a song.
+   * @returns an error if the search fails, undefined otherwise
+   */
   const handleSearch: () => Promise<Error | undefined> = async (): Promise<Error | undefined> => {
-    // Implement your Spotify search logic here. You may want to use the Spotify API or another service.
-    // For simplicity, let's assume a function called searchSpotify in your spotifyAreaController.
     try {
       const results = await spotifyAreaController.searchSong(searchTerm);
       setSearchResults(results);
@@ -84,135 +100,244 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
     };
   }, [spotifyAreaController, likeDict, queue, townController]);
 
+  const spotifyButtonTheme = extendTheme({
+    colors: {
+      spotifyGreen: '#1DB954',
+    },
+    components: {
+      Button: {
+        baseStyle: {
+          color: 'white',
+        },
+        variants: {
+          green: {
+            bg: 'spotifyGreen',
+            _hover: {
+              bg: 'spotifyGreen', // Adjust hover color if needed
+            },
+          },
+        },
+      },
+    },
+  });
+
   const toast = useToast();
   return (
-    <Container>
-      <Heading as='h2' size='md'>
-        Search for a Song
-      </Heading>
-      <InputGroup>
-        {/* Input field for searching */}
-        <FormControl>
-          <input
-            type='text'
-            placeholder='Enter song name...'
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
-        </FormControl>
-        {/* Button to trigger the search */}
+    <ChakraProvider theme={spotifyButtonTheme}>
+      <Container>
+        <Heading as='h2' size='md'>
+          Song Search
+        </Heading>
+        {/* add small gap of 10 px */}
+        <InputGroup>
+          {/* Input field for searching */}
+          <FormControl color='black'>
+            <input
+              type='text'
+              style={{ width: '400px' }}
+              placeholder='What do you want to listen to?'
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+          </FormControl>
+          {/* Button to trigger the search */}
+          <Button
+            mr={10}
+            bg='gray.800'
+            variant='outline'
+            colorScheme='white'
+            onClick={async () => {
+              const error: Error | undefined = await handleSearch();
+              if (error) {
+                toast({
+                  title: 'Error searching for song',
+                  description: error.message,
+                  status: 'error',
+                });
+              }
+            }}>
+            <Icon as={FaSearch} mr={2} />
+            Search
+          </Button>
+        </InputGroup>
+
+        {/* Display search results */}
+        <List aria-label='list of search results'>
+          {searchResults.map(result => (
+            <Flex
+              data-testid='search-result'
+              key={result.id}
+              align='center'
+              justifyContent='space-between'
+              mb={2}>
+              <Box w='50px' bg='red.500'>
+                <Image src={result.albumImage.url} />
+              </Box>
+              <Text fontSize={15} w='200px' h='50px' noOfLines={[1, 2]}>
+                {result.name} - {result.artists[0].name}
+              </Text>
+              <Button
+                bg='gray.800'
+                variant='outline'
+                colorScheme='white'
+                onClick={() => {
+                  spotifyAreaController.addSongToQueue(result);
+                  console.log('Song added to queue: ' + result.name);
+                }}>
+                Add to Queue
+              </Button>
+            </Flex>
+          ))}
+        </List>
+        <Heading as='h2' size='md'>
+          Queue
+        </Heading>
         <Button
+          bg='gray.800'
+          variant='outline'
+          colorScheme='white'
           onClick={async () => {
-            const error: Error | undefined = await handleSearch();
-            if (error) {
+            await spotifyAreaController.clearQueue();
+          }}>
+          Clear Queue
+        </Button>
+        <Button
+          bg='gray.800'
+          variant='outline'
+          colorScheme='white'
+          onClick={async () => {
+            try {
+              await spotifyAreaController.playNextSong();
+            } catch (e) {
               toast({
-                title: 'Error searching for song',
-                description: error.message,
+                title: 'Error playing song',
+                description: (e as Error).toString(),
                 status: 'error',
               });
             }
           }}>
-          Search
+          Play Next
         </Button>
-      </InputGroup>
+        {/* The queue */}
+        <List aria-label='list of songs in the queue' mb={10}>
+          {queue.map(song => (
+            <Grid
+              key={song.id}
+              data-testid='queue-song'
+              templateColumns='100px 200px 60px 20px 100px 100px'
+              gap={2}
+              justifyItems='left'
+              alignItems='center'
+              justifyContent='center'
+              mt={4}
+              mb={2}>
+              <Box w='50px' bg='red.500'>
+                <Image src={song.albumImage.url} />
+              </Box>
+              {/* Text */}
+              <Text fontSize={15} w='150px' noOfLines={[1, 2]}>
+                {song.name} - {song.artists[0]?.name}
+              </Text>
 
-      {/* Display search results */}
-      <List aria-label='list of search results'>
-        {searchResults.map(result => (
-          <Flex data-testid='search-result' key={result.id} align='center'>
-            <Box w='50px' bg='red.500'>
-              <Image src={result.albumImage.url} />
-            </Box>
-            <Text fontSize={15} w='200px' h='50px' noOfLines={[1, 2]}>
-              {result.name} - {result.artists[0].name}
-            </Text>
+              {/* Like Button */}
+              {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
+              <Button
+                variant={likeDict[song.id] === 1 ? 'green' : 'outline'}
+                colorScheme='white'
+                isActive={likeDict[song.id] === 1}
+                onClick={() => {
+                  const songLikeDict = likeDict;
+                  if (likeDict[song.id] === 0) {
+                    spotifyAreaController.addLikeToSong(song);
+                    songLikeDict[song.id] = 1;
+                  } else if (likeDict[song.id] === -1) {
+                    spotifyAreaController.addLikeToSong(song);
+                    spotifyAreaController.addLikeToSong(song);
+                    songLikeDict[song.id] = 1;
+                  } else {
+                    spotifyAreaController.addDislikeToSong(song);
+                    songLikeDict[song.id] = 0;
+                  }
+                  setLikeDict({ ...songLikeDict });
+                }}>
+                {likeDict[song.id] === 1 ? <Icon as={AiFillLike} /> : <Icon as={AiOutlineLike} />}
+              </Button>
+
+              {/* Likes Ticker */}
+              <Text>{song.likes}</Text>
+
+              {/* Dislike Button */}
+              <Button
+                variant={likeDict[song.id] === -1 ? 'green' : 'outline'}
+                colorScheme='white'
+                isActive={likeDict[song.id] === -1}
+                onClick={() => {
+                  const songLikeDict = likeDict;
+                  if (likeDict[song.id] === 1) {
+                    spotifyAreaController.addDislikeToSong(song);
+                    spotifyAreaController.addDislikeToSong(song);
+                    songLikeDict[song.id] = -1;
+                  } else if (likeDict[song.id] === 0) {
+                    spotifyAreaController.addDislikeToSong(song);
+                    songLikeDict[song.id] = -1;
+                  } else {
+                    spotifyAreaController.addLikeToSong(song);
+                    songLikeDict[song.id] = 0;
+                  }
+                  setLikeDict({ ...songLikeDict });
+                }}>
+                {likeDict[song.id] === -1 ? (
+                  <Icon as={AiFillDislike} />
+                ) : (
+                  <Icon as={AiOutlineDislike} />
+                )}
+              </Button>
+              {/* Button to post a comment */}
+              <Button
+                bg='gray.800'
+                variant='outline'
+                colorScheme='white'
+                onClick={() => {
+                  setCommentModalIsOpen(true);
+                }}>
+                Write comment
+              </Button>
+            </Grid>
+          ))}
+        </List>
+      </Container>
+
+      {/* Modal for posting a comment */}
+      <Modal isOpen={commentModalIsOpen} onClose={() => setCommentModalIsOpen(false)}>
+        <ModalOverlay />
+        <ModalContent bg='gray.800' color='white'>
+          <ModalHeader>Write a comment</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl>
+              <Textarea
+                placeholder='Write a comment'
+                value={commentInput}
+                onChange={e => setCommentInput(e.target.value)}
+              />
+            </FormControl>
             <Button
-              onClick={() => {
-                spotifyAreaController.addSongToQueue(result);
-                // Add logic to add the selected song to the queue
-                console.log('Song added to queue: ' + result.name);
+              mt={4}
+              bg='gray.800'
+              variant='outline'
+              colorScheme='white'
+              onClick={async () => {
+                // TODO: Implement postComment
+                // await spotifyAreaController.postComment(commentInput);
+                setCommentInput('');
+                // setCommentModalIsOpen(false);
               }}>
-              Add to Queue
+              Post
             </Button>
-          </Flex>
-        ))}
-      </List>
-      <Heading as='h2' size='md'>
-        Spotify Song Queue
-      </Heading>
-      <Button
-        onClick={async () => {
-          await spotifyAreaController.clearQueue();
-        }}>
-        Clear Queue
-      </Button>
-      <Button
-        onClick={async () => {
-          try {
-            await spotifyAreaController.playNextSong();
-          } catch (e) {
-            toast({
-              title: 'Error playing song',
-              description: (e as Error).toString(),
-              status: 'error',
-            });
-          }
-        }}>
-        Play Next
-      </Button>
-      <List aria-label='list of songs in the queue'>
-        {queue.map(song => (
-          <Flex data-testid='song' key={song.id} align='center'>
-            <Box w='50px' bg='red.500'>
-              <Image src={song.albumImage.url} />
-            </Box>
-            <Text fontSize={15} w='150px' noOfLines={[1, 2]}>
-              {song.name} - {song.artists[0]?.name}
-            </Text>
-            {/* Add like/dislike buttons for each song in the queue, which would update the likes fields in each song */}
-            <Button
-              isActive={likeDict[song.id] === 1}
-              onClick={() => {
-                const songLikeDict = likeDict;
-                if (likeDict[song.id] === 0) {
-                  spotifyAreaController.addLikeToSong(song);
-                  songLikeDict[song.id] = 1;
-                } else if (likeDict[song.id] === -1) {
-                  spotifyAreaController.addLikeToSong(song);
-                  spotifyAreaController.addLikeToSong(song);
-                  songLikeDict[song.id] = 1;
-                } else {
-                  spotifyAreaController.addDislikeToSong(song);
-                  songLikeDict[song.id] = 0;
-                }
-                setLikeDict({ ...songLikeDict });
-              }}>
-              Like
-            </Button>
-            <Button
-              isActive={likeDict[song.id] === -1}
-              onClick={() => {
-                const songLikeDict = likeDict;
-                if (likeDict[song.id] === 1) {
-                  spotifyAreaController.addDislikeToSong(song);
-                  spotifyAreaController.addDislikeToSong(song);
-                  songLikeDict[song.id] = -1;
-                } else if (likeDict[song.id] === 0) {
-                  spotifyAreaController.addDislikeToSong(song);
-                  songLikeDict[song.id] = -1;
-                } else {
-                  spotifyAreaController.addLikeToSong(song);
-                  songLikeDict[song.id] = 0;
-                }
-                setLikeDict({ ...songLikeDict });
-              }}>
-              Dislike
-            </Button>
-            <Text>{song.likes}</Text>
-          </Flex>
-        ))}
-      </List>
-    </Container>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </ChakraProvider>
   );
 }
 
@@ -243,10 +368,14 @@ export default function SpotifyAreaWrapper(): JSX.Element {
 
   if (spotifyArea) {
     return (
-      <Modal isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
+      <Modal size={'4xl'} isOpen={true} onClose={closeModal} closeOnOverlayClick={false}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Spotify Area</ModalHeader>
+        <ModalContent bg='gray.800' color='white'>
+          {/* <ModalHeader>Spotify Area</ModalHeader> */}
+          <Flex justifyContent='center' align='center'>
+            <Image src={'./images/spotify-icon.png'} alt='Spotify Logo' boxSize='40px' />
+            <ModalHeader fontSize='4xl'>Spotify</ModalHeader>
+          </Flex>
           <ModalCloseButton />
           <ModalBody>
             <SpotifyHubArea interactableID={spotifyArea.name} />
