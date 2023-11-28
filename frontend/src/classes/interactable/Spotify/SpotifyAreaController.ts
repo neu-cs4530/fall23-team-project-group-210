@@ -71,8 +71,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
   public async _getSongAnalytics(uri: string): Promise<AudioFeatures | undefined> {
     const parts = uri.split(':');
     const id = parts[2];
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     return this._spotifyAPI?.tracks.audioFeatures(id);
   }
 
