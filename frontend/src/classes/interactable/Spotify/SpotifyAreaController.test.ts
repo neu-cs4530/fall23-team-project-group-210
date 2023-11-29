@@ -179,11 +179,6 @@ describe('SpotifyAreaController Tests', () => {
     return features;
   };
 
-  // const audioFeaturesArrayMock = async (ids: string[]): Promise<AudioFeatures[]> => {
-  //   // Return an array of AudioFeatures for an array of IDs
-  //   return [features];
-  // };
-
   // Assign the overloads to the mockSpotifyApi.tracks.audioFeatures
   mockSpotifyApi.tracks = {
     audioFeatures: audioFeaturesMock as unknown as {
