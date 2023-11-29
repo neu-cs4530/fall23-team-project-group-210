@@ -64,9 +64,21 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   public async addSongToQueue(song: Song): Promise<void> {
+    const songToAdd: Song = {
+      id: uuidv4(),
+      albumUri: song.albumUri,
+      uri: song.uri,
+      name: song.name,
+      artists: song.artists,
+      likes: song.likes,
+      comments: song.comments,
+      albumImage: song.albumImage,
+      songAnalytics: song.songAnalytics,
+      genre: song.genre,
+    };
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyAddSongCommand',
-      song: song,
+      song: songToAdd,
     });
   }
 
@@ -83,7 +95,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
     this._userName = userName;
   }
 
-  public async _getSongAnalytics(uri: string): Promise<AudioFeatures | undefined> {
+  private async _getSongAnalytics(uri: string): Promise<AudioFeatures | undefined> {
     const parts = uri.split(':');
     const id = parts[2];
     return this._spotifyAPI?.tracks.audioFeatures(id);
@@ -172,25 +184,27 @@ export default class SpotifyAreaController extends InteractableAreaController<
       artists: item.artists,
       likes: 0,
       comments: [],
-      genres: undefined,
+      genre: undefined,
       albumImage: item.album.images[0],
       songAnalytics: await this._getSongAnalytics(item.uri),
     }));
     const out: Song[] = await Promise.all(songs);
-    out.forEach(async song => {
+    this._addGenre(out);
+    return out;
+  }
+
+  private _addGenre(songs: Song[]): void {
+    songs.forEach(async song => {
       const genres =
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         (await this._spotifyAPI?.search(song.artists[0].name, ['artist']))?.artists?.items[0]
           .genres ?? undefined;
-      if (genres) {
-        for (let i = 0; i < genres.length; i++) {
-          genres[i] = this._capitalizeEveryWord(genres[i]);
-        }
-        song.genres = genres;
+      if (genres && genres.length > 0) {
+        genres[0] = this._capitalizeEveryWord(genres[0]);
+        song.genre = genres[0];
       }
     });
-    return out;
   }
 
   /**
@@ -209,9 +223,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
       throw new Error(
         'Spotify device not provided on sign in or does not have an id. Song will still play for other players',
       );
-    }
-    if (!this._spotifyAPI) {
-      throw new Error('Spotify api not provided');
     }
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyPlaySongCommand',

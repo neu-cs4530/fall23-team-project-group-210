@@ -54,7 +54,7 @@ export type Song = {
   comments: string[];
   albumImage: Image;
   songAnalytics: AudioFeatures | undefined;
-  genres?: string[] | undefined;
+  genre?: string | undefined;
 };
 
 export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'SpotifyArea';
