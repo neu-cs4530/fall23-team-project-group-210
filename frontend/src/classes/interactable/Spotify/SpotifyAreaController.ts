@@ -59,7 +59,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
       comments: song.comments,
       albumImage: song.albumImage,
       songAnalytics: song.songAnalytics,
-      genres: song.genres,
+      genre: song.genre,
     };
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyAddSongCommand',
@@ -148,13 +148,33 @@ export default class SpotifyAreaController extends InteractableAreaController<
     });
   }
 
+  public async removeSong(song: Song): Promise<void> {
+    const songToRemove: Song = {
+      id: uuidv4(),
+      albumUri: song.albumUri,
+      uri: song.uri,
+      name: song.name,
+      artists: song.artists,
+      likes: song.likes,
+      comments: song.comments,
+      albumImage: song.albumImage,
+      songAnalytics: song.songAnalytics,
+    };
+    const profile = await this._spotifyAPI?.currentUser.profile();
+    const userName = profile?.display_name;
+    if (!userName) {
+      throw new Error('User not signed in');
+    }
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyRemoveSongCommand',
+      song: songToRemove,
+      userName: userName,
+    });
+  }
+
   /**
-<<<<<<< HEAD
    * Capitalizes every word in the input string
    *
-=======
-   * Capitalize the first letter of every word in the input string
->>>>>>> c4fa2db (linting)
    * @param inputString the string to capitalize
    * @returns the capitalized string
    */
@@ -185,25 +205,27 @@ export default class SpotifyAreaController extends InteractableAreaController<
       artists: item.artists,
       likes: 0,
       comments: [],
-      genres: undefined,
+      genre: undefined,
       albumImage: item.album.images[0],
       songAnalytics: await this._getSongAnalytics(item.uri),
     }));
     const out: Song[] = await Promise.all(songs);
-    out.forEach(async song => {
+    this._addGenre(out);
+    return out;
+  }
+
+  private _addGenre(songs: Song[]): void {
+    songs.forEach(async song => {
       const genres =
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         (await this._spotifyAPI?.search(song.artists[0].name, ['artist']))?.artists?.items[0]
           .genres ?? undefined;
-      if (genres) {
-        for (let i = 0; i < genres.length; i++) {
-          genres[i] = this._capitalizeEveryWord(genres[i]);
-        }
-        song.genres = genres;
+      if (genres && genres.length > 0) {
+        genres[0] = this._capitalizeEveryWord(genres[0]);
+        song.genre = genres[0];
       }
     });
-    return out;
   }
 
   /**
@@ -222,9 +244,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
       throw new Error(
         'Spotify device not provided on sign in or does not have an id. Song will still play for other players',
       );
-    }
-    if (!this._spotifyAPI) {
-      throw new Error('Spotify api not provided');
     }
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyPlaySongCommand',

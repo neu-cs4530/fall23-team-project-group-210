@@ -54,7 +54,7 @@ export type Song = {
   comments: Comment[];
   albumImage: Image;
   songAnalytics: AudioFeatures | undefined;
-  genres?: string[] | undefined;
+  genre?: string | undefined;
 };
 
 export type Comment = {
@@ -312,6 +312,12 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
   : CommandType extends SpotifyQueueRefreshCommand
   ? undefined
   : CommandType extends SpotifyClearQueueCommand
+  ? undefined
+  : CommandType extends SpotifySaveSongCommand
+  ? undefined
+  : CommandType extends SpotifyGetSavedSongsCommand
+  ? undefined
+  : CommandType extends SpotifyRemoveSongCommand
   ? undefined
   : never;
 
