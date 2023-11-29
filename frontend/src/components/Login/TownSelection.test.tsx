@@ -2,7 +2,7 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import '@testing-library/jest-dom';
 import React from 'react';
-import { fireEvent, render, RenderResult, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, RenderResult, waitFor, within, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mock, mockClear, MockProxy, mockReset } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
@@ -13,6 +13,8 @@ import { CancelablePromise, Town, TownsService } from '../../generated/client';
 import * as useLoginController from '../../hooks/useLoginController';
 import { mockTownController } from '../../TestUtils';
 import TownSelection from './TownSelection';
+// import { useSpotify } from '../../hooks/useSpotify';
+// import { SpotifyApi } from '@spotify/web-api-ts-sdk';
 
 const mockConnect = jest.fn(() => Promise.resolve());
 
@@ -29,6 +31,25 @@ jest.mock('@chakra-ui/react', () => {
     useToast: mockUseToast,
   };
 });
+// Mocking the useSpotify hook
+// jest.mock('../../hooks/useSpotify', () => ({
+//   __esModule: true,
+//   useSpotify: jest.fn(),
+// }));
+
+// // Mocking the useSpotify hook
+// const mockUseSpotify = (isInitialized = true) => ({
+//   isInitialized,
+//   login: jest.fn(),
+//   currentUser: isInitialized ? { display_name: 'TestUser' } : {},
+//   devices: isInitialized
+//     ? [
+//         { id: '1', name: 'Device1' },
+//         { id: '2', name: 'Device2' },
+//       ]
+//     : [],
+// });
+
 function toCancelablePromise<T>(p: T): CancelablePromise<T> {
   return new CancelablePromise(async resolve => {
     resolve(p);
@@ -122,6 +143,54 @@ describe('Town Selection', () => {
     coveyTownControllerConstructorSpy.mockReturnValue(mockedTownController);
     mockedTownController.connect.mockReturnValue(Promise.resolve());
   });
+  // describe('Spotify Login', () => {
+  //   const clientID = 'ddf7330eed894b0f81b580cba2d1b570';
+  //   const isSpotifyAttempt = false;
+  //   const spotifyAPI: SpotifyApi | undefined = useSpotify(
+  //     isSpotifyAttempt,
+  //     clientID, // Figure out env variables
+  //     `${window.location.protocol}//${window.location.host}`,
+  //     [
+  //       'streaming',
+  //       'user-read-playback-state',
+  //       'user-read-currently-playing',
+  //       'user-read-private',
+  //       'playlist-read-private',
+  //       'playlist-read-collaborative',
+  //       'user-library-read',
+  //     ],
+  //   );
+  //   it('should not render Spotify elements if spotifyApi prop is null', () => {
+  //     // render(<TownSelection spotifyAPI = {null} />);
+  //     // code wont work with null 
+  //     const spotifyLoginButton = screen.queryByRole('button', { name: 'Login with Spotify' });
+  //     const spotifyAccountDetails = screen.queryByText('John Doe');
+  //     const deviceDropdown = screen.queryByRole('combobox');
+  //     expect(spotifyLoginButton).not.toBeInTheDocument();
+  //     expect(spotifyAccountDetails).not.toBeInTheDocument();
+  //     expect(deviceDropdown).not.toBeInTheDocument();
+  //   });
+  //   it('should store Spotify access token and connect to API on successful authorization', () => {
+  //     const mockSpotifyApi = {
+  //       setAccessToken: jest.fn(),
+  //     };
+  //     render(<TownSelection spotifyAPI={mockSpotifyApi} />);
+  //     // Simulate successful authorization and access token retrieval
+  //     window.dispatchEvent(
+  //       new CustomEvent('spotifyLoginSuccess', { detail: { accessToken: 'mockAccessToken' } }),
+  //     );
+  //     expect(mockSpotifyApi.setAccessToken).toHaveBeenCalledWith('mockAccessToken');
+  //   });
+  //   it('should update selected device in TownController on device selection', () => {
+  //     const mockTownController = {
+  //       setSelectedDevice: jest.fn(),
+  //     };
+  //     render(<TownSelection townController={mockTownController} />);
+  //     const deviceDropdown = screen.getByRole('combobox');
+  //     const deviceOption = deviceDropdown.querySelector('option[value="device1"]');
+  //     fireEvent.change(deviceDropdown, { target: { value: 'device1' } });
+  //     expect(mockTownController.setSelectedDevice).
+  // });
   describe('Listing public towns', () => {
     it('is called when rendering (hopefully by a useeffect, this will be checked manually)', async () => {
       jest.useRealTimers();
@@ -660,4 +729,123 @@ describe('Town Selection', () => {
       });
     });
   });
+
+  // describe('Spotify Login', () => {
+  //   it('should store Spotify access token and connect to API on successful authorization', () => {
+  //     const mockSpotifyApi = {
+  //       setAccessToken: jest.fn(),
+  //     };
+  //     render(<TownSelection spotifyApi={mockSpotifyApi} />);
+  //     // Simulate successful authorization and access token retrieval
+  //     window.dispatchEvent(
+  //       new CustomEvent('spotifyLoginSuccess', { detail: { accessToken: 'mockAccessToken' } }),
+  //     );
+  //     expect(mockSpotifyApi.setAccessToken).toHaveBeenCalledWith('mockAccessToken');
+  //   });
+  //  });
 });
+
+// describe('Spotify Integration', () => {
+//   // Mocking the loginController for testing
+//   const mockLoginController = {
+//     setTownController: jest.fn(),
+//     townsService: {
+//       listTowns: jest.fn(() => Promise.resolve([])),
+//       createTown: jest.fn(() =>
+//         Promise.resolve({ townID: 'mockTownID', townUpdatePassword: 'mockPassword' }),
+//       ),
+//     },
+//   };
+
+//   // Mocking the useSpotify hook
+//   const mockUseSpotify = (isInitialized = true) => ({
+//     isInitialized,
+//     login: jest.fn(),
+//     currentUser: isInitialized ? { display_name: 'TestUser' } : {},
+//     devices: isInitialized
+//       ? [
+//           { id: '1', name: 'Device1' },
+//           { id: '2', name: 'Device2' },
+//         ]
+//       : [],
+//   });
+
+//   // Mocking the useVideoContext hook
+//   const mockUseVideoContext = () => ({
+//     setTownController: jest.fn(),
+//   });
+
+//   beforeEach(() => {
+//     jest.clearAllMocks();
+//   });
+
+//   it('renders Spotify login button initially', () => {
+//     const mockSpotifyApi = {
+//       setAccessToken: jest.fn(),
+//     };
+//     render(<TownSelection spotifyApi={mockSpotifyApi} />);
+
+//     const loginButton = screen.getByText('Login to Spotify Account');
+//     expect(loginButton).toBeInTheDocument();
+//     const spotifyLoginButton = screen.getByRole('button', { name: 'Login with Spotify' });
+//     expect(spotifyLoginButton).toBeVisible();
+//   });
+//   it('renders Spotify connected message after login', async () => {
+//     useSpotify.mockReturnValue(mockUseSpotify());
+
+//     render(<TownSelection />);
+
+//     const connectedMessage = await screen.findByText('Spotify account for TestUser is connected.');
+//     expect(connectedMessage).toBeInTheDocument();
+//   });
+
+//   it('handles Spotify login button click', async () => {
+//     useSpotify.mockReturnValue(mockUseSpotify(false));
+
+//     render(<TownSelection />);
+
+//     const loginButton = screen.getByText('Login to Spotify Account');
+//     fireEvent.click(loginButton);
+
+//     // Assuming the login function is called when the button is clicked
+//     expect(useSpotify().login).toHaveBeenCalled();
+//   });
+
+//   it('renders device dropdown after Spotify login', async () => {
+//     useSpotify.mockReturnValue(mockUseSpotify());
+
+//     render(<TownSelection />);
+
+//     // Assuming the device dropdown is rendered after Spotify login
+//     const deviceDropdown = screen.getByLabelText('Choose Device to Play Music');
+//     expect(deviceDropdown).toBeInTheDocument();
+//   });
+
+//   it('handles device selection change', async () => {
+//     useSpotify.mockReturnValue(mockUseSpotify());
+
+//     render(<TownSelection />);
+
+//     // Assuming there is a device dropdown
+//     const deviceDropdown = screen.getByLabelText('Choose Device to Play Music');
+//     fireEvent.change(deviceDropdown, { target: { value: 'Device1' } });
+
+//     // Assuming the device selection triggers some state update
+//     // Verify that the state is updated accordingly
+//     // Add relevant assertions based on your component's behavior
+//   });
+
+//   it('handles device refresh button click', async () => {
+//     useSpotify.mockReturnValue(mockUseSpotify());
+
+//     render(<TownSelection />);
+
+//     // Assuming there is a refresh device list button
+//     const refreshButton = screen.getByText('Refresh Device List');
+//     fireEvent.click(refreshButton);
+
+//     // Assuming the device list is updated
+//     // Verify that the state is updated accordingly
+//     // Add relevant assertions based on your component's behavior
+//   });
+// });
