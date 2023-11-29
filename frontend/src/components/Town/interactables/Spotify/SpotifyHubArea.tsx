@@ -125,7 +125,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         return acc;
       }, {} as Record<string, Rating>);
       setSongLikeDict(newSongLikeDict);
-      console.log('Updated songLikeDict: ', newSongLikeDict);
 
       const newCommentLikeDict = spotifyAreaController.queue.reduce((acc, song) => {
         song.comments.forEach(comment => {
@@ -139,14 +138,12 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         return acc;
       }, {} as Record<string, Rating>);
       setCommentLikeDict(newCommentLikeDict);
-      console.log('Updated commentLikeDict: ', newCommentLikeDict);
     };
 
     const updateSavedSongs = async () => {
       const newSavedSongs = await spotifyAreaController.savedSongs();
       if (newSavedSongs) {
         setSavedSongs([...newSavedSongs]);
-        console.log('saved songs updated');
       }
     };
 
@@ -197,7 +194,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   });
 
   const SavedSongNames = () => {
-    const songList = savedSongs.map(song => (
+    const songList = savedSongs?.map(song => (
       <Grid
         key={song.id}
         data-testid='saved-song'
@@ -506,7 +503,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                     if (savedSongs && savedSongs.some(s => s.id === song.id)) {
                       await spotifyAreaController.removeSong(song);
                     } else {
-                      console.log('song to save: ', song);
                       await spotifyAreaController.saveSong(song);
                     }
                   }}>

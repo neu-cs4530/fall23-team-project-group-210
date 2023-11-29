@@ -87,7 +87,6 @@ export default function TownSelection(): JSX.Element {
         if (items) {
           setSpotifyDevices(items);
         }
-        console.log(items);
         if (items) {
           console.table(
             items.map((item: Device) => ({
