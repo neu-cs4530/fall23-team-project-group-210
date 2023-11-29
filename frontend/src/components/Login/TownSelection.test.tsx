@@ -162,7 +162,7 @@ describe('Town Selection', () => {
   //   );
   //   it('should not render Spotify elements if spotifyApi prop is null', () => {
   //     // render(<TownSelection spotifyAPI = {null} />);
-  //     // code wont work with null 
+  //     // code wont work with null
   //     const spotifyLoginButton = screen.queryByRole('button', { name: 'Login with Spotify' });
   //     const spotifyAccountDetails = screen.queryByText('John Doe');
   //     const deviceDropdown = screen.queryByRole('combobox');
@@ -829,23 +829,15 @@ describe('Town Selection', () => {
 //     // Assuming there is a device dropdown
 //     const deviceDropdown = screen.getByLabelText('Choose Device to Play Music');
 //     fireEvent.change(deviceDropdown, { target: { value: 'Device1' } });
-
-//     // Assuming the device selection triggers some state update
-//     // Verify that the state is updated accordingly
-//     // Add relevant assertions based on your component's behavior
 //   });
 
 //   it('handles device refresh button click', async () => {
 //     useSpotify.mockReturnValue(mockUseSpotify());
-
 //     render(<TownSelection />);
 
 //     // Assuming there is a refresh device list button
 //     const refreshButton = screen.getByText('Refresh Device List');
 //     fireEvent.click(refreshButton);
 
-//     // Assuming the device list is updated
-//     // Verify that the state is updated accordingly
-//     // Add relevant assertions based on your component's behavior
 //   });
 // });
