@@ -247,16 +247,56 @@ describe('SongQueue Tests', () => {
       expect(queue.songs[1].comments).toEqual([]);
       expect(queue.songs[2].comments).toEqual([]);
       const song0 = queue.songs[0];
-      song0.comments = ['Amazing Song!'];
+      song0.comments = [
+        {
+          id: '1',
+          author: 'dummyuser',
+          body: 'Amazing Song!',
+          likes: 0,
+        },
+      ];
       const song1 = queue.songs[1];
-      song1.comments = ['Boo!', 'I dont like this song'];
+      song1.comments = [
+        {
+          id: '1',
+          author: 'dummyuser',
+          body: 'Boo!',
+          likes: 0,
+        },
+        {
+          id: '2',
+          author: 'dummyuser',
+          body: 'I dont like this song',
+          likes: 0,
+        },
+      ];
       const song2 = queue.songs[2];
       song2.comments = [];
       queue.updateSong(song0);
       queue.updateSong(song1);
       queue.updateSong(song2);
-      expect(queue.songs[0].comments).toEqual(['Amazing Song!']);
-      expect(queue.songs[1].comments).toEqual(['Boo!', 'I dont like this song']);
+      expect(queue.songs[0].comments).toEqual([
+        {
+          id: '1',
+          author: 'dummyuser',
+          body: 'Amazing Song!',
+          likes: 0,
+        },
+      ]);
+      expect(queue.songs[1].comments).toEqual([
+        {
+          id: '1',
+          author: 'dummyuser',
+          body: 'Boo!',
+          likes: 0,
+        },
+        {
+          id: '2',
+          author: 'dummyuser',
+          body: 'I dont like this song',
+          likes: 0,
+        },
+      ]);
       expect(queue.songs[2].comments).toEqual([]);
     });
   });
