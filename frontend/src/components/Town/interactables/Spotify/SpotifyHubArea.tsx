@@ -50,16 +50,17 @@ type SongDictionary = Record<string, SongRating>;
 function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const toast = useToast();
   const spotifyAreaController = useSpotifyAreaController(interactableID);
-  spotifyAreaController.refreshQueue();
-  try {
-    spotifyAreaController.refreshSavedSongs();
-  } catch (e) {
-    toast({
-      title: 'You are not logged into Spotify',
-      description: (e as Error).toString(),
-      status: 'error',
-    });
-  }
+  //spotifyAreaController.refreshQueue();
+  // try {
+  //   console.log('1');
+  //   spotifyAreaController.refreshSavedSongs();
+  // } catch (e) {
+  //   toast({
+  //     title: 'You are not logged into Spotify',
+  //     description: (e as Error).toString(),
+  //     status: 'error',
+  //   });
+  // }
   const townController = useTownController();
   const [queue, setQueue] = useState(spotifyAreaController.queue);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to store the search term
@@ -172,7 +173,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         {/* Text */}
         <Text fontSize={13} w='400px' noOfLines={[1, 2]}>
           {song.name} - Artist: {song.artists[0]?.name} - Genre:{' '}
-          {song.genres ? song.genres[0] : 'Unspecified'} - Likes: {song.likes}
+          {song.genres ? song.genres[0] : 'Unspecified'}
         </Text>
         <Button
           mr={'auto'}
