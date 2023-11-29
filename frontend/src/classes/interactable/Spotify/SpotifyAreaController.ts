@@ -1,7 +1,7 @@
 import TownController from '../../TownController';
 import { SpotifyApi, Device, PartialSearchResult, AudioFeatures } from '@spotify/web-api-ts-sdk';
 import { v4 as uuidv4 } from 'uuid';
-import { Song, SpotifyModel } from '../../../types/CoveyTownSocket';
+import { Comment, Song, SpotifyModel } from '../../../types/CoveyTownSocket';
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from '../InteractableAreaController';
@@ -111,6 +111,9 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   public async clearQueue(): Promise<void> {
+    if (!this._spotifyAPI) {
+      throw Error('Spotify details not provided on sign-in');
+    }
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyClearQueueCommand',
     });
@@ -156,6 +159,12 @@ export default class SpotifyAreaController extends InteractableAreaController<
     }
   }
 
+  /**
+   * Capitalizes every word in the input string
+   *
+   * @param inputString the string to capitalize
+   * @returns the capitalized string
+   */
   private _capitalizeEveryWord(inputString: string): string {
     return inputString.replace(/\b\w/g, char => char.toUpperCase());
   }
@@ -279,7 +288,36 @@ export default class SpotifyAreaController extends InteractableAreaController<
    * @param comment comment to add to song
    */
   async addCommentToSong(song: Song, comment: string): Promise<void> {
-    song.comments.push(comment);
+    song.comments.push({
+      id: uuidv4(),
+      author: this._townController.userName,
+      body: comment,
+      likes: 0,
+    });
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyUpdateSongCommand',
+      song: song,
+    });
+  }
+
+  /**
+   * Adds a like to the comment
+   * @param comment comment to add like to
+   */
+  async addLikeToComment(comment: Comment, song: Song): Promise<void> {
+    comment.likes = comment.likes + 1;
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyUpdateSongCommand',
+      song: song,
+    });
+  }
+
+  /**
+   * Adds a dislike to the comment
+   * @param comment comment to add dislike to
+   */
+  async addDislikeToComment(comment: Comment, song: Song): Promise<void> {
+    comment.likes = comment.likes - 1;
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyUpdateSongCommand',
       song: song,
