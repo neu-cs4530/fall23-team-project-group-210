@@ -12,7 +12,7 @@ import SpotifyAreaController from './SpotifyAreaController';
 import { SpotifyApi, PartialSearchResult } from '@spotify/web-api-ts-sdk';
 import TownController from '../../TownController';
 import TracksEndpoints from '@spotify/web-api-ts-sdk/dist/mjs/endpoints/TracksEndpoints';
-import { Song, SpotifyModel } from '../../../types/CoveyTownSocket';
+import { Song } from '../../../types/CoveyTownSocket';
 import CurrentUserEndpoints from '@spotify/web-api-ts-sdk/dist/mjs/endpoints/CurrentUserEndpoints';
 import PlayerController from '../../PlayerController';
 describe('SpotifyAreaController Tests', () => {
