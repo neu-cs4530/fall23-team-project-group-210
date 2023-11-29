@@ -209,6 +209,7 @@ describe('SpotifyAreaController Tests', () => {
       queue: [],
       currentlyPlaying: undefined,
       playSong: false,
+      savedSongs: {},
     },
     mockTownController,
   );
