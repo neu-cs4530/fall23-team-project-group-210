@@ -54,7 +54,7 @@ export type Song = {
   comments: Comment[];
   albumImage: Image;
   songAnalytics: AudioFeatures | undefined;
-  genres: string[];
+  genres?: string[] | undefined;
 };
 
 export type Comment = {
