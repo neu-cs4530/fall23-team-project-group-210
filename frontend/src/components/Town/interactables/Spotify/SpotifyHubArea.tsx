@@ -56,7 +56,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
     }, {} as Record<string, Rating>),
   ); // State to store the user's like/dislike status of each song]
   const [commentLikeDict, setCommentLikeDict] = useState<RatingDictionary>(
-    // Initialize an empty dictionary. Then iterate through each song in the queue, and for each 
+    // Initialize an empty dictionary. Then iterate through each song in the queue, and for each
     // comment in each song, add the comment to the dictionary with a value of 0
     queue.reduce((acc, song) => {
       song.comments.forEach(comment => {
@@ -65,7 +65,9 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
       return acc;
     }, {} as Record<string, Rating>),
   ); // State to store the user's like/dislike status of each comment]
-  const [selectedSongForCommenting, setSelectedSongForCommenting] = useState<Song | undefined>(undefined); // State to store the selected song
+  const [selectedSongForCommenting, setSelectedSongForCommenting] = useState<Song | undefined>(
+    undefined,
+  ); // State to store the selected song
   const [commentModalIsOpen, setCommentModalIsOpen] = useState<boolean>(false); // State to store whether the comment modal is open
   const [commentInput, setCommentInput] = useState<string>(''); // State to store the comment input
 
@@ -164,8 +166,8 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
               style={{ width: '400px' }}
               placeholder='What do you want to listen to?'
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => {
+              onChange={e => setSearchTerm(e.target.value)}
+              onKeyPress={e => {
                 if (e.key === 'Enter') {
                   handleSearch(); // Trigger search when Enter key is pressed
                 }
@@ -198,8 +200,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                   status: 'error',
                 });
               }
-            }}
-          >
+            }}>
             <Icon as={FaSearch} mr={2} />
             Search
           </Button>
@@ -324,10 +325,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 isActive={songLikeDict[song.id] === 1}
                 onClick={async () => {
                   const likeDict = songLikeDict;
-                  // print out songLikeDict[song.id] and a confirmation message that the like button was clicked
-                  console.log('Song like button clicked')
-                  console.log('Song ID: ' + song.id);
-                  console.log('Song like status: ' + songLikeDict[song.id]);
                   if (songLikeDict[song.id] === 0) {
                     await spotifyAreaController.addLikeToSong(song);
                     likeDict[song.id] = 1;
@@ -341,7 +338,11 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                   }
                   setSongLikeDict({ ...likeDict });
                 }}>
-                {songLikeDict[song.id] === 1 ? <Icon as={AiFillLike} /> : <Icon as={AiOutlineLike} />}
+                {songLikeDict[song.id] === 1 ? (
+                  <Icon as={AiFillLike} />
+                ) : (
+                  <Icon as={AiOutlineLike} />
+                )}
               </Button>
 
               {/* Likes Ticker */}
@@ -354,10 +355,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 isActive={songLikeDict[song.id] === -1}
                 onClick={async () => {
                   const likeDict = songLikeDict;
-                  // print out songLikeDict[song.id] and a confirmation message that the dislike button was clicked
-                  console.log('Song dislike button clicked')
-                  console.log('Song ID: ' + song.id);
-                  console.log('Song like status: ' + songLikeDict[song.id]);
                   if (songLikeDict[song.id] === 1) {
                     await spotifyAreaController.addDislikeToSong(song);
                     await spotifyAreaController.addDislikeToSong(song);
@@ -392,7 +389,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
             </Grid>
           ))}
         </List>
-<<<<<<< HEAD
 
         {/* Modal for reading/writing comments */}
         {selectedSongForCommenting && (
@@ -429,7 +425,10 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                       });
                       return;
                     }
-                    await spotifyAreaController.addCommentToSong(selectedSongForCommenting, commentInput);
+                    await spotifyAreaController.addCommentToSong(
+                      selectedSongForCommenting,
+                      commentInput,
+                    );
                     setCommentInput('');
                   }}>
                   Post
@@ -463,23 +462,36 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                         onClick={() => {
                           const likeDict = commentLikeDict;
                           if (commentLikeDict[comment.id] === 0) {
-                            spotifyAreaController.addLikeToComment(comment, selectedSongForCommenting);
+                            spotifyAreaController.addLikeToComment(
+                              comment,
+                              selectedSongForCommenting,
+                            );
                             likeDict[comment.id] = 1;
                           } else if (commentLikeDict[comment.id] === -1) {
-                            spotifyAreaController.addLikeToComment(comment, selectedSongForCommenting);
-                            spotifyAreaController.addLikeToComment(comment, selectedSongForCommenting);
+                            spotifyAreaController.addLikeToComment(
+                              comment,
+                              selectedSongForCommenting,
+                            );
+                            spotifyAreaController.addLikeToComment(
+                              comment,
+                              selectedSongForCommenting,
+                            );
                             likeDict[comment.id] = 1;
                           } else {
-                            spotifyAreaController.addDislikeToComment(comment, selectedSongForCommenting);
+                            spotifyAreaController.addDislikeToComment(
+                              comment,
+                              selectedSongForCommenting,
+                            );
                             likeDict[comment.id] = 0;
                           }
                           setCommentLikeDict({ ...likeDict });
                         }}>
-                        {commentLikeDict[comment.id] === 1 ? <Icon as={AiFillLike} /> : <Icon as={AiOutlineLike} />}
+                        {commentLikeDict[comment.id] === 1 ? (
+                          <Icon as={AiFillLike} />
+                        ) : (
+                          <Icon as={AiOutlineLike} />
+                        )}
                       </Button>
-=======
-      </Container>
->>>>>>> 762d092 (fix: got rid of legacy code)
 
                       {/* Likes Ticker */}
                       <Text>{comment.likes}</Text>
@@ -492,14 +504,26 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                         onClick={() => {
                           const likeDict = commentLikeDict;
                           if (commentLikeDict[comment.id] === 1) {
-                            spotifyAreaController.addDislikeToComment(comment, selectedSongForCommenting);
-                            spotifyAreaController.addDislikeToComment(comment, selectedSongForCommenting);
+                            spotifyAreaController.addDislikeToComment(
+                              comment,
+                              selectedSongForCommenting,
+                            );
+                            spotifyAreaController.addDislikeToComment(
+                              comment,
+                              selectedSongForCommenting,
+                            );
                             likeDict[comment.id] = -1;
                           } else if (commentLikeDict[comment.id] === 0) {
-                            spotifyAreaController.addDislikeToComment(comment, selectedSongForCommenting);
+                            spotifyAreaController.addDislikeToComment(
+                              comment,
+                              selectedSongForCommenting,
+                            );
                             likeDict[comment.id] = -1;
                           } else {
-                            spotifyAreaController.addLikeToComment(comment, selectedSongForCommenting);
+                            spotifyAreaController.addLikeToComment(
+                              comment,
+                              selectedSongForCommenting,
+                            );
                             likeDict[comment.id] = 0;
                           }
                           setCommentLikeDict({ ...likeDict });

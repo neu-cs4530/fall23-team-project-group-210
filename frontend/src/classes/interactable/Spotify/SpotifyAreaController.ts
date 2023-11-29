@@ -284,7 +284,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
 
   /**
    * Adds a like to the comment
-   * @param comment comment to add like to 
+   * @param comment comment to add like to
    */
   async addLikeToComment(comment: Comment, song: Song): Promise<void> {
     comment.likes = comment.likes + 1;

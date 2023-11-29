@@ -5,32 +5,25 @@ import type {
   ExternalIds,
   ExternalUrls,
   AudioFeatures,
-  AccessToken,
-  SdkConfiguration,
 } from '../../../../node_modules/@spotify/web-api-ts-sdk/dist/mjs/types';
 import SpotifyAreaController from './SpotifyAreaController';
-import { SpotifyApi, PartialSearchResult, IAuthStrategy } from '@spotify/web-api-ts-sdk';
+import { SpotifyApi, PartialSearchResult } from '@spotify/web-api-ts-sdk';
 import TownController from '../../TownController';
 import TracksEndpoints from '@spotify/web-api-ts-sdk/dist/mjs/endpoints/TracksEndpoints';
-
-import { getApp } from 'firebase/app';
-import { initializeApp } from 'firebase/app';
-import { Database, getDatabase, onValue, ref, set } from 'firebase/database';
-import SongQueue from '../../../../../townService/src/town/Spotify/SongQueue';
 import { Song } from '../../../types/CoveyTownSocket';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: 'AIzaSyAIE5wWApYIghDcv-GQJCtN3_CCJHzlGmg',
-  authDomain: 'spotify-819f9.firebaseapp.com',
-  databaseURL: 'https://spotify-819f9-default-rtdb.firebaseio.com',
-  projectId: 'spotify-819f9',
-  storageBucket: 'spotify-819f9.appspot.com',
-  messagingSenderId: '643647635154',
-  appId: '1:643647635154:web:c8b7f2a749b6d44054b70b',
-  measurementId: 'G-GXPWKR312B',
-};
+// const firebaseConfig = {
+//   apiKey: 'AIzaSyAIE5wWApYIghDcv-GQJCtN3_CCJHzlGmg',
+//   authDomain: 'spotify-819f9.firebaseapp.com',
+//   databaseURL: 'https://spotify-819f9-default-rtdb.firebaseio.com',
+//   projectId: 'spotify-819f9',
+//   storageBucket: 'spotify-819f9.appspot.com',
+//   messagingSenderId: '643647635154',
+//   appId: '1:643647635154:web:c8b7f2a749b6d44054b70b',
+//   measurementId: 'G-GXPWKR312B',
+// };
 describe('SpotifyAreaController Tests', () => {
   const mockSpotifyApi = mock<SpotifyApi>();
   const out: Pick<PartialSearchResult, 'tracks'> = {};
@@ -116,7 +109,7 @@ describe('SpotifyAreaController Tests', () => {
     explicit: false,
     external_urls: externalUrls,
     href: '',
-    id: '',
+    id: '2',
     is_local: false,
     name: 'song_2',
     preview_url: null,
@@ -180,33 +173,16 @@ describe('SpotifyAreaController Tests', () => {
     duration_ms: 0,
     time_signature: 0,
   };
-  const features2: AudioFeatures = {
-    danceability: 4,
-    energy: 1,
-    key: 0,
-    loudness: 0,
-    mode: 0,
-    speechiness: 0,
-    acousticness: 1,
-    instrumentalness: 0,
-    liveness: 0,
-    valence: 0,
-    tempo: 0,
-    type: '',
-    id: '',
-    uri: '',
-    track_href: '',
-    analysis_url: '',
-    duration_ms: 0,
-    time_signature: 0,
-  };
-  const audioFeaturesMock = async (id: string): Promise<AudioFeatures> => {
-    console.log(id);
-    if (id === 'song_2_uri') {
-      return features2;
-    }
+
+  const audioFeaturesMock = async (): Promise<AudioFeatures> => {
+    // Return a single AudioFeatures for a single ID
     return features;
   };
+
+  // const audioFeaturesArrayMock = async (ids: string[]): Promise<AudioFeatures[]> => {
+  //   // Return an array of AudioFeatures for an array of IDs
+  //   return [features];
+  // };
 
   // Assign the overloads to the mockSpotifyApi.tracks.audioFeatures
   mockSpotifyApi.tracks = {
@@ -229,6 +205,7 @@ describe('SpotifyAreaController Tests', () => {
       queue: [],
       currentlyPlaying: undefined,
       playSong: false,
+      savedSongs: {},
     },
     mockTownController,
   );
@@ -258,9 +235,9 @@ describe('SpotifyAreaController Tests', () => {
         expect(resultNames).toEqual(['song_1', 'song_2', 'song_3']);
         expect(resultArtists).toEqual(['artist1', 'artist2', 'artist3']);
         expect(resultUri).toEqual(['x:x:song_1_uri', 'x:x:song_2_uri', 'x:x:song_3_uri']);
-        expect(resultDanceability).toEqual([10, 4, 10]);
-        expect(resultEnergy).toEqual([3, 1, 3]);
-        expect(resultAcousticness).toEqual([9, 1, 9]);
+        expect(resultDanceability).toEqual([10, 10, 10]);
+        expect(resultEnergy).toEqual([3, 3, 3]);
+        expect(resultAcousticness).toEqual([9, 9, 9]);
       });
     });
     describe('Add song to queue', () => {
@@ -293,6 +270,17 @@ describe('SpotifyAreaController Tests', () => {
         expect(spyOnInteractableCommand).toBeCalledTimes(1);
         expect(spyOnInteractableCommand).toHaveBeenCalledWith('1', {
           type: 'SpotifyQueueRefreshCommand',
+        });
+      });
+      describe('SpotifyAreaController search', () => {
+        it('Returns the correct search results with the proper data', async () => {
+          const results = await controller.searchSong('song');
+          const resultNames: string[] = results.map(song => song.name);
+          const resultArtists: string[] = results.map(song => song.artists[0].name);
+          const resultUri: string[] = results.map(song => song.uri);
+          expect(resultNames).toEqual(['song_1', 'song_2', 'song_3']);
+          expect(resultArtists).toEqual(['artist1', 'artist2', 'artist3']);
+          expect(resultUri).toEqual(['x:x:song_1_uri', 'x:x:song_2_uri', 'x:x:song_3_uri']);
         });
       });
     });
