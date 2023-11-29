@@ -16,7 +16,11 @@ import { Song } from '../../../types/CoveyTownSocket';
 import CurrentUserEndpoints from '@spotify/web-api-ts-sdk/dist/mjs/endpoints/CurrentUserEndpoints';
 import PlayerController from '../../PlayerController';
 describe('SpotifyAreaController Tests', () => {
+  let profileMock = async (): Promise<UserProfile> => {
+    return { display_name: 'mockDisplayName' } as unknown as UserProfile;
+  };
   const mockSpotifyApi = mock<SpotifyApi>();
+  mockSpotifyApi.currentUser = { profile: profileMock } as unknown as CurrentUserEndpoints;
   const out: Pick<PartialSearchResult, 'tracks'> = {};
   const tracks: Track[] = [];
   const externalIds: ExternalIds = {
@@ -185,7 +189,6 @@ describe('SpotifyAreaController Tests', () => {
     time_signature: 0,
   };
   const audioFeaturesMock = async (id: string): Promise<AudioFeatures> => {
-    console.log(id);
     if (id === 'song_2_uri') {
       return features2;
     }
@@ -277,7 +280,7 @@ describe('SpotifyAreaController Tests', () => {
 
     describe('Save Song', () => {
       it('Save song calls the right command', async () => {
-        const profileMock = async (): Promise<UserProfile> => {
+        profileMock = async (): Promise<UserProfile> => {
           return { display_name: 'mockDisplayName' } as unknown as UserProfile;
         };
         mockSpotifyApi.currentUser = { profile: profileMock } as unknown as CurrentUserEndpoints;
@@ -292,7 +295,7 @@ describe('SpotifyAreaController Tests', () => {
       });
 
       it('Save song throws error if username cannot be retrieved', async () => {
-        const profileMock = async (): Promise<UserProfile> => {
+        profileMock = async (): Promise<UserProfile> => {
           return { display_name: undefined } as unknown as UserProfile;
         };
         mockSpotifyApi.currentUser = { profile: profileMock } as unknown as CurrentUserEndpoints;
@@ -300,33 +303,9 @@ describe('SpotifyAreaController Tests', () => {
       });
     });
 
-    describe('Get save Song', () => {
-      it('Get save song calls the right command', async () => {
-        const profileMock = async (): Promise<UserProfile> => {
-          return { display_name: 'mockDisplayName' } as unknown as UserProfile;
-        };
-        mockSpotifyApi.currentUser = { profile: profileMock } as unknown as CurrentUserEndpoints;
-        expect(spyOnInteractableCommand).toBeCalledTimes(0);
-        await controller.getSavedSong();
-        expect(spyOnInteractableCommand).toBeCalledTimes(1);
-        expect(spyOnInteractableCommand).toHaveBeenCalledWith('1', {
-          type: 'SpotifyGetSavedSongsCommand',
-          userName: 'mockDisplayName',
-        });
-      });
-
-      it('Get save song throws error if username cannot be retrieved', async () => {
-        const profileMock = async (): Promise<UserProfile> => {
-          return { display_name: undefined } as unknown as UserProfile;
-        };
-        mockSpotifyApi.currentUser = { profile: profileMock } as unknown as CurrentUserEndpoints;
-        await expect(controller.getSavedSong()).rejects.toThrow('User not signed in');
-      });
-    });
-
     describe('Remove saved song', () => {
       it('Remove song calls the right command', async () => {
-        const profileMock = async (): Promise<UserProfile> => {
+        profileMock = async (): Promise<UserProfile> => {
           return { display_name: 'mockDisplayName' } as unknown as UserProfile;
         };
         mockSpotifyApi.currentUser = { profile: profileMock } as unknown as CurrentUserEndpoints;
@@ -341,7 +320,7 @@ describe('SpotifyAreaController Tests', () => {
       });
 
       it('Get save song throws error if username cannot be retrieved', async () => {
-        const profileMock = async (): Promise<UserProfile> => {
+        profileMock = async (): Promise<UserProfile> => {
           return { display_name: undefined } as unknown as UserProfile;
         };
         mockSpotifyApi.currentUser = { profile: profileMock } as unknown as CurrentUserEndpoints;

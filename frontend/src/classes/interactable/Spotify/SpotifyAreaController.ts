@@ -31,6 +31,8 @@ export default class SpotifyAreaController extends InteractableAreaController<
 
   private _townController: TownController;
 
+  protected _userName: string | undefined;
+
   /**
    * Create a new SpotifyAreaController
    * @param id
@@ -46,6 +48,19 @@ export default class SpotifyAreaController extends InteractableAreaController<
 
   get queue(): Song[] {
     return this._spotifyAreaModel.queue;
+  }
+
+  public async savedSongs(): Promise<Song[]> {
+    if (!this._userName) {
+      await this.setUsername();
+    }
+
+    if (this._userName) {
+      const savedSongs = this._spotifyAreaModel.savedSongs[this._userName];
+      return savedSongs;
+    } else {
+      return [];
+    }
   }
 
   public async addSongToQueue(song: Song): Promise<void> {
@@ -67,6 +82,19 @@ export default class SpotifyAreaController extends InteractableAreaController<
     });
   }
 
+  /**
+   * Need to set the username field here, since it is an asych call to fetch it from the spotify api
+   * @returns the song at the top of the queue
+   */
+  public async setUsername(): Promise<void> {
+    const profile = await this._spotifyAPI?.currentUser.profile();
+    const userName = profile?.display_name;
+    if (!userName) {
+      throw new Error('User not signed in');
+    }
+    this._userName = userName;
+  }
+
   private async _getSongAnalytics(uri: string): Promise<AudioFeatures | undefined> {
     const parts = uri.split(':');
     const id = parts[2];
@@ -83,69 +111,52 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   public async clearQueue(): Promise<void> {
+    if (!this._spotifyAPI) {
+      throw Error('Spotify details not provided on sign-in');
+    }
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyClearQueueCommand',
     });
   }
 
   public async saveSong(song: Song): Promise<void> {
-    const songToSave: Song = {
-      id: uuidv4(),
-      albumUri: song.albumUri,
-      uri: song.uri,
-      name: song.name,
-      artists: song.artists,
-      likes: song.likes,
-      comments: song.comments,
-      albumImage: song.albumImage,
-      songAnalytics: song.songAnalytics,
-    };
-    const profile = await this._spotifyAPI?.currentUser.profile();
-    const userName = profile?.display_name;
-    if (!userName) {
-      throw new Error('User not signed in');
+    if (!this._userName) {
+      await this.setUsername();
     }
-    await this._townController.sendInteractableCommand(this.id, {
-      type: 'SpotifySaveSongCommand',
-      song: songToSave,
-      userName: userName,
-    });
+    if (this._userName) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'SpotifySaveSongCommand',
+        song: song,
+        userName: this._userName,
+      });
+    }
   }
 
-  public async getSavedSong(): Promise<void> {
-    const profile = await this._spotifyAPI?.currentUser.profile();
-    const userName = profile?.display_name;
-    if (!userName) {
-      throw new Error('User not signed in');
+  public async refreshSavedSongs(): Promise<void> {
+    if (!this._userName) {
+      await this.setUsername();
     }
-    await this._townController.sendInteractableCommand(this.id, {
-      type: 'SpotifyGetSavedSongsCommand',
-      userName: userName,
-    });
+    if (this._userName) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'SpotifyGetSavedSongsCommand',
+        userName: this._userName,
+      });
+      const savedSongs = this._spotifyAreaModel.savedSongs[this._userName];
+      console.log('saved songs: ' + savedSongs);
+    }
   }
 
   public async removeSong(song: Song): Promise<void> {
-    const songToRemove: Song = {
-      id: uuidv4(),
-      albumUri: song.albumUri,
-      uri: song.uri,
-      name: song.name,
-      artists: song.artists,
-      likes: song.likes,
-      comments: song.comments,
-      albumImage: song.albumImage,
-      songAnalytics: song.songAnalytics,
-    };
-    const profile = await this._spotifyAPI?.currentUser.profile();
-    const userName = profile?.display_name;
-    if (!userName) {
-      throw new Error('User not signed in');
+    if (!this._userName) {
+      await this.setUsername();
     }
-    await this._townController.sendInteractableCommand(this.id, {
-      type: 'SpotifyRemoveSongCommand',
-      song: songToRemove,
-      userName: userName,
-    });
+    if (this._userName) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'SpotifyRemoveSongCommand',
+        song: song,
+        userName: this._userName,
+      });
+    }
   }
 
   /**
@@ -332,6 +343,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
       this._spotifyAreaModel.playSong = false;
     }
     this.emit('queueUpdated');
+    this.emit('savedSongsUpdated');
   }
 
   public isActive(): boolean {

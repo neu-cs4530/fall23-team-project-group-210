@@ -136,7 +136,7 @@ export default class SpotifyArea extends InteractableArea {
       return {} as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'SpotifySaveSongCommand') {
-      this.songSave(command.song, player.id);
+      this.songSave(command.song, command.userName);
       this._emitAreaChanged();
       return {} as InteractableCommandReturnType<CommandType>;
     }
@@ -145,7 +145,7 @@ export default class SpotifyArea extends InteractableArea {
       return {} as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'SpotifyRemoveSongCommand') {
-      this.songRemove(player.id, command.song);
+      this.songRemove(command.userName, command.song);
       this._emitAreaChanged();
       return {} as InteractableCommandReturnType<CommandType>;
     }
@@ -193,16 +193,18 @@ export default class SpotifyArea extends InteractableArea {
    * Save the given song to the database for the given userId
    * @param song song to be saved
    * @param playerId playerId who saved the song
-   * @param votes the number of votes the song has
    */
   public songSave(song: Song, playerId: string): void {
-    if (!this._savedSongs[playerId].includes(song)) {
+    if (!this._savedSongs[playerId]) {
+      this._savedSongs[playerId] = [];
+    }
+    if (!this._savedSongs[playerId].some(savedSong => savedSong.id === song.id)) {
       this._savedSongs[playerId].push(song);
       const db = getDatabase();
       const reference = ref(db, `player/${playerId}/saved songs`);
 
       // Check if song exists
-      onValue(reference, snapshot => {
+      const unsubscribe = onValue(reference, snapshot => {
         if (snapshot.val()) {
           update(reference, {
             name: song.name,
@@ -218,6 +220,7 @@ export default class SpotifyArea extends InteractableArea {
           set(reference, song);
         }
       });
+      unsubscribe();
     }
   }
 
@@ -225,12 +228,12 @@ export default class SpotifyArea extends InteractableArea {
    * Return a dictionary of saved songs for all user.
    * @param playerId The array of ids of the player whose saved songs we're fetching
    */
-  public songsFromDatabase(playerIDS: string[]): Record<string, Song[]> {
+  public songsFromDatabase(playerIDS: string[]): void {
     const db = getDatabase(this._app);
     const savedSongDict = playerIDS.reduce((acc, player) => {
       const reference = ref(db, `player/${player}/savedSongs`);
       const savedSongs: Song[] = [];
-      onValue(reference, snapshot => {
+      const unsubscribe = onValue(reference, snapshot => {
         if (snapshot.val()) {
           snapshot.forEach(childSnapshot => {
             const songData: Song = {
@@ -247,11 +250,12 @@ export default class SpotifyArea extends InteractableArea {
             savedSongs.push(songData);
           });
         }
+        unsubscribe();
       });
       acc[player] = savedSongs;
       return acc;
     }, {} as Record<string, Song[]>);
-    return savedSongDict;
+    this._savedSongs = savedSongDict;
   }
 
   /**

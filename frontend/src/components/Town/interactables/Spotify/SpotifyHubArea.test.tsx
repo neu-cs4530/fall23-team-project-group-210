@@ -102,6 +102,14 @@ class MockSpotifyAreaController extends SpotifyAreaController {
     super(nanoid(), mock<SpotifyAreaModel>(), mock<TownController>());
   }
 
+  public async setUsername(): Promise<void> {
+    this._userName = nanoid();
+  }
+
+  public async refreshSavedSongs(): Promise<void> {
+    return;
+  }
+
   // mock the functions that are called in the constructor
   get queue(): Song[] {
     return MOCK_QUEUE;
