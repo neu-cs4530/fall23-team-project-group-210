@@ -100,15 +100,27 @@ export default class SpotifyAreaController extends InteractableAreaController<
       albumImage: song.albumImage,
       songAnalytics: song.songAnalytics,
     };
+    const profile = await this._spotifyAPI?.currentUser.profile();
+    const userName = profile?.display_name;
+    if (!userName) {
+      throw new Error('User not signed in');
+    }
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifySaveSongCommand',
       song: songToSave,
+      userName: userName,
     });
   }
 
   public async getSavedSong(): Promise<void> {
+    const profile = await this._spotifyAPI?.currentUser.profile();
+    const userName = profile?.display_name;
+    if (!userName) {
+      throw new Error('User not signed in');
+    }
     await this._townController.sendInteractableCommand(this.id, {
-      type: 'SpotifyGetSaveSongCommand',
+      type: 'SpotifyGetSavedSongsCommand',
+      userName: userName,
     });
   }
 
@@ -124,9 +136,15 @@ export default class SpotifyAreaController extends InteractableAreaController<
       albumImage: song.albumImage,
       songAnalytics: song.songAnalytics,
     };
+    const profile = await this._spotifyAPI?.currentUser.profile();
+    const userName = profile?.display_name;
+    if (!userName) {
+      throw new Error('User not signed in');
+    }
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyRemoveSongCommand',
       song: songToRemove,
+      userName: userName,
     });
   }
 

@@ -21,7 +21,7 @@ export type Image = {
   url: string;
   height: number;
   width: number;
-}
+};
 
 export interface AudioFeatures {
   danceability: number;
@@ -124,6 +124,7 @@ export interface SpotifyModel extends Interactable {
   queue: Song[];
   currentlyPlaying: Song | undefined;
   playSong: boolean;
+  savedSongs: Record<string, Song[]>;
 }
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER';
@@ -238,7 +239,7 @@ export type InteractableCommand =
   | SpotifyAddSongCommand
   | SpotifyClearQueueCommand
   | SpotifySaveSongCommand
-  | SpotifyGetSaveSongCommand
+  | SpotifyGetSavedSongsCommand
   | SpotifyRemoveSongCommand;
 export interface ViewingAreaUpdateCommand {
   type: 'ViewingAreaUpdate';
@@ -280,14 +281,17 @@ export interface SpotifyClearQueueCommand {
 export interface SpotifySaveSongCommand {
   type: 'SpotifySaveSongCommand';
   song: Song;
+  userName: string;
 }
-export interface SpotifyGetSaveSongCommand {
-  type: 'SpotifyGetSaveSongCommand';
+export interface SpotifyGetSavedSongsCommand {
+  type: 'SpotifyGetSavedSongsCommand';
+  userName: string;
 }
 
 export interface SpotifyRemoveSongCommand {
   type: 'SpotifyRemoveSongCommand';
   song: Song;
+  userName: string;
 }
 
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> =
@@ -311,7 +315,7 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
   ? undefined
   : CommandType extends SpotifySaveSongCommand
   ? undefined
-  : CommandType extends SpotifyGetSaveSongCommand
+  : CommandType extends SpotifyGetSavedSongsCommand
   ? undefined
   : CommandType extends SpotifyRemoveSongCommand
   ? undefined

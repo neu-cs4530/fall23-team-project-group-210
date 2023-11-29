@@ -1,6 +1,6 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
-import { initializeApp } from 'firebase/app';
-import { getDatabase, onValue, ref, remove, set, update } from 'firebase/database';
+import { FirebaseApp, initializeApp } from '@firebase/app';
+import { getDatabase, onValue, ref, remove, set, update } from '@firebase/database';
 import InvalidParametersError from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
 import {
@@ -28,16 +28,16 @@ const firebaseConfig = {
   appId: '1:643647635154:web:c8b7f2a749b6d44054b70b',
   measurementId: 'G-GXPWKR312B',
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
 export default class SpotifyArea extends InteractableArea {
   private _queue: SongQueue;
 
   private _currentSong: Song | undefined;
 
   private _playSong: boolean;
+
+  private _app: FirebaseApp;
+
+  private _savedSongs: Record<string, Song[]> = {};
 
   public constructor(
     { id, queue }: Omit<SpotifyModel, 'type'>,
@@ -47,6 +47,8 @@ export default class SpotifyArea extends InteractableArea {
     super(id, coordinates, townEmitter);
     this._queue = new SongQueue(queue);
     this._playSong = false;
+    this._savedSongs = {};
+    this._app = initializeApp(firebaseConfig);
   }
 
   public toModel(): SpotifyModel {
@@ -57,6 +59,7 @@ export default class SpotifyArea extends InteractableArea {
       queue: this._queue.songs,
       playSong: this._playSong,
       currentlyPlaying: this._currentSong,
+      savedSongs: this._savedSongs,
     };
   }
 
@@ -65,9 +68,10 @@ export default class SpotifyArea extends InteractableArea {
    *
    * @param viewingArea updated model
    */
-  public updateModel(update: SpotifyModel) {
-    this._queue = new SongQueue(update.queue);
-    this._currentSong = update.currentlyPlaying;
+  public updateModel(updateModel: SpotifyModel) {
+    this._queue = new SongQueue(updateModel.queue);
+    this._currentSong = updateModel.currentlyPlaying;
+    this._savedSongs = updateModel.savedSongs;
     this._emitAreaChanged();
   }
 
@@ -125,7 +129,7 @@ export default class SpotifyArea extends InteractableArea {
       this._emitAreaChanged();
       return {} as InteractableCommandReturnType<CommandType>;
     }
-    if (command.type === 'SpotifyGetSaveSongCommand') {
+    if (command.type === 'SpotifyGetSavedSongsCommand') {
       this._emitAreaChanged();
       return {} as InteractableCommandReturnType<CommandType>;
     }
@@ -156,6 +160,7 @@ export default class SpotifyArea extends InteractableArea {
         currentlyPlaying: undefined,
         playSong: false,
         occupants: [],
+        savedSongs: {},
       },
       rect,
       townEmitter,
@@ -169,34 +174,37 @@ export default class SpotifyArea extends InteractableArea {
    * @param votes the number of votes the song has
    */
   public songSave(song: Song, playerId: string): void {
-    const db = getDatabase();
-    const reference = ref(db, `player/${playerId}/saved songs`);
+    if (!this._savedSongs[playerId].includes(song)) {
+      this._savedSongs[playerId].push(song);
+      const db = getDatabase();
+      const reference = ref(db, `player/${playerId}/saved songs`);
 
-    // Check if song exists
-    onValue(reference, snapshot => {
-      if (snapshot.val()) {
-        update(reference, {
-          name: song.name,
-          albumUri: song.albumUri,
-          artists: song.artists,
-          likes: song.likes,
-          comments: song.comments,
-          albumImage: song.albumImage,
-          songAnalytics: song.songAnalytics,
-        });
-      } else {
-        // Song doesn't exist, save it as a new song
-        set(reference, song);
-      }
-    });
+      // Check if song exists
+      onValue(reference, snapshot => {
+        if (snapshot.val()) {
+          update(reference, {
+            name: song.name,
+            albumUri: song.albumUri,
+            artists: song.artists,
+            likes: song.likes,
+            comments: song.comments,
+            albumImage: song.albumImage,
+            songAnalytics: song.songAnalytics,
+          });
+        } else {
+          // Song doesn't exist, save it as a new song
+          set(reference, song);
+        }
+      });
+    }
   }
 
   /**
    * Return a dictionary of saved songs for all user.
    * @param playerId The array of ids of the player whose saved songs we're fetching
    */
-  public songFromDatabase(playerIDS: string[]): Record<string, Song[]> {
-    const db = getDatabase(app);
+  public songsFromDatabase(playerIDS: string[]): Record<string, Song[]> {
+    const db = getDatabase(this._app);
     const savedSongDict = playerIDS.reduce((acc, player) => {
       const reference = ref(db, `player/${player}/savedSongs`);
       const savedSongs: Song[] = [];
@@ -230,6 +238,9 @@ export default class SpotifyArea extends InteractableArea {
    * @param song The song that we are removing.
    */
   public songRemove(playerId: string, song: Song): void {
+    this._savedSongs[playerId] = this._savedSongs[playerId].filter(
+      (savedSong: Song) => savedSong.id !== song.id,
+    );
     const db = getDatabase();
     const songRef = ref(db, `player/${playerId}/savedSongs/${song.id}`);
 
