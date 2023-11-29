@@ -17,7 +17,20 @@ const MOCK_QUEUE: Song[] = [
     uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 1',
     likes: 10,
-    comments: ['Great song!', 'I love this one'],
+    comments: [
+      {
+        id: '1',
+        author: 'test',
+        body: 'Great song!',
+        likes: 0,
+      },
+      {
+        id: '2',
+        author: 'test',
+        body: 'I love this one',
+        likes: 0,
+      },
+    ],
     albumUri: '',
     artists: [],
     albumImage: {
@@ -32,7 +45,20 @@ const MOCK_QUEUE: Song[] = [
     uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 2',
     likes: 5,
-    comments: ['Not my favorite', 'Could be better'],
+    comments: [
+      {
+        id: '3',
+        author: 'test',
+        body: 'Not my favorite',
+        likes: 0,
+      },
+      {
+        id: '4',
+        author: 'test',
+        body: 'Could be better',
+        likes: 0,
+      },
+    ],
     albumUri: '',
     artists: [],
     albumImage: {
@@ -47,7 +73,21 @@ const MOCK_QUEUE: Song[] = [
     uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 3',
     likes: 20,
-    comments: ['This is amazing!', 'Best song ever'],
+    // comments: ['This is amazing!', 'Best song ever'],
+    comments: [
+      {
+        id: '5',
+        author: 'test',
+        body: 'This is amazing!',
+        likes: 0,
+      },
+      {
+        id: '6',
+        author: 'test',
+        body: 'Best song ever',
+        likes: 0,
+      },
+    ],
     albumUri: '',
     artists: [],
     albumImage: {
