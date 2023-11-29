@@ -60,6 +60,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
       albumImage: song.albumImage,
       songAnalytics: song.songAnalytics,
       genre: song.genre,
+      genres: song.genres,
     };
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyAddSongCommand',
@@ -167,6 +168,9 @@ export default class SpotifyAreaController extends InteractableAreaController<
     // @ts-ignore
     // eslint-disable-next-line prettier/prettier
     const items: Required<Pick<PartialSearchResult, "tracks">> = await this._spotifyAPI.search(searchString, ['track'], undefined, 5);
+    items.tracks.items.forEach(item => {
+      console.log(item.album);
+    });
     const songs: Promise<Song>[] = items.tracks.items.map(async item => ({
       id: uuidv4(),
       albumUri: item.album.uri,
@@ -175,7 +179,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
       artists: item.artists,
       likes: 0,
       comments: [],
-      genre: undefined,
+      genres: item.album.genres,
       albumImage: item.album.images[0],
       songAnalytics: await this._getSongAnalytics(item.uri),
     }));
