@@ -5,12 +5,32 @@ import type {
   ExternalIds,
   ExternalUrls,
   AudioFeatures,
+  AccessToken,
+  SdkConfiguration,
 } from '../../../../node_modules/@spotify/web-api-ts-sdk/dist/mjs/types';
 import SpotifyAreaController from './SpotifyAreaController';
-import { SpotifyApi, PartialSearchResult } from '@spotify/web-api-ts-sdk';
+import { SpotifyApi, PartialSearchResult, IAuthStrategy } from '@spotify/web-api-ts-sdk';
 import TownController from '../../TownController';
 import TracksEndpoints from '@spotify/web-api-ts-sdk/dist/mjs/endpoints/TracksEndpoints';
+
+import { getApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
+import { Database, getDatabase, onValue, ref, set } from 'firebase/database';
+import SongQueue from '../../../../../townService/src/town/Spotify/SongQueue';
 import { Song } from '../../../types/CoveyTownSocket';
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: 'AIzaSyAIE5wWApYIghDcv-GQJCtN3_CCJHzlGmg',
+  authDomain: 'spotify-819f9.firebaseapp.com',
+  databaseURL: 'https://spotify-819f9-default-rtdb.firebaseio.com',
+  projectId: 'spotify-819f9',
+  storageBucket: 'spotify-819f9.appspot.com',
+  messagingSenderId: '643647635154',
+  appId: '1:643647635154:web:c8b7f2a749b6d44054b70b',
+  measurementId: 'G-GXPWKR312B',
+};
 describe('SpotifyAreaController Tests', () => {
   const mockSpotifyApi = mock<SpotifyApi>();
   const out: Pick<PartialSearchResult, 'tracks'> = {};
@@ -278,3 +298,187 @@ describe('SpotifyAreaController Tests', () => {
     });
   });
 });
+
+/**
+ * spotify.search.mockImplementation(async (a: string, b: string[], c: SpotifyApi.Options, d: (error: any, response: SpotifyApi.Response) => void): Promise<SpotifyApi.Response> => {
+   return Promise.resolve({
+     tracks: {
+       // ... provide the expected structure with types
+     }
+   } as SpotifyApi.Response);
+});
+
+spotify.search.mockImplementation(async (a, b, c, d) => {
+   return Promise.resolve({
+     tracks: {
+       // ... provide the expected structure
+     }
+   });
+});
+ */
+
+// describe('Database', () => {
+//   let database: Database;
+//   let mockSpotifyAreaController: SpotifyAreaController;
+//   const userId = '1234';
+//   const mockTownController = mock<TownController>();
+//   const song1: Song = {
+//     id: 'someId',
+//     albumUri: 'someAlbumUri',
+//     uri: 'someUri',
+//     artists: [{ name: 'artist1', uri: 'artist1Uri' }],
+//     name: 'Test Song',
+//     likes: 5,
+//     comments: [
+//       {
+//         id: '1',
+//         author: 'author1',
+//         body: 'Great song!',
+//         likes: 0,
+//       },
+//     ],
+//     albumImage: {
+//       url: '',
+//       height: 0,
+//       width: 0,
+//     },
+//     songAnalytics: {
+//       danceability: 1,
+//       energy: 1,
+//       key: 1,
+//       loudness: 1,
+//       mode: 1,
+//       speechiness: 1,
+//       acousticness: 1,
+//       instrumentalness: 1,
+//       liveness: 1,
+//       valence: 1,
+//       tempo: 1,
+//       type: 'string',
+//       id: 'string',
+//       uri: 'string',
+//       track_href: 'string',
+//       analysis_url: 'string',
+//       duration_ms: 1,
+//       time_signature: 1,
+//     },
+//   };
+//   const song2: Song = {
+//     id: 'idisnew',
+//     albumUri: 'albumnnew',
+//     uri: 'newuri',
+//     artists: [{ name: 'artist341', uri: 'artist1Uri' }],
+//     name: 'Test Song',
+//     likes: 5,
+//     comments: [
+//       {
+//         id: '1',
+//         author: 'author1',
+//         body: 'Great song!',
+//         likes: 0,
+//       },
+//     ],
+//     albumImage: {
+//       url: '',
+//       height: 0,
+//       width: 0,
+//     },
+//     songAnalytics: {
+//       danceability: 1,
+//       energy: 1,
+//       key: 1,
+//       loudness: 1,
+//       mode: 1,
+//       speechiness: 1,
+//       acousticness: 1,
+//       instrumentalness: 1,
+//       liveness: 1,
+//       valence: 1,
+//       tempo: 1,
+//       type: 'c',
+//       id: 'd',
+//       uri: 's',
+//       track_href: 'd',
+//       analysis_url: 'a',
+//       duration_ms: 1,
+//       time_signature: 1,
+//     },
+//   };
+
+//   beforeEach(() => {
+//     // const app = initializeAdminApp({ projectId: projectId });
+//     const app = initializeApp(firebaseConfig);
+//     database = getDatabase(app);
+//     mockSpotifyAreaController = new SpotifyAreaController(
+//       '1',
+//       {
+//         id: '1',
+//         type: 'SpotifyArea',
+//         occupants: [],
+//         queue: [],
+//         currentlyPlaying: undefined,
+//         playSong: false,
+//       },
+//       mockTownController,
+//     );
+//   });
+
+//   it('can save song to the database', async () => {
+//     mockSpotifyAreaController.saveSong(song2);
+
+//     const savedSongRef = ref(database, `player/${userId}/saved songs`);
+//     let savedSong;
+//     console.log(mockSpotifyAreaController);
+//     onValue(savedSongRef, snapshot => {
+//       savedSong = snapshot.val();
+//     });
+//     expect(savedSong).toEqual(song1);
+
+//     // add song 2
+//     mockSpotifyAreaController.saveSong(song2);
+//     await onValue(savedSongRef, snapshot => {
+//       savedSong = snapshot.val();
+//     });
+//     expect(savedSong).toEqual(expect.arrayContaining([song1, song2]));
+//     //expect(savedSong).toEqual(expect.arrayContaining([song]));
+//   });
+
+//   it('should retrieve saved songs from the database', async () => {
+//     mockSpotifyAreaController.saveSong(song1);
+//     // await set(ref(database, `player/${userId}/saved songs`), [song1]);
+
+//     const savedSongs = mockSpotifyAreaController.getSavedSong();
+
+//     expect(savedSongs).toEqual(expect.arrayContaining([song1]));
+
+//     mockSpotifyAreaController.saveSong(song2);
+//     const savedSongs2 = mockSpotifyAreaController.getSavedSong();
+//     expect(savedSongs2).toEqual(expect.arrayContaining([song1, song2]));
+//   });
+//   it('should handle the case when no songs are found', async () => {
+//     // const userIdWithNoSongs = 7789;
+//     // await expect(mockSpotifyAreaController.getSavedSongs(userIdWithNoSongs)).rejects.toThrow(
+//     //   'No songs found for the player',
+//     // );
+//     await expect(mockSpotifyAreaController.getSavedSong()).resolves.toEqual([]);
+//   });
+//   it('removes a song from the players saved songs', async () => {
+//     const newuserId = 1888;
+//     // Add two songs to the database
+//     await mockSpotifyAreaController.saveSong(song1);
+//     await mockSpotifyAreaController.saveSong(song2);
+
+//     // Remove one song from the player's saved songs
+//     await mockSpotifyAreaController.removeSong(song1);
+
+//     // Check if there is only one song left in the database
+//     const savedSongsRef = ref(database, `player/${newuserId}/saved songs`);
+//     let savedSongs;
+
+//     await onValue(savedSongsRef, snapshot => {
+//       savedSongs = snapshot.val();
+//     });
+
+//     expect(savedSongs).toEqual(song2);
+//   });
+// });
