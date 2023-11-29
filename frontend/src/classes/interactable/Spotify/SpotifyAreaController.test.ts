@@ -173,10 +173,31 @@ describe('SpotifyAreaController Tests', () => {
     duration_ms: 0,
     time_signature: 0,
   };
-
+  const features2: AudioFeatures = {
+    danceability: 4,
+    energy: 1,
+    key: 0,
+    loudness: 0,
+    mode: 0,
+    speechiness: 0,
+    acousticness: 1,
+    instrumentalness: 0,
+    liveness: 0,
+    valence: 0,
+    tempo: 0,
+    type: '',
+    id: '',
+    uri: '',
+    track_href: '',
+    analysis_url: '',
+    duration_ms: 0,
+    time_signature: 0,
+  };
   const audioFeaturesMock = async (id: string): Promise<AudioFeatures> => {
-    // Return a single AudioFeatures for a single ID
-    features.id = id;
+    console.log(id);
+    if (id === 'song_2_uri') {
+      return features2;
+    }
     return features;
   };
 
@@ -231,9 +252,9 @@ describe('SpotifyAreaController Tests', () => {
         expect(resultNames).toEqual(['song_1', 'song_2', 'song_3']);
         expect(resultArtists).toEqual(['artist1', 'artist2', 'artist3']);
         expect(resultUri).toEqual(['x:x:song_1_uri', 'x:x:song_2_uri', 'x:x:song_3_uri']);
-        expect(resultDanceability).toEqual([10, 10, 10]);
-        expect(resultEnergy).toEqual([3, 3, 3]);
-        expect(resultAcousticness).toEqual([9, 9, 9]);
+        expect(resultDanceability).toEqual([10, 4, 10]);
+        expect(resultEnergy).toEqual([3, 1, 3]);
+        expect(resultAcousticness).toEqual([9, 1, 9]);
       });
     });
     describe('Add song to queue', () => {
