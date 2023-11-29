@@ -5,7 +5,6 @@ import { Song, SpotifyModel } from '../../../types/CoveyTownSocket';
 import InteractableAreaController, {
   BaseInteractableEventMap,
 } from '../InteractableAreaController';
-
 /**
  * Events to be emitted. I believe this tells the frontend to rerender. Right now
  * only adding a queueChanged event, but may need more types of events like new comments, likes,
@@ -89,21 +88,64 @@ export default class SpotifyAreaController extends InteractableAreaController<
     });
   }
 
-  /**
-   * Save the given song to the database for the given userId
-   * @param song song to be saved
-   * @param playerId playerId who saved the song
-   */
-  saveSong(song: Song, playerId: number): void {
-    throw new Error('Method not implemented.' + song + playerId);
+  public async saveSong(song: Song): Promise<void> {
+    const songToSave: Song = {
+      id: uuidv4(),
+      albumUri: song.albumUri,
+      uri: song.uri,
+      name: song.name,
+      artists: song.artists,
+      likes: song.likes,
+      comments: song.comments,
+      albumImage: song.albumImage,
+      songAnalytics: song.songAnalytics,
+    };
+    const profile = await this._spotifyAPI?.currentUser.profile();
+    const userName = profile?.display_name;
+    if (!userName) {
+      throw new Error('User not signed in');
+    }
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifySaveSongCommand',
+      song: songToSave,
+      userName: userName,
+    });
   }
 
-  /**
-   * return the saved songs of the player with the provided id
-   * @param playerId the Id of the player whose saved songs we're fetching
-   */
-  getSavedSongs(playerId: number): Song[] {
-    throw new Error('Method not implemented.' + playerId);
+  public async getSavedSong(): Promise<void> {
+    const profile = await this._spotifyAPI?.currentUser.profile();
+    const userName = profile?.display_name;
+    if (!userName) {
+      throw new Error('User not signed in');
+    }
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyGetSavedSongsCommand',
+      userName: userName,
+    });
+  }
+
+  public async removeSong(song: Song): Promise<void> {
+    const songToRemove: Song = {
+      id: uuidv4(),
+      albumUri: song.albumUri,
+      uri: song.uri,
+      name: song.name,
+      artists: song.artists,
+      likes: song.likes,
+      comments: song.comments,
+      albumImage: song.albumImage,
+      songAnalytics: song.songAnalytics,
+    };
+    const profile = await this._spotifyAPI?.currentUser.profile();
+    const userName = profile?.display_name;
+    if (!userName) {
+      throw new Error('User not signed in');
+    }
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'SpotifyRemoveSongCommand',
+      song: songToRemove,
+      userName: userName,
+    });
   }
 
   private _capitalizeEveryWord(inputString: string): string {
