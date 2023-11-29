@@ -149,8 +149,12 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   /**
+<<<<<<< HEAD
    * Capitalizes every word in the input string
    *
+=======
+   * Capitalize the first letter of every word in the input string
+>>>>>>> c4fa2db (linting)
    * @param inputString the string to capitalize
    * @returns the capitalized string
    */

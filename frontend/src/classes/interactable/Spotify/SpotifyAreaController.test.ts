@@ -69,7 +69,7 @@ describe('SpotifyAreaController Tests', () => {
       width: 0,
     },
     songAnalytics: undefined,
-    genre: undefined,
+    genres: [],
   };
   const track: Track = {
     album: album,
@@ -174,7 +174,7 @@ describe('SpotifyAreaController Tests', () => {
     time_signature: 0,
   };
 
-  const audioFeaturesMock = async (): Promise<AudioFeatures> => {
+  const audioFeaturesMock = async (id: string): Promise<AudioFeatures> => {
     // Return a single AudioFeatures for a single ID
     features.id = id;
     return features;
