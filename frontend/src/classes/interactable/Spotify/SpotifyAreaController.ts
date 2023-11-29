@@ -59,8 +59,8 @@ export default class SpotifyAreaController extends InteractableAreaController<
       comments: song.comments,
       albumImage: song.albumImage,
       songAnalytics: song.songAnalytics,
+      genres: song.genres,
     };
-    console.log('url: ' + song.albumImage.url);
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyAddSongCommand',
       song: songToAdd,
@@ -148,13 +148,15 @@ export default class SpotifyAreaController extends InteractableAreaController<
     });
   }
 
+  private _capitalizeEveryWord(inputString: string): string {
+    return inputString.replace(/\b\w/g, char => char.toUpperCase());
+  }
+
   /**
    * Return the search results of the provided song name
    * @param songName the name of the song provided by the frontend from the user
    */
-  //UPDATE TO BE ABLE TO SEARCH FOR ALBUMS AND ARTISTS AS WELL
   async searchSong(searchString: string): Promise<Song[]> {
-    console.log(this._spotifyAreaModel.queue.length);
     if (!this._spotifyAPI) {
       throw Error('Spotify details not provided');
     }
@@ -173,10 +175,24 @@ export default class SpotifyAreaController extends InteractableAreaController<
       artists: item.artists,
       likes: 0,
       comments: [],
+      genres: undefined,
       albumImage: item.album.images[0],
       songAnalytics: await this._getSongAnalytics(item.uri),
     }));
     const out: Song[] = await Promise.all(songs);
+    out.forEach(async song => {
+      const genres =
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        (await this._spotifyAPI?.search(song.artists[0].name, ['artist']))?.artists?.items[0]
+          .genres ?? undefined;
+      if (genres) {
+        for (let i = 0; i < genres.length; i++) {
+          genres[i] = this._capitalizeEveryWord(genres[i]);
+        }
+        song.genres = genres;
+      }
+    });
     return out;
   }
 
@@ -216,7 +232,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
     if (!this._spotifyAPI) {
       throw new Error('Spotify api not provided');
     }
-    console.log('SHOULD PLAY');
     this._spotifyAPI.player.startResumePlayback(this._device.id, current.albumUri, undefined, {
       uri: current.uri,
     });

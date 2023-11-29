@@ -79,9 +79,7 @@ export default function TownSelection(): JSX.Element {
 
   useEffect(() => {
     const logAPISearch = async () => {
-      // console.log('Searching Spotify for The Beatles...'); // Let's see if the API search is working
       console.log('Searching Spotify for devices...'); // Let's see if the API search is working
-
       try {
         // const items = await spotifyAPI?.search('The Beatles', ['artist']);
         const devices = await spotifyAPI?.player.getAvailableDevices();
