@@ -68,7 +68,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   const [songAnalytics, setSongAnalytics] = useState(false);
   const [songForAnalytics, setSongForAnalytics] = useState<Song>();
   const [viewSavedSongs, setViewSavedSongs] = useState<boolean>(false); // State to store whether the user is viewing their saved songs
-  const [savedSongs, setSavedSongs] = useState<Song[]>(spotifyAreaController.savedSongs); // State to store the user's saved songs
+  const [savedSongs, setSavedSongs] = useState<Song[]>([]); // State to store the user's saved songs
   const [likeDict, setLikeDict] = useState<SongDictionary>(
     spotifyAreaController.queue.reduce((acc, song) => {
       acc[song.id] = 0;
@@ -93,6 +93,24 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Your asynchronous operation, for example, fetching data from an API
+        const result = await spotifyAreaController.savedSongs();
+        await spotifyAreaController.refreshQueue();
+
+        // Assuming result is an Element, you set it to the state
+        setSavedSongs(result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    // Call the async function
+    fetchData();
+  }, [spotifyAreaController]);
+
+  useEffect(() => {
     const updateSpotifyState = () => {
       setQueue([...spotifyAreaController.queue]);
 
@@ -109,7 +127,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
     };
 
     const updateSavedSongs = async () => {
-      const newSavedSongs = spotifyAreaController.savedSongs;
+      const newSavedSongs = await spotifyAreaController.savedSongs();
       if (newSavedSongs) {
         setSavedSongs([...newSavedSongs]);
         console.log('saved songs updated');
@@ -172,8 +190,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         </Box>
         {/* Text */}
         <Text fontSize={13} w='400px' noOfLines={[1, 2]}>
-          {song.name} - Artist: {song.artists[0]?.name} - Genre:{' '}
-          {song.genres ? song.genres[0] : 'Unspecified'}
+          {song.name} - Artist: {song.artists[0]?.name} - Genre: {song.genre ?? 'Unspecified'}
         </Text>
         <Button
           mr={'auto'}

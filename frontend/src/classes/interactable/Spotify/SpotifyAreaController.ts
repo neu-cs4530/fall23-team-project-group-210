@@ -50,9 +50,9 @@ export default class SpotifyAreaController extends InteractableAreaController<
     return this._spotifyAreaModel.queue;
   }
 
-  get savedSongs(): Song[] {
+  public async savedSongs(): Promise<Song[]> {
     if (!this._userName) {
-      this.setUsername();
+      await this.setUsername();
     }
 
     if (this._userName) {
@@ -117,9 +117,8 @@ export default class SpotifyAreaController extends InteractableAreaController<
   }
 
   public async saveSong(song: Song): Promise<void> {
-    console.log(this._userName);
     if (!this._userName) {
-      this.setUsername();
+      await this.setUsername();
     }
     if (this._userName) {
       await this._townController.sendInteractableCommand(this.id, {
@@ -132,7 +131,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
 
   public async refreshSavedSongs(): Promise<void> {
     if (!this._userName) {
-      this.setUsername();
+      await this.setUsername();
     }
     if (this._userName) {
       await this._townController.sendInteractableCommand(this.id, {
@@ -146,7 +145,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
 
   public async removeSong(song: Song): Promise<void> {
     if (!this._userName) {
-      this.setUsername();
+      await this.setUsername();
     }
     if (this._userName) {
       await this._townController.sendInteractableCommand(this.id, {
