@@ -180,7 +180,12 @@ export default class SpotifyAreaController extends InteractableAreaController<
       songAnalytics: await this._getSongAnalytics(item.uri),
     }));
     const out: Song[] = await Promise.all(songs);
-    out.forEach(async song => {
+    this._addGenre(out);
+    return out;
+  }
+
+  private _addGenre(songs: Song[]): void {
+    songs.forEach(async song => {
       const genres =
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -191,7 +196,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
         song.genre = genres[0];
       }
     });
-    return out;
   }
 
   /**
@@ -210,9 +214,6 @@ export default class SpotifyAreaController extends InteractableAreaController<
       throw new Error(
         'Spotify device not provided on sign in or does not have an id. Song will still play for other players',
       );
-    }
-    if (!this._spotifyAPI) {
-      throw new Error('Spotify api not provided');
     }
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyPlaySongCommand',
