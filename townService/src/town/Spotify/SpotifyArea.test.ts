@@ -27,7 +27,14 @@ describe('SpotifyArea', () => {
   beforeEach(() => {
     mockClear(townEmitter);
     testArea = new SpotifyArea(
-      { queue: [], id, occupants: [], currentlyPlaying: undefined, playSong: false },
+      {
+        queue: [],
+        id,
+        occupants: [],
+        currentlyPlaying: undefined,
+        playSong: false,
+        savedSongs: {},
+      },
       testAreaBox,
       townEmitter,
     );
@@ -45,6 +52,7 @@ describe('SpotifyArea', () => {
         currentlyPlaying: undefined,
         playSong: false,
         occupants: [newPlayer.id],
+        savedSongs: {},
         type: 'SpotifyArea',
       });
     });
@@ -70,6 +78,7 @@ describe('SpotifyArea', () => {
         currentlyPlaying: undefined,
         playSong: false,
         occupants: [extraPlayer.id],
+        savedSongs: {},
         type: 'SpotifyArea',
       });
     });
@@ -90,6 +99,7 @@ describe('SpotifyArea', () => {
       currentlyPlaying: undefined,
       playSong: false,
       occupants: [],
+      savedSongs: {},
       type: 'SpotifyArea',
     });
     const testModel = testArea.toModel();
@@ -99,6 +109,7 @@ describe('SpotifyArea', () => {
       type: 'SpotifyArea',
       queue,
       playSong: false,
+      savedSongs: {},
       currentlyPlaying: undefined,
     });
   });
@@ -110,6 +121,7 @@ describe('SpotifyArea', () => {
         occupants: [],
         type: 'SpotifyArea',
         queue,
+        savedSongs: {},
         currentlyPlaying: song,
         playSong: true,
       });
@@ -119,6 +131,7 @@ describe('SpotifyArea', () => {
         occupants: [newPlayer.id],
         type: 'SpotifyArea',
         queue,
+        savedSongs: {},
         playSong: false,
         currentlyPlaying: song,
       });
@@ -129,6 +142,7 @@ describe('SpotifyArea', () => {
         id,
         occupants: [],
         type: 'SpotifyArea',
+        savedSongs: {},
         queue: [],
         currentlyPlaying: undefined,
         playSong: true,
@@ -140,6 +154,7 @@ describe('SpotifyArea', () => {
         type: 'SpotifyArea',
         queue: [],
         playSong: false,
+        savedSongs: {},
         currentlyPlaying: undefined,
       });
 
@@ -171,6 +186,7 @@ describe('SpotifyArea', () => {
       expect(testModel.queue).toEqual([]);
       expect(testModel.currentlyPlaying).toBeUndefined();
       expect(testModel.playSong).toEqual(false);
+      expect(testModel.savedSongs).toEqual({});
       expect(val.occupantsByID).toEqual([]);
     });
   });
