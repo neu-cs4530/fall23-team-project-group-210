@@ -17,7 +17,6 @@ const MOCK_QUEUE: Song[] = [
     uri: 'spotify:track:6rqhFgbbKwnb9MLmUQDhG6',
     name: 'Song 1',
     likes: 10,
-
     comments: [
       {
         id: '1',
