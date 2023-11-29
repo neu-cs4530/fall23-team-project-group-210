@@ -174,7 +174,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
     commentLikeDict,
     queue,
     townController,
-    savedSongs.length,
+    savedSongs?.length,
   ]);
 
   const spotifyButtonTheme = extendTheme({
