@@ -1,6 +1,6 @@
 import TownController from '../../TownController';
 import { SpotifyApi, Device, PartialSearchResult, AudioFeatures } from '@spotify/web-api-ts-sdk';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 } from 'uuid';
 import { Song, SpotifyModel } from '../../../types/CoveyTownSocket';
 import InteractableAreaController, {
   BaseInteractableEventMap,
@@ -51,7 +51,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
 
   public async addSongToQueue(song: Song): Promise<void> {
     const songToAdd: Song = {
-      id: uuidv4(),
+      id: v4(),
       albumUri: song.albumUri,
       uri: song.uri,
       name: song.name,
@@ -60,7 +60,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
       comments: song.comments,
       albumImage: song.albumImage,
       songAnalytics: song.songAnalytics,
-      genres: song.genres,
+      genre: song.genre,
     };
     await this._townController.sendInteractableCommand(this.id, {
       type: 'SpotifyAddSongCommand',
@@ -68,7 +68,7 @@ export default class SpotifyAreaController extends InteractableAreaController<
     });
   }
 
-  public async _getSongAnalytics(uri: string): Promise<AudioFeatures | undefined> {
+  private async _getSongAnalytics(uri: string): Promise<AudioFeatures | undefined> {
     const parts = uri.split(':');
     const id = parts[2];
     return this._spotifyAPI?.tracks.audioFeatures(id);
@@ -126,14 +126,14 @@ export default class SpotifyAreaController extends InteractableAreaController<
     // eslint-disable-next-line prettier/prettier
     const items: Required<Pick<PartialSearchResult, "tracks">> = await this._spotifyAPI.search(searchString, ['track'], undefined, 5);
     const songs: Promise<Song>[] = items.tracks.items.map(async item => ({
-      id: uuidv4(),
+      id: v4(),
       albumUri: item.album.uri,
       uri: item.uri,
       name: item.name,
       artists: item.artists,
       likes: 0,
       comments: [],
-      genres: undefined,
+      genre: undefined,
       albumImage: item.album.images[0],
       songAnalytics: await this._getSongAnalytics(item.uri),
     }));
@@ -144,11 +144,9 @@ export default class SpotifyAreaController extends InteractableAreaController<
         // @ts-ignore
         (await this._spotifyAPI?.search(song.artists[0].name, ['artist']))?.artists?.items[0]
           .genres ?? undefined;
-      if (genres) {
-        for (let i = 0; i < genres.length; i++) {
-          genres[i] = this._capitalizeEveryWord(genres[i]);
-        }
-        song.genres = genres;
+      if (genres && genres.length > 0) {
+        genres[0] = this._capitalizeEveryWord(genres[0]);
+        song.genre = genres[0];
       }
     });
     return out;
