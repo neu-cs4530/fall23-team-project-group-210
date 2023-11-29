@@ -108,8 +108,6 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
         console.error('Error fetching data:', error);
       }
     };
-
-    // Call the async function
     fetchData();
   }, [spotifyAreaController]);
 

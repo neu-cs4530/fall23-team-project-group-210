@@ -16,8 +16,6 @@ import {
 import InteractableArea from '../InteractableArea';
 import SongQueue from './SongQueue';
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: 'AIzaSyAIE5wWApYIghDcv-GQJCtN3_CCJHzlGmg',
   authDomain: 'spotify-819f9.firebaseapp.com',
