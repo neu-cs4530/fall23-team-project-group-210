@@ -10,6 +10,7 @@ import {
   Heading,
   Icon,
   Image,
+  Input,
   InputGroup,
   List,
   Modal,
@@ -29,7 +30,7 @@ import useTownController from '../../../../hooks/useTownController';
 import { InteractableID, Song } from '../../../../types/CoveyTownSocket';
 import SpotifyArea from './SpotifyArea';
 import { AiFillLike, AiOutlineLike, AiFillDislike, AiOutlineDislike } from 'react-icons/ai';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaCommentDots, FaTimes } from 'react-icons/fa';
 
 type SongRating = -1 | 0 | 1;
 
