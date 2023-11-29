@@ -389,19 +389,10 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                 <Icon as={FaCommentDots} mr={2} />
                 Comments
               </Button>
-              {/* Button to save a song */}
-              <Button
-                bg='gray.800'
-                variant='outline'
-                colorScheme='white'
-                onClick={async () => {
-                  await spotifyAreaController.saveSong(song);
-                }}>
-                Save Song
-              </Button>
             </Grid>
           ))}
         </List>
+<<<<<<< HEAD
 
         {/* Modal for reading/writing comments */}
         {selectedSongForCommenting && (
@@ -486,6 +477,9 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                         }}>
                         {commentLikeDict[comment.id] === 1 ? <Icon as={AiFillLike} /> : <Icon as={AiOutlineLike} />}
                       </Button>
+=======
+      </Container>
+>>>>>>> 762d092 (fix: got rid of legacy code)
 
                       {/* Likes Ticker */}
                       <Text>{comment.likes}</Text>
