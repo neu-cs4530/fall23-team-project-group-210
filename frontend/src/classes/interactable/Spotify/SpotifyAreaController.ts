@@ -148,10 +148,12 @@ export default class SpotifyAreaController extends InteractableAreaController<
     });
   }
 
-  private _capitalizeEveryWord(inputString: string): string {
-    return inputString.replace(/\b\w/g, char => char.toUpperCase());
-  }
-
+  /**
+   * Capitalizes every word in the input string
+   *
+   * @param inputString the string to capitalize
+   * @returns the capitalized string
+   */
   private _capitalizeEveryWord(inputString: string): string {
     return inputString.replace(/\b\w/g, char => char.toUpperCase());
   }

@@ -313,12 +313,6 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
   ? undefined
   : CommandType extends SpotifyClearQueueCommand
   ? undefined
-  : CommandType extends SpotifySaveSongCommand
-  ? undefined
-  : CommandType extends SpotifyGetSavedSongsCommand
-  ? undefined
-  : CommandType extends SpotifyRemoveSongCommand
-  ? undefined
   : never;
 
 export type InteractableCommandResponse<MessageType> = {
