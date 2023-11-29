@@ -246,10 +246,7 @@ function SpotifyHubArea({ interactableID }: { interactableID: InteractableID }):
                   <ModalCloseButton />
                   <ModalBody>
                     <Text>
-                      Genre:{' '}
-                      {songForAnalytics?.genres && songForAnalytics.genres.length > 0
-                        ? songForAnalytics.genres[0]
-                        : 'unspecified'}{' '}
+                      Genre: {songForAnalytics?.genre ? songForAnalytics.genre : 'unspecified'}{' '}
                     </Text>
                     <Text>
                       Danceability: {songForAnalytics?.songAnalytics?.danceability ?? 0}/1{' '}
